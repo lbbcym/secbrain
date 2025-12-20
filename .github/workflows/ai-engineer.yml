@@ -51,7 +51,8 @@ jobs:
           
           # Check for TODOs and FIXMEs
           echo "**TODOs and FIXMEs:**" >> analysis.md
-          grep -r "TODO\|FIXME" secbrain --include="*.py" | wc -l >> analysis.md
+          TODO_COUNT=$(grep -r "TODO\|FIXME" secbrain --include="*.py" 2>/dev/null | wc -l || echo "0")
+          echo "$TODO_COUNT items found" >> analysis.md
           echo "" >> analysis.md
           
           cat analysis.md

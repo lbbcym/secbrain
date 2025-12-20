@@ -1,6 +1,8 @@
 version: 2
 updates:
   # Python dependencies - daily security updates
+  # Note: Daily updates are aggressive but necessary for security research/bug bounty work
+  # where staying current with CVE fixes is critical. For production use, consider weekly.
   - package-ecosystem: "pip"
     directory: "/secbrain"
     schedule:

@@ -2,6 +2,9 @@
 """
 Validation script for automated agent suite configuration.
 Checks all workflow files, configuration files, and ensures everything is set up correctly.
+
+Requirements: pyyaml
+Install with: pip install pyyaml
 """
 
 import json
@@ -12,10 +15,9 @@ from typing import List, Tuple
 try:
     import yaml
 except ImportError:
-    print("Installing pyyaml...")
-    import subprocess
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pyyaml", "-q"])
-    import yaml
+    print("❌ Error: pyyaml is not installed.")
+    print("Please install it with: pip install pyyaml")
+    sys.exit(1)
 
 
 def validate_yaml_file(file_path: Path) -> Tuple[bool, str]:

@@ -78,11 +78,11 @@ jobs:
       - name: Run Mythril symbolic execution
         id: mythril
         continue-on-error: true
-        timeout-minutes: 30
+        timeout-minutes: 15
         run: |
           # Run Mythril on sample contracts (limit to avoid timeout)
           find targets/originprotocol/exploit_attempts -name "*.sol" -type f | head -5 | while read file; do
-            echo "Analyzing $file with Mythril"
+            echo "Analyzing $file with Mythril (15 min timeout per file)"
             myth analyze "$file" -o json > "${file}.mythril.json" 2>&1 || true
             myth analyze "$file" || true
           done

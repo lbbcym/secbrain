@@ -101,15 +101,16 @@ repos:
       - id: markdownlint
         args: ['--fix', '--config', '.markdownlint-cli2.yaml']
 
-  # Check for dependency vulnerabilities
+  # Check for dependency vulnerabilities (informational only in pre-commit)
   - repo: local
     hooks:
       - id: safety
-        name: safety check
-        entry: bash -c 'cd secbrain && safety check --json || true'
+        name: safety check (informational)
+        entry: bash -c 'cd secbrain && echo "Running safety check..." && safety check || echo "⚠️  Safety check found issues. Review before committing."'
         language: system
         pass_filenames: false
         files: requirements.*\.txt$|pyproject\.toml$
+        verbose: true
 
 # Configuration for individual hooks
 default_language_version:

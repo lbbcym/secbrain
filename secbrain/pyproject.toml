@@ -59,6 +59,10 @@ line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
+# Comprehensive rule set for security research and bug bounty work
+# Note: This is an aggressive configuration designed for maximum code quality.
+# Some rules may produce noise during development but help catch security issues early.
+# Consider using `# noqa: <rule>` with justification for false positives.
 select = [
     "E",   # pycodestyle errors
     "F",   # pyflakes

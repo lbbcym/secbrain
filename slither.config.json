@@ -11,7 +11,7 @@
   "exclude_medium": false,
   "exclude_high": false,
   "disable_color": false,
-  "filter_paths_regex": ".*/(test|mock|mocks)/.*",
+  "filter_paths_regex": ".*/(test|mocks?)/.*",
   "json": "-",
   "checklist": false,
   "markdown": "-",

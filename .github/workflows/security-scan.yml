@@ -97,7 +97,8 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 state: 'open',
-                labels: labels.join(',')
+                labels: ['security', 'automated-scan', severity].join(','),
+                per_page: 100
               });
               
               const isDuplicate = existingIssues.data.some(issue => 
