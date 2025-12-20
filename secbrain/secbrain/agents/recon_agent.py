@@ -405,7 +405,7 @@ class ReconAgent(BaseAgent):
                                 "forge_build_failed",
                                 contract=contract.name,
                                 profile=profile,
-                                error=stderr[:500] if stderr else "Unknown error",
+                                stderr_msg=stderr[:500] if stderr else "Unknown error",
                             )
                             error_asset = {
                                 "id": f"error-{uuid.uuid4().hex[:8]}",
