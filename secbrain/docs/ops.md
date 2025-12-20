@@ -3,8 +3,10 @@
 ## Installation
 
 ### Prerequisites
+
 - Python 3.11+
 - uv (recommended) or pip
+- Foundry/forge (for on-chain exploit phases)
 
 ### Install with uv
 
@@ -19,6 +21,10 @@ uv sync
 cd secbrain
 pip install -e ".[dev]"
 ```
+
+### Windows note (forge)
+
+- If forge is installed via the Windows installer, run forge commands from PowerShell/CMD (not Git Bash/WSL) or add `C:\Users\<you>\.foundry\bin` to the shell PATH.
 
 ## Configuration
 
@@ -165,6 +171,7 @@ secbrain run \
 ```
 
 Key behaviors:
+
 - Recon extracts contract ABI and function signatures from Foundry build artifacts and attaches to assets for hypothesis generation.
 - Exploit phase runs iterative forge tests with injected attack bodies; stops early once `profit_threshold` (ETH) is met (forked runs).
 - Economic gating in triage marks findings ready_for_report only when decision is PURSUE.
@@ -250,25 +257,25 @@ workspace/
 
 1. **Recon ABI/function extraction**
 
-Open `workspace/phases/recon.json` and confirm each contract asset includes:
+   Open `workspace/phases/recon.json` and confirm each contract asset includes:
 
-- `metadata.abi`
-- `metadata.functions`
+   - `metadata.abi`
+   - `metadata.functions`
 
 2. **Hypotheses have concrete targets**
 
-Open `workspace/phases/hypothesis.json` and confirm:
+   Open `workspace/phases/hypothesis.json` and confirm:
 
-- `data.missing_targets.missing_contract_or_function` is low
-- Each top hypothesis includes `contract_address` and `function_signature`
-- For Foundry targets, hypotheses include `foundry_profile` (used as `FOUNDRY_PROFILE` during `forge test`)
+   - `data.missing_targets.missing_contract_or_function` is low
+   - Each top hypothesis includes `contract_address` and `function_signature`
+   - For Foundry targets, hypotheses include `foundry_profile` (used as `FOUNDRY_PROFILE` during `forge test`)
 
 3. **Exploit loop generated artifacts**
 
-Open `workspace/phases/exploit.json` and confirm:
+   Open `workspace/phases/exploit.json` and confirm:
 
-- `data.attempts_count > 0`
-- `data.attempts` entries have `attempt_index`, and `profit_eth` when successful
+   - `data.attempts_count > 0`
+   - `data.attempts` entries have `attempt_index`, and `profit_eth` when successful
 
 Inspect `workspace/exploit_attempts/**/Exploit.t.sol` and confirm the injected `attack_body` is non-empty.
 
@@ -311,6 +318,7 @@ secbrain run --scope scope.yaml --program program.json --workspace ./test --dry-
 ```
 
 Verify:
+
 1. Logs are created in `workspace/logs/`
 2. Agents are invoked in correct order
 3. No real network calls are made
@@ -357,25 +365,30 @@ async def run_my_tool(
 ## Troubleshooting
 
 ### "Kill-switch activated"
+
 The run was stopped by external signal. Check the kill-switch file or internal error threshold.
 
 ### "Rate limit exceeded"
+
 Reduce concurrency or increase rate limits in `config/tools.yaml`.
 
 ### "Scope violation"
+
 The action target is not in scope.yaml. Review and update scope if needed.
 
 ### "Tool not found"
+
 Check tool paths in `config/tools.yaml` and ensure tools are installed.
 
 ### "API key not set"
+
 Set required environment variables for Perplexity/Gemini.
 
 ## Security Best Practices
 
-1. **Never commit API keys** - Use environment variables
-2. **Review scope carefully** - Ensure targets are in authorized scope
-3. **Start with dry-run** - Validate before real execution
-4. **Monitor logs** - Watch for anomalies during runs
-5. **Use kill-switch** - Be ready to stop at any time
-6. **Review findings** - Human verification before submission
+- **Never commit API keys** - Use environment variables
+- **Review scope carefully** - Ensure targets are in authorized scope
+- **Start with dry-run** - Validate before real execution
+- **Monitor logs** - Watch for anomalies during runs
+- **Use kill-switch** - Be ready to stop at any time
+- **Review findings** - Human verification before submission

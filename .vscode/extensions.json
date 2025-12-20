@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-vscode.powershell",
+        "semgrep.semgrep",
+        "DavidAnson.vscode-markdownlint",
+        "JuanBlanco.solidity",
+        "github.vscode-github-actions"
+    ]
+}

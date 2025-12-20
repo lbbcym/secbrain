@@ -1,5 +1,20 @@
 {
     "python.languageServer": "None",
+    "python.defaultInterpreterPath": "${workspaceFolder}\\\\.venv\\\\Scripts\\\\python.exe",
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "secbrain/tests"
+    ],
+    "python.analysis.typeCheckingMode": "basic",
+    "python.formatting.provider": "none",
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit",
+            "source.fixAll": "explicit"
+        }
+    },
     "semgrep.scan.onlyGitDirty": false,
     "wake.compiler.solc.remappings": [],
     "terminal.integrated.defaultProfile.windows": "PowerShell"
