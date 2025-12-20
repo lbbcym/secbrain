@@ -42,6 +42,12 @@ htmlcov/
 coverage.xml
 .pytest_cache/
 
+# Hypothesis testing cache
+.hypothesis/
+
+# Mutation testing cache
+.mutmut-cache/
+
 # Pre-commit
 .pre-commit-cache/
 
