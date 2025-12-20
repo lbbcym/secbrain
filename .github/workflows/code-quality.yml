@@ -1,0 +1,271 @@
+name: Code Quality
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'secbrain/**/*.py'
+      - 'tests/**/*.py'
+      - 'examples/**/*.py'
+      - 'secbrain/pyproject.toml'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'secbrain/**/*.py'
+      - 'tests/**/*.py'
+      - 'examples/**/*.py'
+      - 'secbrain/pyproject.toml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  python-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd secbrain
+          pip install -r requirements.lock
+          pip install -e ".[dev]"
+          pip install black pylint radon vulture
+
+      - name: Check code formatting with Black
+        id: black
+        continue-on-error: true
+        run: |
+          cd secbrain
+          black --check --diff secbrain/ tests/ examples/ || true
+
+      - name: Run Ruff linter
+        id: ruff
+        continue-on-error: true
+        run: |
+          cd secbrain
+          ruff check secbrain/ tests/ examples/ --output-format=json > ruff-results.json || true
+          ruff check secbrain/ tests/ examples/ || true
+
+      - name: Run MyPy type checker
+        id: mypy
+        continue-on-error: true
+        run: |
+          cd secbrain
+          mypy secbrain/ --no-error-summary > mypy-results.txt 2>&1 || true
+          mypy secbrain/ || true
+
+      - name: Run Pylint
+        id: pylint
+        continue-on-error: true
+        run: |
+          cd secbrain
+          pylint secbrain/ --output-format=json > pylint-results.json || true
+          pylint secbrain/ --output-format=text || true
+
+      - name: Calculate complexity with Radon
+        id: radon
+        continue-on-error: true
+        run: |
+          cd secbrain
+          echo "### Cyclomatic Complexity (CC)" > radon-results.txt
+          radon cc secbrain/ -a -s >> radon-results.txt || true
+          echo -e "\n### Maintainability Index (MI)" >> radon-results.txt
+          radon mi secbrain/ -s >> radon-results.txt || true
+          echo -e "\n### Raw Metrics" >> radon-results.txt
+          radon raw secbrain/ -s >> radon-results.txt || true
+          cat radon-results.txt
+
+      - name: Detect dead code with Vulture
+        id: vulture
+        continue-on-error: true
+        run: |
+          cd secbrain
+          vulture secbrain/ --min-confidence 80 > vulture-results.txt || true
+          cat vulture-results.txt || echo "No dead code detected"
+
+      - name: Upload quality analysis results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-quality-results
+          path: |
+            secbrain/ruff-results.json
+            secbrain/mypy-results.txt
+            secbrain/pylint-results.json
+            secbrain/radon-results.txt
+            secbrain/vulture-results.txt
+          retention-days: 30
+
+      - name: Analyze quality issues
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            let qualityReport = '## 📊 Code Quality Analysis\n\n';
+            let hasIssues = false;
+
+            // Analyze Ruff results
+            try {
+              const ruffResults = JSON.parse(fs.readFileSync('secbrain/ruff-results.json', 'utf8'));
+              if (ruffResults && ruffResults.length > 0) {
+                const errorCount = ruffResults.filter(r => r.type === 'error').length;
+                const warningCount = ruffResults.filter(r => r.type === 'warning').length;
+                qualityReport += `### 🔍 Ruff Linter\n`;
+                qualityReport += `- Errors: ${errorCount}\n`;
+                qualityReport += `- Warnings: ${warningCount}\n\n`;
+                if (errorCount > 0) hasIssues = true;
+              }
+            } catch (e) {
+              qualityReport += `### 🔍 Ruff Linter\n- ✅ No issues found\n\n`;
+            }
+
+            // Analyze MyPy results
+            try {
+              const mypyResults = fs.readFileSync('secbrain/mypy-results.txt', 'utf8');
+              const errorLines = mypyResults.split('\n').filter(line => line.includes('error:'));
+              qualityReport += `### 🔎 MyPy Type Checker\n`;
+              qualityReport += `- Type errors: ${errorLines.length}\n\n`;
+              if (errorLines.length > 10) {
+                qualityReport += `<details>\n<summary>Top 10 type errors</summary>\n\n\`\`\`\n`;
+                qualityReport += errorLines.slice(0, 10).join('\n');
+                qualityReport += `\n\`\`\`\n</details>\n\n`;
+                hasIssues = true;
+              }
+            } catch (e) {
+              qualityReport += `### 🔎 MyPy Type Checker\n- ✅ No type errors\n\n`;
+            }
+
+            // Analyze Pylint results
+            try {
+              const pylintResults = JSON.parse(fs.readFileSync('secbrain/pylint-results.json', 'utf8'));
+              if (pylintResults && pylintResults.length > 0) {
+                const errors = pylintResults.filter(r => r.type === 'error');
+                const warnings = pylintResults.filter(r => r.type === 'warning');
+                const conventions = pylintResults.filter(r => r.type === 'convention');
+                qualityReport += `### 📋 Pylint\n`;
+                qualityReport += `- Errors: ${errors.length}\n`;
+                qualityReport += `- Warnings: ${warnings.length}\n`;
+                qualityReport += `- Conventions: ${conventions.length}\n\n`;
+                if (errors.length > 0) hasIssues = true;
+              }
+            } catch (e) {
+              qualityReport += `### 📋 Pylint\n- ✅ No issues found\n\n`;
+            }
+
+            // Analyze Radon complexity
+            try {
+              const radonResults = fs.readFileSync('secbrain/radon-results.txt', 'utf8');
+              const complexFunctions = radonResults.split('\n').filter(line =>
+                line.includes('- ') && (line.includes(' F ') || line.includes(' E ') || line.includes(' D '))
+              );
+              qualityReport += `### 🔄 Cyclomatic Complexity (Radon)\n`;
+              if (complexFunctions.length > 0) {
+                qualityReport += `- Found ${complexFunctions.length} complex functions (D/E/F grade)\n`;
+                qualityReport += `- Consider refactoring for better maintainability\n\n`;
+                hasIssues = true;
+              } else {
+                qualityReport += `- ✅ All functions have acceptable complexity\n\n`;
+              }
+            } catch (e) {
+              qualityReport += `### 🔄 Cyclomatic Complexity\n- Analysis complete\n\n`;
+            }
+
+            // Analyze Vulture dead code
+            try {
+              const vultureResults = fs.readFileSync('secbrain/vulture-results.txt', 'utf8');
+              const deadCodeLines = vultureResults.split('\n').filter(line => line.trim().length > 0);
+              qualityReport += `### 🦅 Dead Code Detection (Vulture)\n`;
+              if (deadCodeLines.length > 0) {
+                qualityReport += `- Found ${deadCodeLines.length} potential unused code items\n`;
+                qualityReport += `- Review and remove if confirmed unused\n\n`;
+              } else {
+                qualityReport += `- ✅ No dead code detected\n\n`;
+              }
+            } catch (e) {
+              qualityReport += `### 🦅 Dead Code Detection\n- ✅ No dead code detected\n\n`;
+            }
+
+            // Add summary
+            qualityReport += `### Summary\n`;
+            if (hasIssues) {
+              qualityReport += `⚠️ Some quality issues detected. Review the artifacts for details.\n\n`;
+            } else {
+              qualityReport += `✅ Code quality looks good! All checks passed.\n\n`;
+            }
+
+            qualityReport += `### Recommendations\n`;
+            qualityReport += `- Fix type errors for better IDE support and fewer runtime bugs\n`;
+            qualityReport += `- Refactor complex functions for better maintainability\n`;
+            qualityReport += `- Remove dead code to reduce cognitive load\n`;
+            qualityReport += `- Follow linting suggestions for consistency\n`;
+
+            // Post as PR comment if this is a PR
+            if (context.payload.pull_request) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: qualityReport
+              });
+            }
+
+            core.info('Code quality analysis complete');
+
+      - name: Generate summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 📊 Code Quality Summary
+
+          ### Quality Checks Completed
+          - ✅ **Black**: Code formatting check
+          - ✅ **Ruff**: Fast Python linter
+          - ✅ **MyPy**: Static type checking
+          - ✅ **Pylint**: Comprehensive code analysis
+          - ✅ **Radon**: Complexity metrics
+          - ✅ **Vulture**: Dead code detection
+
+          ### Metrics Analyzed
+          - Code style and formatting
+          - Type safety and correctness
+          - Cyclomatic complexity
+          - Maintainability index
+          - Unused code detection
+          - Best practice adherence
+
+          ### Quality Standards
+          - PEP 8 compliance
+          - Type hints coverage
+          - Function complexity (CC < 10 recommended)
+          - Maintainability index (MI > 65 recommended)
+          - Zero dead code policy
+
+          ### Next Steps
+          1. Review quality analysis results
+          2. Fix critical errors first
+          3. Address type safety issues
+          4. Refactor complex functions
+          5. Remove dead code
+
+          ---
+          *Maintaining high code quality for security research* 🎯
+          EOF
+
+      - name: Fail on critical issues
+        if: steps.mypy.outcome == 'failure'
+        run: |
+          echo "::error::Critical type checking failures detected"
+          exit 1

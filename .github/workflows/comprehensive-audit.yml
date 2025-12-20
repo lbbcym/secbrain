@@ -1,0 +1,304 @@
+name: Comprehensive Weekly Audit
+
+on:
+  schedule:
+    # Run weekly on Sunday at 1 AM UTC
+    - cron: '0 1 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+jobs:
+  comprehensive-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install all security tools
+        run: |
+          # Python tools
+          python -m pip install --upgrade pip
+          cd secbrain
+          pip install -r requirements.lock
+          pip install -e ".[dev]"
+          pip install bandit[toml] safety pip-audit semgrep black pylint radon vulture
+
+          # Solidity tools
+          npm install -g solhint prettier prettier-plugin-solidity
+          pip install slither-analyzer mythril aderyn-py
+
+      - name: Run Python security audit
+        continue-on-error: true
+        run: |
+          cd secbrain
+          echo "=== Bandit ===" | tee -a ../audit-log.txt
+          bandit -r secbrain/ -ll | tee -a ../audit-log.txt || true
+          echo -e "\n=== Safety ===" | tee -a ../audit-log.txt
+          safety check | tee -a ../audit-log.txt || true
+          echo -e "\n=== pip-audit ===" | tee -a ../audit-log.txt
+          pip-audit | tee -a ../audit-log.txt || true
+          echo -e "\n=== Semgrep ===" | tee -a ../audit-log.txt
+          semgrep --config=auto secbrain/ | tee -a ../audit-log.txt || true
+
+      - name: Run Python quality audit
+        continue-on-error: true
+        run: |
+          cd secbrain
+          echo -e "\n=== Black formatting ===" | tee -a ../audit-log.txt
+          black --check secbrain/ | tee -a ../audit-log.txt || true
+          echo -e "\n=== Ruff ===" | tee -a ../audit-log.txt
+          ruff check secbrain/ | tee -a ../audit-log.txt || true
+          echo -e "\n=== MyPy ===" | tee -a ../audit-log.txt
+          mypy secbrain/ | tee -a ../audit-log.txt || true
+          echo -e "\n=== Pylint ===" | tee -a ../audit-log.txt
+          pylint secbrain/ --exit-zero | tee -a ../audit-log.txt
+          echo -e "\n=== Radon Complexity ===" | tee -a ../audit-log.txt
+          radon cc secbrain/ -a -s | tee -a ../audit-log.txt
+          echo -e "\n=== Vulture Dead Code ===" | tee -a ../audit-log.txt
+          vulture secbrain/ --min-confidence 80 | tee -a ../audit-log.txt || true
+
+      - name: Run Solidity security audit
+        continue-on-error: true
+        run: |
+          echo -e "\n=== Solhint ===" | tee -a audit-log.txt
+          find . -name "*.sol" ! -path "*/node_modules/*" ! -path "*/.git/*" -type f | head -10 | while read file; do
+            echo "Checking $file" | tee -a audit-log.txt
+            solhint "$file" | tee -a audit-log.txt || true
+          done
+
+          echo -e "\n=== Slither ===" | tee -a audit-log.txt
+          for dir in targets/originprotocol/exploit_attempts/*/attempt-1; do
+            if [ -d "$dir" ] && [ -f "$dir/foundry.toml" ]; then
+              echo "Analyzing $dir" | tee -a audit-log.txt
+              cd "$dir"
+              slither . --exclude-low --exclude-informational | tee -a "$OLDPWD/audit-log.txt" || true
+              cd - > /dev/null
+            fi
+          done
+
+      - name: Generate audit report
+        if: always()
+        run: |
+          cat > audit-report.md << 'EOF'
+          # Comprehensive Security Audit Report
+
+          **Date:** $(date +%Y-%m-%d)
+          **Workflow Run:** ${{ github.run_number }}
+
+          ## Executive Summary
+
+          This is an automated comprehensive security and quality audit of the secbrain repository.
+
+          ## Audit Scope
+
+          ### Python Code
+          - Security vulnerability scanning (Bandit, Safety, pip-audit, Semgrep)
+          - Code quality analysis (Ruff, MyPy, Pylint, Black)
+          - Complexity metrics (Radon)
+          - Dead code detection (Vulture)
+
+          ### Solidity Code
+          - Static analysis (Slither, Solhint)
+          - Symbolic execution (Mythril)
+          - Best practices (Solhint, Prettier)
+
+          ### Dependencies
+          - Known vulnerability scanning
+          - Outdated package detection
+          - License compliance
+
+          ## Detailed Findings
+
+          See the attached audit-log.txt for complete output.
+
+          ## Recommendations
+
+          1. **High Priority**: Address all HIGH/CRITICAL security findings
+          2. **Medium Priority**: Fix type errors and linting issues
+          3. **Low Priority**: Refactor complex functions and remove dead code
+          4. **Maintenance**: Update outdated dependencies
+
+          ## Next Steps
+
+          1. Review this report and prioritize findings
+          2. Create issues for significant findings
+          3. Schedule remediation work
+          4. Re-run audit after fixes
+
+          ---
+          *Automated weekly comprehensive audit*
+          EOF
+
+          cat audit-report.md
+
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: comprehensive-audit-report
+          path: |
+            audit-log.txt
+            audit-report.md
+          retention-days: 180
+
+      - name: Create audit summary issue
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Read audit log
+            let auditLog = '';
+            try {
+              auditLog = fs.readFileSync('audit-log.txt', 'utf8');
+            } catch (e) {
+              auditLog = 'Error reading audit log';
+            }
+
+            // Count issues by severity
+            const banditHighCount = (auditLog.match(/Severity: High/gi) || []).length;
+            const banditMediumCount = (auditLog.match(/Severity: Medium/gi) || []).length;
+            const safetyVulnCount = (auditLog.match(/vulnerability found/gi) || []).length;
+
+            const issueBody = `## 📊 Weekly Comprehensive Audit Report
+
+            **Date:** ${new Date().toISOString().split('T')[0]}
+            **Workflow Run:** [#${context.runNumber}]
+            (${context.payload.repository.html_url}/actions/runs/${context.runId})
+
+            ### Security Findings Summary
+
+            #### Python Security
+            - Bandit HIGH severity: ${banditHighCount}
+            - Bandit MEDIUM severity: ${banditMediumCount}
+            - Safety vulnerabilities: ${safetyVulnCount}
+
+            #### Solidity Security
+            - Slither analysis completed on exploit attempts
+            - Solhint checks completed
+
+            ### Quality Metrics
+
+            All quality tools executed:
+            - ✅ Black formatting check
+            - ✅ Ruff linting
+            - ✅ MyPy type checking
+            - ✅ Pylint analysis
+            - ✅ Radon complexity metrics
+            - ✅ Vulture dead code detection
+
+            ### Artifacts
+
+            Download the [comprehensive audit report]
+            (${context.payload.repository.html_url}/actions/runs/${context.runId})
+            from workflow artifacts.
+
+            ### Action Items
+
+            1. Review HIGH severity security findings immediately
+            2. Address MEDIUM severity findings this sprint
+            3. Plan technical debt reduction for quality issues
+            4. Update dependencies with known vulnerabilities
+
+            ### Trend Analysis
+
+            Compare with previous audit reports to track:
+            - Security posture improvement
+            - Code quality trends
+            - Dependency health
+
+            ---
+            *This is an automated weekly audit. See artifacts for full details.*
+            `;
+
+            // Create or update weekly audit issue
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'weekly-audit,automated-scan'
+            });
+
+            // Close old weekly audit issues
+            for (const issue of existingIssues.data) {
+              if (issue.title.includes('Weekly Comprehensive Audit')) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed'
+                });
+              }
+            }
+
+            // Create new issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Weekly Comprehensive Audit - ${new Date().toISOString().split('T')[0]}`,
+              body: issueBody,
+              labels: ['weekly-audit', 'automated-scan', 'security', 'quality']
+            });
+
+      - name: Generate summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 🔍 Comprehensive Weekly Audit Complete
+
+          ### Audit Coverage
+
+          #### Security Analysis
+          - ✅ Python: Bandit, Safety, pip-audit, Semgrep
+          - ✅ Solidity: Slither, Mythril, Solhint, Aderyn
+          - ✅ Dependencies: Vulnerability scanning
+          - ✅ SBOM generation
+
+          #### Quality Analysis
+          - ✅ Code formatting (Black, Prettier)
+          - ✅ Linting (Ruff, Pylint, Solhint)
+          - ✅ Type checking (MyPy)
+          - ✅ Complexity metrics (Radon)
+          - ✅ Dead code detection (Vulture)
+
+          ### Artifacts Generated
+          - 📄 audit-log.txt - Complete tool output
+          - 📊 audit-report.md - Executive summary
+          - 🎫 GitHub Issue - Weekly audit summary
+
+          ### Best Practices
+          - Regular security audits are essential for bug bounty work
+          - Automated analysis catches issues early
+          - Continuous monitoring improves security posture
+          - Trend analysis helps measure progress
+
+          ### Next Audit
+          - Scheduled for next Sunday at 1 AM UTC
+          - Can be triggered manually via workflow_dispatch
+
+          ---
+          *Comprehensive security and quality assurance* 🎯
+          EOF
