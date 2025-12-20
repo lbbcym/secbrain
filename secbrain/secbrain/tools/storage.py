@@ -6,14 +6,16 @@ import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, LiteralString
 
 try:
-    import aiosqlite  # type: ignore
+    import aiosqlite
 except ModuleNotFoundError:  # pragma: no cover
     aiosqlite = None  # type: ignore[assignment]
 
 if TYPE_CHECKING:
+    import sqlite3
+
     from secbrain.core.context import RunContext
 
 
@@ -30,34 +32,55 @@ class WorkspaceStorage:
 
     def __init__(self, workspace_path: Path | RunContext, run_id: str | None = None):
         if run_id is None and hasattr(workspace_path, "workspace_path"):
-            rc = workspace_path
-            self.workspace_path = rc.workspace_path
-            self.run_id = rc.run_id
+            rc: RunContext = workspace_path  # type: ignore[assignment]
+            self.workspace_path: Path = rc.workspace_path
+            self.run_id: str = rc.run_id
         else:
             if run_id is None:
                 raise TypeError("WorkspaceStorage requires run_id when workspace_path is a Path")
             self.workspace_path = workspace_path  # type: ignore[assignment]
             self.run_id = run_id
-        self.db_path = self.workspace_path / "secbrain.db"
-        self._db: Any | None = None
+        self.db_path: Path = self.workspace_path / "secbrain.db"
+        self._db: Any = None
         self._sqlite_backend: str = "aiosqlite" if aiosqlite is not None else "sqlite3"
 
-    async def _execute(self, sql: str, params: tuple[Any, ...] = ()) -> Any:
+    async def _execute(self, sql: LiteralString, params: tuple[Any, ...] = ()) -> Any:
+        """Execute a SQL query with parameterized values.
+
+        Args:
+            sql: SQL query as a literal string (prevents SQL injection)
+            params: Query parameters to be safely substituted
+
+        Returns:
+            Database cursor with query results
+        """
+        if self._db is None:
+            raise RuntimeError("Database not initialized. Call initialize() first.")
         if self._sqlite_backend == "aiosqlite":
             return await self._db.execute(sql, params)
         return await asyncio.to_thread(self._db.execute, sql, params)
 
-    async def _executescript(self, sql: str) -> None:
+    async def _executescript(self, sql: LiteralString) -> None:
+        """Execute a SQL script (multiple statements).
+
+        Args:
+            sql: SQL script as a literal string (prevents SQL injection)
+        """
+        if self._db is None:
+            raise RuntimeError("Database not initialized. Call initialize() first.")
         if self._sqlite_backend == "aiosqlite":
             await self._db.executescript(sql)
             return
-        return await asyncio.to_thread(self._db.executescript, sql)
+        await asyncio.to_thread(self._db.executescript, sql)
 
     async def _commit(self) -> None:
+        """Commit pending database transactions."""
+        if self._db is None:
+            raise RuntimeError("Database not initialized. Call initialize() first.")
         if self._sqlite_backend == "aiosqlite":
             await self._db.commit()
             return
-        return await asyncio.to_thread(self._db.commit)
+        await asyncio.to_thread(self._db.commit)
 
     async def initialize(self) -> None:
         """Initialize the storage database."""
