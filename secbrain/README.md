@@ -186,10 +186,40 @@ python -m ruff check . --fix
 
 ### Running Tests
 
+SecBrain includes comprehensive testing strategies for maximum code quality and security:
+
 ```bash
 cd secbrain
+
+# Standard unit tests
 python -m pytest tests/ -v
+
+# Property-based tests with Hypothesis
+python -m pytest tests/test_property_based.py -v
+
+# Run with coverage
+python -m pytest tests/ --cov=secbrain --cov-report=term-missing
 ```
+
+For smart contract testing (Foundry):
+
+```bash
+# Quick fuzzing (32 runs)
+FOUNDRY_PROFILE=quick forge test
+
+# Standard fuzzing (256 runs)
+forge test
+
+# CI fuzzing (10,000 runs)
+FOUNDRY_PROFILE=ci forge test
+
+# Run invariant tests
+forge test --match-contract Invariant -vvv
+```
+
+For advanced testing strategies including mutation testing and Echidna fuzzing, see:
+- 📚 [Complete Testing Guide](docs/TESTING-STRATEGIES.md)
+- ⚡ [Quick Reference](docs/TESTING-QUICK-REF.md)
 
 ## TODO
 

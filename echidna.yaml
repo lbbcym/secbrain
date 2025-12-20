@@ -1,0 +1,60 @@
+# Echidna Configuration for SecBrain Smart Contract Fuzzing
+# Echidna is a property-based fuzzer for Ethereum smart contracts
+# Documentation: https://github.com/crytic/echidna
+
+# Test configuration
+testMode: assertion  # assertion, property, optimization, or overflow
+testLimit: 50000     # Number of test sequences to run
+shrinkLimit: 5000    # Number of attempts to shrink a failing test
+seqLen: 100          # Length of each test sequence
+contractAddr: "0x00a329c0648769a73afac7f9381e08fb43dbea72"
+
+# Fuzzing behavior
+coverage: true       # Enable coverage-guided fuzzing
+corpusDir: "corpus"  # Directory to save/load corpus
+seed: null           # Random seed (null for random)
+dictFreq: 0.40      # Frequency of dictionary use
+mutConsts: true     # Mutate constants in the ABI
+
+# Gas and performance
+gasLimit: 12500000  # Gas limit for each transaction
+maxGasprice: 0      # Maximum gas price (0 = unlimited)
+maxTimeDelay: 604800 # Maximum time delay between transactions (1 week)
+maxBlockDelay: 60480 # Maximum block delay between transactions
+
+# Advanced options
+multi-abi: false    # Support multiple ABIs
+returnValues: true  # Return values from Echidna tests
+estimateGas: true   # Estimate gas usage
+balanceContract: 0xffffffff  # Initial balance for the contract
+balanceAddr: 0xffffffff      # Initial balance for test accounts
+cryticArgs: []      # Additional arguments for crytic-compile
+
+# Output configuration
+format: text        # Output format: text, json, none
+quiet: false        # Suppress some output
+timeout: null       # Timeout for the entire fuzzing campaign
+
+# Solver configuration
+solver: z3          # SMT solver to use
+codeSize: 0x6000   # Maximum contract code size
+
+# Function filtering
+prefix: "echidna_"  # Prefix for property testing functions
+deployer: "0x30000" # Address to use as deployer
+sender: ["0x10000", "0x20000", "0x30000"]  # Addresses to use as transaction senders
+
+# Property testing
+checkAsserts: true  # Check assertions
+assertionMode: true # Run in assertion mode
+
+# Additional settings for security testing
+filterBlacklist: true
+filterFunctions: []
+allowFFI: false  # Disable FFI for security
+
+# Coverage settings
+coverageFormats: ["txt", "html", "lcov"]
+
+# Shrinking behavior
+shrinkMode: true
