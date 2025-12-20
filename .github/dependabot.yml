@@ -18,9 +18,7 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       include: "scope"
-    # Auto-merge security updates
-    ignore:
-      # Add packages to ignore updates here if needed
+    # Group security updates together
     groups:
       security-updates:
         patterns:
