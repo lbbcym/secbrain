@@ -1,0 +1,102 @@
+# Example: Copilot Space Integration
+#
+# This is an example workflow showing how AI insights from Copilot Space
+# can be integrated into your CI/CD pipelines.
+#
+# Note: This is a demonstration and requires GitHub Copilot for Business/Enterprise
+
+name: Example - Copilot Insights Integration
+
+on:
+  workflow_run:
+    workflows: ["SecBrain Contract Audit CI", "SOTA Vulnerability Coverage CI"]
+    types:
+      - completed
+
+jobs:
+  analyze-workflow:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion != 'cancelled'
+    
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Generate analysis summary
+        run: |
+          echo "# Workflow Analysis Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow:** ${{ github.event.workflow_run.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ github.event.workflow_run.conclusion }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Run ID:** ${{ github.event.workflow_run.id }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Duration:** ${{ github.event.workflow_run.run_duration_ms }}ms" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## AI Insights Available" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The following AI-powered analyses are available for this workflow run:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 📊 **Test Coverage Analysis** - View gaps and recommendations" >> $GITHUB_STEP_SUMMARY
+          echo "- ⏱️ **Execution Time Analysis** - Identify performance bottlenecks" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 **Failure Pattern Detection** - See recurring issues" >> $GITHUB_STEP_SUMMARY
+          echo "- 💾 **Artifact Optimization** - Reduce storage costs" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Use Copilot Chat with \`@workspace /task <task-name>\` to invoke specific analyses." >> $GITHUB_STEP_SUMMARY
+      
+      - name: Check for alerts
+        if: github.event.workflow_run.conclusion == 'failure'
+        run: |
+          echo "## ⚠️ Workflow Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This workflow run failed. AI analysis can help identify the root cause." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Recommended Actions:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review the failure logs" >> $GITHUB_STEP_SUMMARY
+          echo "2. Check \`.github/copilot/contract-audit-knowledge.md\` for common issues" >> $GITHUB_STEP_SUMMARY
+          echo "3. Use \`@workspace analyze failures\` for AI-powered root cause analysis" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Performance alert
+        run: |
+          # Example: Alert if workflow took longer than expected
+          DURATION_MS=${{ github.event.workflow_run.run_duration_ms }}
+          THRESHOLD_MS=60000  # 60 seconds
+          
+          if [ "$DURATION_MS" -gt "$THRESHOLD_MS" ]; then
+            echo "## ⏰ Performance Alert" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "This workflow took longer than expected ($((DURATION_MS / 1000))s vs $((THRESHOLD_MS / 1000))s threshold)." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Optimization Suggestions:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Use \`@workspace /task analyze-execution-time\` for detailed analysis" >> $GITHUB_STEP_SUMMARY
+            echo "- Review caching configuration" >> $GITHUB_STEP_SUMMARY
+            echo "- Consider job parallelization" >> $GITHUB_STEP_SUMMARY
+          fi
+
+# Notes on actual Copilot Space integration:
+#
+# 1. Automatic Insights
+#    - Copilot Space automatically analyzes workflows based on the configurations
+#      in .github/copilot/space.yml and task files
+#
+# 2. Manual Invocation
+#    - Use GitHub Copilot Chat: @workspace /task analyze-test-coverage
+#    - Provide workflow run ID if analyzing a specific run
+#
+# 3. Custom Integration
+#    - Create custom tasks in .github/copilot/tasks/ for specific analyses
+#    - Reference workflow data using GitHub Actions context
+#
+# 4. AI-Powered Comments
+#    - Copilot can automatically comment on PRs with insights
+#    - Configure notification rules in task files
+#
+# 5. Knowledge Base
+#    - Keep .github/copilot/*.md files updated with latest patterns
+#    - AI uses these for context-aware suggestions

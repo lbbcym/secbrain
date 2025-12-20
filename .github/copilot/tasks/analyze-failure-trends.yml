@@ -1,0 +1,227 @@
+name: Analyze Failure Trends
+description: Identify patterns in workflow failures and suggest preventive measures
+
+trigger:
+  on_workflow_completion:
+    - contract-audit-ci
+    - sota-coverage-ci
+  
+  on_schedule:
+    cron: "0 0 * * 1"  # Weekly analysis every Monday
+
+inputs:
+  workflow_name:
+    description: Name of the workflow to analyze (or 'all' for all workflows)
+    default: "all"
+    required: false
+  
+  time_window_days:
+    description: Number of days of history to analyze
+    default: 30
+    required: false
+  
+  min_failure_rate:
+    description: Minimum failure rate to trigger alert (0-1)
+    default: 0.05
+    required: false
+
+task:
+  steps:
+    - name: Collect failure data
+      action: get_workflow_runs
+      with:
+        workflow: ${{ inputs.workflow_name }}
+        status: 
+          - failed
+          - action_required
+        since: ${{ inputs.time_window_days }} days ago
+    
+    - name: Categorize failures
+      action: analyze_data
+      with:
+        data_source: failed_runs
+        categorize_by:
+          - failure_step
+          - error_message
+          - branch
+          - trigger_type
+          - author
+    
+    - name: Extract error patterns
+      action: ai_analysis
+      prompt: |
+        Analyze the workflow failures and identify:
+        1. Common error messages and their root causes
+        2. Specific steps that fail most frequently
+        3. Correlation between failures and:
+           - Time of day/week
+           - Specific file changes
+           - PR authors or teams
+           - Dependency updates
+           - Branch patterns
+        
+        For each pattern identified:
+        - Explain the likely root cause
+        - Estimate impact (frequency × severity)
+        - Suggest preventive measures
+        - Recommend quick fixes if applicable
+    
+    - name: Calculate failure metrics
+      action: statistical_analysis
+      with:
+        metrics:
+          - overall_failure_rate
+          - failure_rate_by_step
+          - mean_time_to_recovery
+          - failure_clustering
+          - trend_direction
+    
+    - name: Identify high-risk patterns
+      action: pattern_detection
+      with:
+        algorithms:
+          - sequential_pattern_mining
+          - association_rules
+          - time_series_analysis
+        focus:
+          - recurring_failures
+          - cascading_failures
+          - environmental_issues
+    
+    - name: Root cause analysis
+      action: ai_analysis
+      prompt: |
+        For each major failure pattern identified, perform root cause analysis:
+        
+        1. **Immediate cause**: What directly caused the failure?
+        2. **Underlying issues**: What conditions enabled this failure?
+        3. **Contributing factors**: What made it worse or more likely?
+        4. **Preventive measures**: How can we prevent this in the future?
+        5. **Detection improvements**: How can we catch this earlier?
+        
+        Use the 5 Whys technique where appropriate.
+    
+    - name: Generate failure analysis report
+      action: create_summary
+      template: |
+        ## Workflow Failure Trend Analysis
+        ### Period: {{ analysis.period }}
+        ### Workflows Analyzed: {{ analysis.workflows }}
+        
+        ### Executive Summary
+        - Total runs: {{ metrics.total_runs }}
+        - Failed runs: {{ metrics.failed_runs }}
+        - Overall failure rate: {{ metrics.failure_rate }}%
+        - Trend: {{ metrics.trend }}
+        
+        ### Failure Rate by Workflow
+        {{ metrics.by_workflow }}
+        
+        ### Top Failure Causes
+        {{ analysis.top_causes }}
+        
+        ### Failure Patterns Detected
+        {{ patterns.list }}
+        
+        ### Step-by-Step Failure Analysis
+        {{ analysis.by_step }}
+        
+        ### Root Cause Analysis
+        {{ analysis.root_causes }}
+        
+        ### Temporal Patterns
+        {{ patterns.temporal }}
+        
+        ### High-Risk Indicators
+        {{ patterns.risk_indicators }}
+        
+        ### Preventive Recommendations
+        {{ recommendations.preventive }}
+        
+        ### Quick Wins
+        {{ recommendations.quick_fixes }}
+        
+        ### Long-term Improvements
+        {{ recommendations.strategic }}
+
+outputs:
+  overall_failure_rate:
+    description: Percentage of runs that failed
+  
+  top_failure_causes:
+    description: List of most common failure reasons
+  
+  high_risk_patterns:
+    description: Patterns that indicate systemic issues
+  
+  recommendations:
+    description: Prioritized list of preventive measures
+  
+  trend_assessment:
+    description: Whether failures are increasing, stable, or decreasing
+
+success_criteria:
+  - overall_failure_rate <= inputs.min_failure_rate
+  - trend_assessment != "increasing"
+  - no_critical_patterns_detected
+
+notifications:
+  on_high_failure_rate:
+    - 'Create GitHub issue: High Workflow Failure Rate Detected'
+    - Include failure analysis and recommendations
+    - Assign to team lead
+    - 'Labels: critical, ci-cd, needs-attention'
+  
+  on_pattern_detected:
+    - Create discussion with pattern details
+    - Tag relevant team members
+    - Request investigation
+  
+  on_trend_worsening:
+    - Send alert to team channel
+    - Schedule team meeting if severe
+    - Create tracking issue
+
+action_items:
+  # Automatically create action items based on findings
+  auto_create_issues:
+    - condition: failure_rate > 0.15
+      title: "CI Stability: Failure rate above 15%"
+      priority: high
+    
+    - condition: flaky_test_detected
+      title: "Flaky Test: {{ test_name }}"
+      priority: medium
+      labels: ["flaky-test", "testing"]
+    
+    - condition: environment_issue_detected
+      title: "Environment Issue: {{ issue_description }}"
+      priority: high
+      labels: ["infrastructure", "ci-cd"]
+    
+    - condition: dependency_conflict_detected
+      title: "Dependency Conflict: {{ conflict_details }}"
+      priority: medium
+      labels: ["dependencies"]
+
+preventive_checks:
+  # Suggestions for preventing common failures
+  lint_failures:
+    - "Add pre-commit hooks for linting"
+    - "Include ruff check in IDE/editor"
+    - "Document coding standards"
+  
+  dependency_failures:
+    - "Use locked requirements files"
+    - "Enable Dependabot"
+    - "Test dependency updates in isolation"
+  
+  test_failures:
+    - "Improve test isolation"
+    - "Add retry logic for flaky tests"
+    - "Use test fixtures consistently"
+  
+  configuration_failures:
+    - "Validate YAML/JSON in pre-commit"
+    - "Use schema validation"
+    - "Add configuration tests"

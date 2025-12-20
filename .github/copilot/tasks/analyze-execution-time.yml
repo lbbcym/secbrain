@@ -1,0 +1,154 @@
+name: Analyze Execution Time
+description: Track and analyze workflow execution times to identify performance bottlenecks
+
+trigger:
+  on_workflow_completion:
+    - contract-audit-ci
+    - sota-coverage-ci
+
+inputs:
+  workflow_name:
+    description: Name of the workflow to analyze
+    required: true
+  
+  time_window:
+    description: Number of recent runs to analyze
+    default: 30
+    required: false
+  
+  alert_threshold_minutes:
+    description: Alert if execution time exceeds this threshold
+    default: 5
+    required: false
+
+task:
+  steps:
+    - name: Fetch workflow run history
+      action: get_workflow_runs
+      with:
+        workflow: ${{ inputs.workflow_name }}
+        count: ${{ inputs.time_window }}
+        include_timing: true
+    
+    - name: Calculate step timings
+      action: analyze_data
+      with:
+        data_source: workflow_runs
+        analysis_type: execution_time
+        granularity: step_level
+    
+    - name: Identify bottlenecks
+      action: ai_analysis
+      prompt: |
+        Analyze the workflow execution times and identify:
+        1. Steps that take disproportionately long
+        2. Steps with high variability in execution time
+        3. Potential optimization opportunities
+        4. Patterns in slow runs (specific branches, file changes, etc.)
+        
+        Consider:
+        - Dependency installation time
+        - Test execution time
+        - Artifact upload/download time
+        - Setup and teardown overhead
+        
+        Provide specific, actionable recommendations for optimization.
+    
+    - name: Detect anomalies
+      action: statistical_analysis
+      with:
+        metric: execution_time_seconds
+        method: moving_average
+        window_size: 10
+        threshold: 2_standard_deviations
+    
+    - name: Compare with baselines
+      action: compare_metrics
+      with:
+        current: latest_run
+        baseline: 
+          - average_last_30_runs
+          - best_run_ever
+          - same_day_last_week
+    
+    - name: Generate performance report
+      action: create_summary
+      template: |
+        ## Workflow Execution Time Analysis
+        ### Workflow: {{ inputs.workflow_name }}
+        
+        ### Current Performance
+        - Latest run: {{ timing.latest.total }}
+        - Average (last {{ inputs.time_window }} runs): {{ timing.average }}
+        - Best time: {{ timing.best }}
+        - Worst time: {{ timing.worst }}
+        - Status: {{ timing.status }}
+        
+        ### Step-by-Step Breakdown
+        {{ timing.steps_table }}
+        
+        ### Bottleneck Analysis
+        {{ analysis.bottlenecks }}
+        
+        ### Time Trends
+        {{ trends.chart }}
+        - Trend: {{ trends.direction }}
+        - Variance: {{ trends.variance }}
+        
+        ### Optimization Opportunities
+        {{ analysis.optimizations }}
+        
+        ### Anomalies Detected
+        {{ anomalies.list }}
+        
+        ### Recommendations
+        {{ analysis.recommendations }}
+
+outputs:
+  average_execution_time:
+    description: Average execution time across analyzed runs
+  
+  slowest_step:
+    description: The step that takes the most time
+  
+  optimization_suggestions:
+    description: AI-generated optimization recommendations
+  
+  performance_trend:
+    description: Whether performance is improving or degrading
+  
+  anomalies:
+    description: List of detected anomalous runs
+
+success_criteria:
+  - average_execution_time <= inputs.alert_threshold_minutes * 60
+  - no_severe_anomalies_detected
+
+notifications:
+  on_threshold_exceeded:
+    - Create GitHub issue titled "Workflow Performance Degradation"
+    - Include detailed analysis and recommendations
+    - 'Label: performance, ci-cd'
+  
+  on_anomaly:
+    - Add comment to related PR if applicable
+    - Alert team about unusual execution time
+  
+  on_optimization_found:
+    - Create suggestion issue with optimization details
+    - Estimate time savings if implemented
+
+recommendations_engine:
+  # AI-powered suggestions for common scenarios
+  patterns:
+    - condition: step_time > 60 && step_name =~ "Install dependencies"
+      suggestion: "Consider implementing dependency caching or using pre-built containers"
+    
+    - condition: step_time > 30 && step_name =~ "tests"
+      suggestion: "Consider parallelizing test execution or splitting into separate jobs"
+    
+    - condition: variance > 0.3 && step_name =~ "network"
+      suggestion: "High variance suggests network issues - consider retry logic or mirrors"
+    
+    - condition: total_time > alert_threshold && cache_hit_rate < 0.5
+      suggestion: "Low cache hit rate - review cache key configuration and dependencies"

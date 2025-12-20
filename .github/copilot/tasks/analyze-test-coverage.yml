@@ -1,0 +1,104 @@
+name: Analyze Test Coverage
+description: Analyze test coverage metrics from workflow runs and provide actionable insights
+
+trigger:
+  # This task can be invoked manually or automatically after workflow runs
+  on_workflow_completion:
+    - contract-audit-ci
+    - sota-coverage-ci
+
+inputs:
+  workflow_run_id:
+    description: The ID of the workflow run to analyze
+    required: false
+  
+  coverage_threshold:
+    description: Minimum acceptable coverage percentage
+    default: 60
+    required: false
+
+task:
+  # Define the analysis steps
+  steps:
+    - name: Retrieve coverage data
+      action: fetch_workflow_artifacts
+      with:
+        artifact_pattern: "coverage*"
+        workflow_id: ${{ inputs.workflow_run_id }}
+    
+    - name: Parse coverage reports
+      action: analyze_data
+      with:
+        data_source: coverage.xml
+        analysis_type: test_coverage
+    
+    - name: Identify gaps
+      action: ai_analysis
+      prompt: |
+        Analyze the test coverage report and identify:
+        1. Modules or files with coverage below {{ inputs.coverage_threshold }}%
+        2. Critical paths with insufficient coverage
+        3. Untested edge cases or error handling
+        4. Functions/classes with zero coverage
+        
+        Provide:
+        - A prioritized list of areas needing more tests
+        - Specific suggestions for test cases to add
+        - Estimated effort to reach coverage goals
+    
+    - name: Track trends
+      action: compare_metrics
+      with:
+        current_run: ${{ inputs.workflow_run_id }}
+        baseline: previous_runs
+        metric: coverage_percentage
+    
+    - name: Generate report
+      action: create_summary
+      template: |
+        ## Test Coverage Analysis
+        
+        ### Current Status
+        - Overall Coverage: {{ coverage.overall }}%
+        - Change from previous: {{ coverage.delta }}%
+        - Threshold: {{ inputs.coverage_threshold }}%
+        - Status: {{ coverage.status }}
+        
+        ### Coverage by Module
+        {{ coverage.by_module }}
+        
+        ### Areas Needing Attention
+        {{ analysis.low_coverage_areas }}
+        
+        ### Recommendations
+        {{ analysis.recommendations }}
+        
+        ### Trend Analysis
+        {{ trends.chart }}
+        {{ trends.interpretation }}
+
+outputs:
+  coverage_percentage:
+    description: Overall test coverage percentage
+  
+  low_coverage_files:
+    description: List of files below threshold
+  
+  recommendations:
+    description: AI-generated recommendations for improving coverage
+  
+  trend_direction:
+    description: Whether coverage is improving, stable, or declining
+
+success_criteria:
+  - coverage_percentage >= inputs.coverage_threshold
+  - trend_direction != "declining"
+
+notifications:
+  on_failure:
+    - Create GitHub issue with coverage gaps
+    - Notify team in designated channel
+  
+  on_threshold_miss:
+    - Add comment to PR with recommendations
+    - Flag for code review attention

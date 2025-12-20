@@ -1,0 +1,79 @@
+name: SecBrain Audit Workflows
+description: AI-powered workspace for optimizing security audit workflows with insights into test coverage, execution time, and failure trends
+
+# Workspace context and knowledge
+context:
+  focus_areas:
+    - Contract security auditing
+    - Vulnerability coverage analysis
+    - Workflow performance optimization
+    - Test coverage improvement
+    - CI/CD pipeline efficiency
+  
+  key_workflows:
+    - name: contract-audit-ci
+      description: Main contract audit workflow with linting, type checking, and security tests
+      file: .github/workflows/contract-audit-ci.yml
+    - name: sota-coverage-ci
+      description: State-of-the-art vulnerability coverage testing workflow
+      file: .github/workflows/sota-coverage-ci.yml
+  
+  technologies:
+    - Python 3.11+
+    - pytest with coverage
+    - ruff (linter)
+    - mypy (type checker)
+    - Solidity/Foundry (contract testing)
+
+# AI capabilities and tasks
+capabilities:
+  - id: analyze-test-coverage
+    name: Analyze Test Coverage
+    description: Analyze test coverage metrics from workflow runs and provide actionable insights
+    task_file: tasks/analyze-test-coverage.yml
+  
+  - id: analyze-execution-time
+    name: Analyze Execution Time
+    description: Track and analyze workflow execution times to identify performance bottlenecks
+    task_file: tasks/analyze-execution-time.yml
+  
+  - id: analyze-failure-trends
+    name: Analyze Failure Trends
+    description: Identify patterns in workflow failures and suggest preventive measures
+    task_file: tasks/analyze-failure-trends.yml
+  
+  - id: optimize-artifacts
+    name: Optimize Workflow Artifacts
+    description: Review and optimize artifacts generated from audit processes
+    task_file: tasks/optimize-artifacts.yml
+
+# Workspace instructions
+instructions:
+  general: |
+    This workspace focuses on security audit workflows for smart contracts.
+    When working in this space, prioritize:
+    1. Security and correctness over performance
+    2. Comprehensive test coverage (>60%)
+    3. Clean code that passes ruff linting and mypy type checking
+    4. Dry-run testing before actual contract analysis
+  
+  code_review: |
+    When reviewing code changes:
+    - Ensure all security-related tests pass
+    - Verify test coverage meets or exceeds 60%
+    - Check for proper error handling in audit workflows
+    - Validate that dry-run modes work correctly
+  
+  workflow_optimization: |
+    When optimizing workflows:
+    - Cache dependencies appropriately (pip, Python environments)
+    - Parallelize independent jobs where possible
+    - Minimize redundant artifact storage
+    - Use fail-fast strategies for quick feedback
+
+# Knowledge base references
+knowledge_bases:
+  - path: .github/copilot/contract-audit-knowledge.md
+    description: Contract audit workflow patterns and best practices
+  - path: .github/copilot/sota-coverage-knowledge.md
+    description: SOTA coverage testing patterns and optimization strategies
