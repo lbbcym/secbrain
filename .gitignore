@@ -10,3 +10,5 @@ targets/**/instascope/cache/
 targets/**/instascope/lib/
 **/__pycache__/
 *.py[cod]
+pwsh.profile.ps1
+claude-review.*
