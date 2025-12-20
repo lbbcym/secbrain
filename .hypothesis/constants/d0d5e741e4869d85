@@ -1,0 +1,4 @@
+# file: /home/runner/work/secbrain/secbrain/secbrain/secbrain/utils/response_diff.py
+# hypothesis_version: 6.148.7
+
+[0.0, 'added', 'added_keys', 'baseline', 'changed', 'delta', 'entropy', 'error', 'has_diff', 'keywords', 'non-json', 'removed', 'removed_keys', 'size', 'test']
