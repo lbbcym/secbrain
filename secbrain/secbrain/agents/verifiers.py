@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import uuid
 from abc import ABC, abstractmethod
+from typing import Any, Protocol
 from datetime import datetime
 
 from secbrain.core.verification import (
@@ -41,6 +42,35 @@ class ExploitVerifier(ABC):
         test_response,
         trace_id: str,
         verification_method: VerificationMethod,
+        test_passed: bool,
+        confidence_score: float,
+        notes: str | None = None,
+    ) -> EvidenceBundle:
+        payload_hash = hashlib.sha256(payload.encode("utf-8", errors="replace")).hexdigest()
+
+        return EvidenceBundle(
+            evidence_id=str(uuid.uuid4()),
+            trace_id=trace_id,
+            method=str(getattr(test_response, "method", "GET")),
+            url_path=get_url_path(str(getattr(test_response, "url", target_url))),
+            injected_parameter=parameter_name,
+            payload_hash=payload_hash,
+            baseline_response=ResponseFingerprint.from_http_response(baseline_response),
+            test_response=ResponseFingerprint.from_http_response(test_response),
+            verification_method=verification_method,
+            test_passed=test_passed,
+            confidence_score=confidence_score,
+            timestamp=datetime.utcnow(),
+            notes=notes,
+        )
+
+
+class VerificationHttpResponse(Protocol):
+    """Lightweight HTTP response shape for verification routines."""
+
+    text: str | None
+    status_code: int | None
+    duration_ms: float | int | None
         test_passed: bool,
         confidence_score: float,
         notes: str | None = None,
@@ -269,11 +299,10 @@ class SSRFHeuristicVerifier(ExploitVerifier):
         target_url: str,
         parameter_name: str,
         payload: str,
-        baseline_response,
-        test_response,
+        baseline_response: VerificationHttpResponse,
+        test_response: VerificationHttpResponse,
         trace_id: str,
     ) -> VerificationResult:
-        baseline_text = (getattr(baseline_response, "text", "") or "").lower()
         test_text = (getattr(test_response, "text", "") or "").lower()
         baseline_status = int(getattr(baseline_response, "status_code", 0) or 0)
         test_status = int(getattr(test_response, "status_code", 0) or 0)

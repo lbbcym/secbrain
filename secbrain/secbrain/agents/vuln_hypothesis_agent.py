@@ -358,6 +358,10 @@ Output as JSON array ONLY (no markdown, no prose):
 Focus on realistic, Immunefi-grade issues aligned with {protocol_type}. Limit to {profile.budget} hypotheses."""
 
         async with self._contract_llm_sem:
+            precision_keywords = ["share", "rebalance", "mint", "redeem", "deposit", "withdraw", "round", "ceil", "floor"]
+            has_deposit = any("deposit" in fn for fn in lower_functions)
+            has_withdraw = any("withdraw" in fn for fn in lower_functions)
+            has_share = any("share" in fn for fn in lower_functions)
             if "mev_sandwich" not in existing_types:
                 mev_keywords = ["swap", "router", "pair", "pool", "uniswap", "curve", "balancer"]
                 price_keywords = ["price", "reserve", "twap"]
@@ -370,11 +374,7 @@ Focus on realistic, Immunefi-grade issues aligned with {protocol_type}. Limit to
 
 Additional note: The contract contains functions that may be vulnerable to precision errors, such as {', '.join(precision_keywords)}. Please consider this when generating hypotheses."""
 
-            precision_keywords = ["share", "rebalance", "mint", "redeem", "deposit", "withdraw", "round", "ceil", "floor"]
             if "precision_error" not in existing_types:
-                has_deposit = any("deposit" in fn for fn in lower_functions)
-                has_withdraw = any("withdraw" in fn for fn in lower_functions)
-                has_share = any("share" in fn for fn in lower_functions)
                 if has_deposit or has_withdraw or has_share:
                     prompt += f"""
 
@@ -828,7 +828,7 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
         except Exception:
             return False
         conf = hyp.get("confidence")
-        if conf is None or not isinstance(conf, (float, int)):
+        if conf is None or not isinstance(conf, (float | int)):
             return False
         return 0.0 <= float(conf) <= 1.0
 
