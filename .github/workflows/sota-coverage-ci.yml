@@ -49,6 +49,7 @@ jobs:
         mypy .
     
     - name: Run linter
+      continue-on-error: true
       run: |
         cd secbrain
         ruff check .

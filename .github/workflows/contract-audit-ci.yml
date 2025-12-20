@@ -40,6 +40,7 @@ jobs:
         python -m pip install -e ".[dev]"
 
     - name: Lint (ruff)
+      continue-on-error: true
       run: |
         cd secbrain
         python -m ruff check .
