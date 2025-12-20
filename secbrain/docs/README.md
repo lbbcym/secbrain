@@ -24,22 +24,25 @@ For additional documentation, see:
 ## 📂 Documentation Structure
 
 ```
-secbrain/
-├── docs/                       # Core project documentation (you are here)
-│   ├── architecture-updated.md # System architecture
-│   ├── automated-agents.md     # Automated agent suite
-│   ├── ops.md                  # Operations guide
-│   ├── threat_model.md         # Security threat model
-│   └── workflows.md            # Workflow documentation
+secbrain/                           # Repository root
+├── docs/                           # Contributor-focused documentation
+│   ├── TESTING-STRATEGIES.md
+│   ├── GIT_QUICK_START.md
+│   ├── CI_STATUS.md
+│   └── ...
 │
-├── README.md                   # Main project README
+├── secbrain/                       # Main Python package
+│   ├── docs/                       # Core project documentation (you are here)
+│   │   ├── architecture-updated.md # System architecture
+│   │   ├── automated-agents.md     # Automated agent suite
+│   │   ├── ops.md                  # Operations guide
+│   │   ├── threat_model.md         # Security threat model
+│   │   └── workflows.md            # Workflow documentation
+│   │
+│   └── README.md                   # Main project README
 │
-└── (parent directory)
-    └── docs/                   # Contributor-focused documentation
-        ├── TESTING-STRATEGIES.md
-        ├── GIT_QUICK_START.md
-        ├── CI_STATUS.md
-        └── ...
+├── CONTRIBUTING.md
+└── AUTOMATION-QUICK-REF.md
 ```
 
 ---
