@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import uuid
 from abc import ABC, abstractmethod
+from datetime import UTC, datetime
 from typing import Any, Protocol
 from datetime import datetime
 
@@ -60,7 +61,7 @@ class ExploitVerifier(ABC):
             verification_method=verification_method,
             test_passed=test_passed,
             confidence_score=confidence_score,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             notes=notes,
         )
 

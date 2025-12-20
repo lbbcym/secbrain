@@ -217,6 +217,49 @@ python -m pytest tests/ -v
 - [ ] Custom vulnerability template authoring
 - [ ] Team collaboration features
 
+## Contributing
+
+We welcome contributions! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
+
+### For Beginners
+
+- 📖 **Start here**: [Git Quick Start Guide](docs/GIT_QUICK_START.md) - Learn the basics of Git and GitHub
+- 📚 **Full guide**: [Contributing Guide](../CONTRIBUTING.md) - Detailed information about our workflow
+
+### Quick Contribution Flow
+
+```bash
+# 1. Fork and clone the repository
+git clone https://github.com/blairmichaelg/secbrain.git
+cd secbrain
+
+# 2. Create a feature branch
+git checkout -b feature/my-improvement
+
+# 3. Make changes and commit
+git add .
+git commit -m "Add: brief description of changes"
+
+# 4. Push and create PR
+git push -u origin feature/my-improvement
+```
+
+### Current CI Status
+
+Our GitHub Actions CI automatically runs:
+- ✅ **Linting** (ruff) - Code style checks
+- ⚠️ **Type checking** (mypy) - Currently non-blocking while we fix legacy type errors
+- ✅ **Unit tests** - pytest with coverage requirements
+- ✅ **Integration tests** - Dry-run validation
+
+**Note**: Type checking currently has many errors we're working to fix. Your PR won't be blocked by existing type errors, but please don't introduce new ones.
+
+### Need Help?
+
+- Check the [Contributing Guide](../CONTRIBUTING.md) for detailed instructions
+- Open an issue if you have questions
+- Join the discussion in existing PRs
+
 ## License
 
 MIT

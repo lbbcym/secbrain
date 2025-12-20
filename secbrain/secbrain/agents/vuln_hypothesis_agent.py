@@ -358,10 +358,12 @@ Output as JSON array ONLY (no markdown, no prose):
 Focus on realistic, Immunefi-grade issues aligned with {protocol_type}. Limit to {profile.budget} hypotheses."""
 
         async with self._contract_llm_sem:
+            # Define precision-related keywords and checks for use in multiple blocks
             precision_keywords = ["share", "rebalance", "mint", "redeem", "deposit", "withdraw", "round", "ceil", "floor"]
             has_deposit = any("deposit" in fn for fn in lower_functions)
             has_withdraw = any("withdraw" in fn for fn in lower_functions)
             has_share = any("share" in fn for fn in lower_functions)
+
             if "mev_sandwich" not in existing_types:
                 mev_keywords = ["swap", "router", "pair", "pool", "uniswap", "curve", "balancer"]
                 price_keywords = ["price", "reserve", "twap"]

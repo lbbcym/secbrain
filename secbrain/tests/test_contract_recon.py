@@ -56,9 +56,13 @@ class TestContractRecon:
     @pytest.fixture
     def recon_agent(self, mock_run_context):
         """Create a ReconAgent for testing."""
+        # Create a proper mock storage with async methods
+        mock_storage = MagicMock()
+        mock_storage.save_asset = AsyncMock()
+
         agent = ReconAgent(
             run_context=mock_run_context,
-            storage=MagicMock(),
+            storage=mock_storage,
             research_client=MagicMock()
         )
         return agent
@@ -149,7 +153,7 @@ class TestContractRecon:
         # Verify assets show failure status
         assets = result.data["assets"]
         for asset in assets:
-            assert asset["status"] == "compilation_error"
+            assert asset["status"] == "compilation_failed"
             assert "error" in asset["metadata"]
 
     def test_recon_agent_run_with_contracts(self, recon_agent, mock_run_context):
