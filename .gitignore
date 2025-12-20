@@ -5,3 +5,6 @@ secbrain/.env
 secbrain/.env.*
 secbrain/**/.env
 secbrain/**/.env.*
+targets/**/instascope/out/
+targets/**/instascope/cache/
+targets/**/instascope/lib/

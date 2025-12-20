@@ -127,6 +127,13 @@ secbrain/
 └── tests/             # Test suite
 ```
 
+## Instascope bundles (Immunefi)
+
+- Layout per protocol: `targets/<protocol>/instascope/` (Instascope sources: `src/`, `foundry.toml`, `build.sh`, generated `out/`/`cache/`); `targets/<protocol>/workspace/` (SecBrain artifacts: `logs/`, `findings/`, `reports/`, `audit.jsonl`, scope/program files).
+- Fetch/unpack: `python secbrain/scripts/fetch_instascope.py --protocol <name> --source <zip_or_tar>`; add `--build` to run `build.sh` after unpack; add `--force` to overwrite existing.
+- Build: run `forge build` (or `./build.sh`) with cwd `targets/<protocol>/instascope/`. Requires Foundry/forge on PATH and a shell (bash/WSL on Windows).
+- Gitignore: `out/`, `cache/`, `lib/` under `targets/**/instascope` are ignored by default.
+
 ## Safety Controls
 
 1. **Scope Enforcement**: All actions validated against scope.yaml

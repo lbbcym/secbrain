@@ -1,43 +1,41 @@
 {
-  "run_id": "85a9df58",
+  "run_id": "b59e85f0",
   "success": true,
   "phases_completed": [
     "ingest",
     "plan",
     "recon",
     "hypothesis",
-    "exploit",
     "static",
     "triage",
     "report",
     "meta"
   ],
-  "phases_failed": [],
+  "phases_failed": [
+    "exploit"
+  ],
   "findings_count": 0,
   "reports_generated": 0,
-  "duration_seconds": 794.019976,
-  "errors": [],
+  "duration_seconds": 0.080616,
+  "errors": [
+    "No hypotheses to test"
+  ],
   "economic": {
     "decision": "SKIP",
-    "max_profit_eth": 0.0,
-    "max_profit_usd": 0.0,
-    "gas_used": null,
-    "gas_cost_usd_est": 0,
-    "net_usd_est": 0.0,
-    "threshold_eth": 0.1,
-    "threshold_usd": 300
+    "reason": "no_attempts",
+    "max_profit_eth": 0.0
   },
-  "attempts_count": 15,
+  "attempts_count": 0,
   "meta_metrics": {
-    "hypotheses_count": 7,
-    "hypotheses_with_concrete_target": 6,
+    "hypotheses_count": 0,
+    "hypotheses_with_concrete_target": 0,
     "missing_targets": {
-      "missing_contract_or_function": 1,
-      "total_hypotheses": 7
+      "missing_contract_or_function": 0,
+      "total_hypotheses": 0
     },
-    "attempts_count": 15,
+    "attempts_count": 0,
     "attempts_with_profit": 0,
     "economic_decision": "SKIP",
-    "total_duration_seconds": 794.019976
+    "total_duration_seconds": 0.080616
   }
 }
