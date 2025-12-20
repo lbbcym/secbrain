@@ -7,7 +7,6 @@ import json
 import os
 import re
 import shlex
-import hashlib
 import textwrap
 import tomllib
 from dataclasses import asdict, dataclass

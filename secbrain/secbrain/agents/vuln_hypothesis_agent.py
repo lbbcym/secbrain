@@ -370,8 +370,8 @@ Focus on realistic, Immunefi-grade issues aligned with {protocol_type}. Limit to
 
 Additional note: The contract contains functions that may be vulnerable to precision errors, such as {', '.join(precision_keywords)}. Please consider this when generating hypotheses."""
 
+            precision_keywords = ["share", "rebalance", "mint", "redeem", "deposit", "withdraw", "round", "ceil", "floor"]
             if "precision_error" not in existing_types:
-                precision_keywords = ["share", "rebalance", "mint", "redeem", "deposit", "withdraw", "round", "ceil", "floor"]
                 has_deposit = any("deposit" in fn for fn in lower_functions)
                 has_withdraw = any("withdraw" in fn for fn in lower_functions)
                 has_share = any("share" in fn for fn in lower_functions)

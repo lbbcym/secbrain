@@ -315,7 +315,7 @@ class ReconAgent(BaseAgent):
                 try:
                     env = os.environ.copy()
                     env["FOUNDRY_PROFILE"] = profile
-                    
+
                     proc = await asyncio.create_subprocess_exec(
                         "forge", "build",
                         cwd=foundry_root,
@@ -323,7 +323,7 @@ class ReconAgent(BaseAgent):
                         stdout=asyncio.subprocess.PIPE,
                         stderr=asyncio.subprocess.PIPE,
                     )
-                    
+
                     try:
                         stdout_bytes, stderr_bytes = await asyncio.wait_for(
                             proc.communicate(),
@@ -332,7 +332,7 @@ class ReconAgent(BaseAgent):
                         stdout = stdout_bytes.decode()
                         stderr = stderr_bytes.decode()
                         return_code = proc.returncode
-                        
+
                         if return_code == 0:
                             solc_version = None
                             try:
@@ -343,10 +343,10 @@ class ReconAgent(BaseAgent):
                                 )
                             except Exception:
                                 solc_version = None
-                            
+
                             abi, functions = self._extract_contract_metadata(foundry_root, contract.name)
                             classification = self._classify_contract(contract.name, functions)
-                            
+
                             asset = {
                                 "type": "contract",
                                 "value": contract.address,
@@ -364,10 +364,10 @@ class ReconAgent(BaseAgent):
                                     "classification": classification,
                                 },
                             }
-                            
+
                             if self.storage:
                                 await self.storage.save_asset(asset)
-                            
+
                             return {"killed": False, "assets": [asset], "compiled": True, "address": contract.address}
                         else:
                             error_asset = {
@@ -385,8 +385,8 @@ class ReconAgent(BaseAgent):
                             if self.storage:
                                 await self.storage.save_asset(error_asset)
                             return {"killed": False, "assets": [error_asset], "compiled": False}
-                            
-                    except asyncio.TimeoutError:
+
+                    except TimeoutError:
                         error_asset = {
                             "id": f"error-{uuid.uuid4().hex[:8]}",
                             "type": "compilation_error",
