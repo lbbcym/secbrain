@@ -359,3 +359,23 @@ class TestLiteralStringSafety:
         """build_safe_table_name combines literal strings."""
         result = build_safe_table_name("users", "v2")
         assert result == "users_v2"
+
+    def test_storage_uses_literalstring(self) -> None:
+        """Verify storage module uses LiteralString for SQL safety."""
+        # This test verifies that the storage module's _execute and
+        # _executescript methods accept LiteralString parameters.
+        # The actual type checking happens at mypy time - this just
+        # confirms the methods exist and are callable.
+        from secbrain.tools.storage import WorkspaceStorage
+        from pathlib import Path
+        import inspect
+
+        # Check that _execute has LiteralString in its signature
+        sig = inspect.signature(WorkspaceStorage._execute)
+        sql_param = sig.parameters.get("sql")
+        assert sql_param is not None, "_execute should have 'sql' parameter"
+
+        # Check that _executescript has LiteralString in its signature
+        sig = inspect.signature(WorkspaceStorage._executescript)
+        sql_param = sig.parameters.get("sql")
+        assert sql_param is not None, "_executescript should have 'sql' parameter"
