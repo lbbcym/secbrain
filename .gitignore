@@ -12,3 +12,49 @@ targets/**/instascope/lib/
 *.py[cod]
 pwsh.profile.ps1
 claude-review.*
+
+# Automated agent suite artifacts
+*.json.bak
+*-results.json
+*-results.txt
+audit-log.txt
+audit-report.md
+bandit-results.json
+safety-results.json
+pip-audit-results.json
+semgrep-results.json
+solhint-results.json
+slither-output.json
+*.mythril.json
+aderyn-report.md
+ruff-results.json
+mypy-results.txt
+pylint-results.json
+radon-results.txt
+vulture-results.txt
+outdated-packages.json
+pip-audit-sbom.json
+npm-audit-results.json
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+.pytest_cache/
+
+# Pre-commit
+.pre-commit-cache/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+*.whl
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
