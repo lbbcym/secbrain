@@ -81,21 +81,21 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
+
             async function createDependencyIssue(title, body, severity, labels = []) {
               const allLabels = ['dependencies', 'security', 'automated-scan', severity, ...labels];
-              
+
               const existingIssues = await github.rest.issues.listForRepo({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 state: 'open',
                 labels: 'dependencies,security'
               });
-              
-              const isDuplicate = existingIssues.data.some(issue => 
+
+              const isDuplicate = existingIssues.data.some(issue =>
                 issue.title.includes(title.substring(0, 40))
               );
-              
+
               if (!isDuplicate) {
                 await github.rest.issues.create({
                   owner: context.repo.owner,
@@ -106,7 +106,7 @@ jobs:
                 });
               }
             }
-            
+
             // Parse pip-audit results
             try {
               const pipAuditResults = JSON.parse(fs.readFileSync('secbrain/pip-audit-results.json', 'utf8'));
@@ -115,11 +115,11 @@ jobs:
                   // Check if any alias has CVSS score >= 7.0
                   return v.aliases && v.aliases.some(a => a.includes('CVE'));
                 });
-                
+
                 if (critical.length > 0) {
                   const body = `## Critical Dependency Vulnerabilities (pip-audit)\n\n` +
                     `Found ${critical.length} critical vulnerabilities:\n\n` +
-                    critical.slice(0, 10).map(v => 
+                    critical.slice(0, 10).map(v =>
                       `- **${v.package}** ${v.version}\n` +
                       `  - ID: ${v.id}\n` +
                       `  - Fix version: ${v.fix_versions ? v.fix_versions.join(', ') : 'N/A'}\n` +
@@ -128,7 +128,7 @@ jobs:
                     ).join('\n\n') +
                     `\n\n### Remediation\n` +
                     `Update affected packages to the fix versions listed above.`;
-                  
+
                   await createDependencyIssue(
                     'Critical vulnerabilities in Python dependencies',
                     body,
@@ -140,25 +140,25 @@ jobs:
             } catch (e) {
               console.log('No pip-audit results or error parsing:', e.message);
             }
-            
+
             // Parse Safety results
             try {
               const safetyResults = JSON.parse(fs.readFileSync('secbrain/safety-results.json', 'utf8'));
               if (safetyResults.vulnerabilities && safetyResults.vulnerabilities.length > 0) {
-                const highPriority = safetyResults.vulnerabilities.filter(v => 
+                const highPriority = safetyResults.vulnerabilities.filter(v =>
                   v.severity && (v.severity.toLowerCase() === 'high' || v.severity.toLowerCase() === 'critical')
                 );
-                
+
                 if (highPriority.length > 0) {
                   const body = `## High Priority Dependency Vulnerabilities (Safety)\n\n` +
                     `Found ${highPriority.length} high/critical severity vulnerabilities:\n\n` +
-                    highPriority.map(v => 
+                    highPriority.map(v =>
                       `- **${v.package}** ${v.installed_version}\n` +
                       `  - CVE/ID: ${v.vulnerability_id}\n` +
                       `  - Severity: ${v.severity || 'Unknown'}\n` +
                       `  - ${v.advisory}`
                     ).join('\n\n');
-                  
+
                   await createDependencyIssue(
                     'High priority vulnerabilities in dependencies',
                     body,
@@ -170,20 +170,20 @@ jobs:
             } catch (e) {
               console.log('No Safety results or error parsing:', e.message);
             }
-            
+
             // Parse outdated packages
             try {
               const outdatedPackages = JSON.parse(fs.readFileSync('secbrain/outdated-packages.json', 'utf8'));
               if (outdatedPackages && outdatedPackages.length > 10) {
                 const body = `## Outdated Python Packages\n\n` +
                   `Found ${outdatedPackages.length} outdated packages. Top 10:\n\n` +
-                  outdatedPackages.slice(0, 10).map(p => 
+                  outdatedPackages.slice(0, 10).map(p =>
                     `- **${p.name}**: ${p.version} → ${p.latest_version} (${p.latest_filetype})`
                   ).join('\n') +
                   `\n\n### Recommendation\n` +
                   `Consider updating packages to latest versions for bug fixes and improvements. ` +
                   `Review changelogs before updating to avoid breaking changes.`;
-                
+
                 await createDependencyIssue(
                   'Many outdated Python packages detected',
                   body,
@@ -194,7 +194,7 @@ jobs:
             } catch (e) {
               console.log('No outdated packages results or error parsing:', e.message);
             }
-            
+
             core.info('Dependency audit analysis complete');
 
       - name: Generate summary
@@ -202,31 +202,31 @@ jobs:
         run: |
           cat >> $GITHUB_STEP_SUMMARY << 'EOF'
           ## 📦 Dependency Audit Summary
-          
+
           ### Audits Completed
           - ✅ **pip-audit**: CVE/vulnerability scanning
           - ✅ **Safety**: Known vulnerability database check
           - ✅ **Outdated packages**: Version update check
           - ✅ **SBOM generated**: Software Bill of Materials
-          
+
           ### Security Posture
           - All Python dependencies scanned against known CVE databases
           - Results uploaded as artifacts for review
           - Issues created for CRITICAL/HIGH severity findings
-          
+
           ### Best Practices
           - Keep dependencies up to date
           - Review security advisories regularly
           - Pin versions in production
           - Use lock files (requirements.lock)
           - Monitor for new vulnerabilities
-          
+
           ### Next Steps
           1. Review any created issues immediately
           2. Update vulnerable dependencies
           3. Test updates in development before deploying
           4. Consider automated dependency updates via Dependabot
-          
+
           ---
           *Automated dependency security for bug bounty focus* 🎯
           EOF

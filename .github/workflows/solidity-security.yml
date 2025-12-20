@@ -128,21 +128,21 @@ jobs:
           script: |
             const fs = require('fs');
             const { execSync } = require('child_process');
-            
+
             async function createSecurityIssue(title, body, severity) {
               const labels = ['security', 'solidity', 'automated-scan', severity];
-              
+
               const existingIssues = await github.rest.issues.listForRepo({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 state: 'open',
                 labels: labels.slice(0, 3).join(',')
               });
-              
-              const isDuplicate = existingIssues.data.some(issue => 
+
+              const isDuplicate = existingIssues.data.some(issue =>
                 issue.title.includes(title.substring(0, 40))
               );
-              
+
               if (!isDuplicate) {
                 await github.rest.issues.create({
                   owner: context.repo.owner,
@@ -153,19 +153,19 @@ jobs:
                 });
               }
             }
-            
+
             // Parse Solhint results
             try {
               if (fs.existsSync('solhint-results.json')) {
                 const solhintResults = JSON.parse(fs.readFileSync('solhint-results.json', 'utf8'));
                 const errors = solhintResults.filter(r => r.severity === 2); // errors
                 const warnings = solhintResults.filter(r => r.severity === 1); // warnings
-                
+
                 if (errors.length > 0) {
                   const body = `## Solhint Security Findings\n\n` +
                     `Found ${errors.length} errors and ${warnings.length} warnings:\n\n` +
                     `### Errors\n` +
-                    errors.slice(0, 10).map(e => 
+                    errors.slice(0, 10).map(e =>
                       `- **${e.ruleId}**: ${e.message}\n  - File: ${e.filePath}:${e.line}:${e.column}`
                     ).join('\n\n');
                   await createSecurityIssue('Solhint found critical issues', body, 'medium-severity');
@@ -174,23 +174,23 @@ jobs:
             } catch (e) {
               console.log('No Solhint results or error parsing:', e.message);
             }
-            
+
             // Look for Slither high/medium severity issues
             try {
               const slitherFiles = execSync('find . -name "slither-output.json" -type f', { encoding: 'utf8' })
                 .trim().split('\n').filter(f => f);
-              
+
               for (const file of slitherFiles) {
                 const slitherResults = JSON.parse(fs.readFileSync(file, 'utf8'));
                 if (slitherResults.results && slitherResults.results.detectors) {
-                  const highImpact = slitherResults.results.detectors.filter(d => 
+                  const highImpact = slitherResults.results.detectors.filter(d =>
                     d.impact === 'High' || d.impact === 'Medium'
                   );
-                  
+
                   if (highImpact.length > 0) {
                     const body = `## Slither Security Findings\n\n` +
                       `Found ${highImpact.length} high/medium impact issues in ${file}:\n\n` +
-                      highImpact.slice(0, 5).map(d => 
+                      highImpact.slice(0, 5).map(d =>
                         `- **${d.check}** (${d.impact} impact, ${d.confidence} confidence)\n  - ${d.description}`
                       ).join('\n\n');
                     await createSecurityIssue(`Slither found vulnerabilities in ${file}`, body, 'high-severity');
@@ -200,7 +200,7 @@ jobs:
             } catch (e) {
               console.log('No Slither results or error parsing:', e.message);
             }
-            
+
             core.info('Solidity security analysis complete');
 
       - name: Generate summary
@@ -208,14 +208,14 @@ jobs:
         run: |
           cat >> $GITHUB_STEP_SUMMARY << 'EOF'
           ## 🔐 Solidity Security Analysis Summary
-          
+
           ### Analysis Tools Run
           - ✅ **Solhint**: Linting and security best practices
           - ✅ **Slither**: Static analysis for vulnerabilities
           - ✅ **Mythril**: Symbolic execution analysis
           - ✅ **Aderyn**: Rust-based static analyzer
           - ✅ **Prettier**: Code formatting check
-          
+
           ### Vulnerability Categories Checked
           - ♻️ Reentrancy vulnerabilities
           - 🔢 Integer overflow/underflow
@@ -224,19 +224,19 @@ jobs:
           - ⚡ Gas optimization issues
           - 🎯 Delegatecall to untrusted contracts
           - 🔓 Unprotected functions
-          
+
           ### Actions Taken
           - Analysis results uploaded as artifacts
           - Issues created for HIGH/MEDIUM severity findings
           - All results available in workflow artifacts
-          
+
           ### Smart Contract Security Best Practices
           - Follow Checks-Effects-Interactions pattern
           - Use ReentrancyGuard for external calls
           - Validate all inputs and access controls
           - Use SafeMath or Solidity 0.8+ for arithmetic
           - Avoid delegatecall to user-supplied addresses
-          
+
           ---
           *Comprehensive Solidity security analysis for bug bounty research* 🎯
           EOF

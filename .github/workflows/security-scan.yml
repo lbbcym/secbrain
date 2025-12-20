@@ -87,11 +87,11 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // Helper to create issue for findings
             async function createSecurityIssue(title, body, severity) {
               const labels = ['security', 'automated-scan', severity];
-              
+
               // Check if similar issue exists
               const existingIssues = await github.rest.issues.listForRepo({
                 owner: context.repo.owner,
@@ -100,11 +100,11 @@ jobs:
                 labels: ['security', 'automated-scan', severity].join(','),
                 per_page: 100
               });
-              
-              const isDuplicate = existingIssues.data.some(issue => 
+
+              const isDuplicate = existingIssues.data.some(issue =>
                 issue.title.includes(title.substring(0, 50))
               );
-              
+
               if (!isDuplicate) {
                 await github.rest.issues.create({
                   owner: context.repo.owner,
@@ -115,7 +115,7 @@ jobs:
                 });
               }
             }
-            
+
             // Parse Bandit results
             try {
               const banditResults = JSON.parse(fs.readFileSync('secbrain/bandit-results.json', 'utf8'));
@@ -124,8 +124,11 @@ jobs:
                 if (highSeverity.length > 0) {
                   const body = `## Bandit Security Findings\n\n` +
                     `Found ${highSeverity.length} HIGH severity issues:\n\n` +
-                    highSeverity.map(r => 
-                      `- **${r.test_id}**: ${r.issue_text}\n  - File: ${r.filename}:${r.line_number}\n  - Severity: ${r.issue_severity}\n  - Confidence: ${r.issue_confidence}`
+                    highSeverity.map(r =>
+                      `- **${r.test_id}**: ${r.issue_text}\n` +
+                      `  - File: ${r.filename}:${r.line_number}\n` +
+                      `  - Severity: ${r.issue_severity}\n` +
+                      `  - Confidence: ${r.issue_confidence}`
                     ).join('\n\n');
                   await createSecurityIssue('Bandit found HIGH severity vulnerabilities', body, 'high-severity');
                 }
@@ -133,14 +136,14 @@ jobs:
             } catch (e) {
               console.log('No Bandit results or error parsing:', e.message);
             }
-            
+
             // Parse Safety results
             try {
               const safetyResults = JSON.parse(fs.readFileSync('secbrain/safety-results.json', 'utf8'));
               if (safetyResults.vulnerabilities && safetyResults.vulnerabilities.length > 0) {
                 const body = `## Dependency Vulnerabilities (Safety)\n\n` +
                   `Found ${safetyResults.vulnerabilities.length} vulnerable dependencies:\n\n` +
-                  safetyResults.vulnerabilities.map(v => 
+                  safetyResults.vulnerabilities.map(v =>
                     `- **${v.package}** ${v.installed_version}\n  - CVE: ${v.vulnerability_id}\n  - ${v.advisory}`
                   ).join('\n\n');
                 await createSecurityIssue('Vulnerable dependencies found', body, 'high-severity');
@@ -148,7 +151,7 @@ jobs:
             } catch (e) {
               console.log('No Safety results or error parsing:', e.message);
             }
-            
+
             core.info('Security scan analysis complete');
 
       - name: Generate summary
@@ -156,23 +159,23 @@ jobs:
         run: |
           cat >> $GITHUB_STEP_SUMMARY << 'EOF'
           ## 🔒 Security Scan Summary
-          
+
           ### Scans Completed
           - ✅ **Bandit**: Python code vulnerability detection
           - ✅ **Safety**: Dependency vulnerability scanning
           - ✅ **pip-audit**: Known vulnerability scanning
           - ✅ **Semgrep**: Custom security pattern matching
-          
+
           ### Actions Taken
           - Security scan results uploaded as artifacts
           - Issues created for HIGH severity findings
           - All results available in workflow artifacts
-          
+
           ### Next Steps
           1. Review any created issues
           2. Address HIGH severity findings immediately
           3. Plan remediation for MEDIUM/LOW findings
-          
+
           ---
           *Automated security scanning for bug bounty focus* 🎯
           EOF

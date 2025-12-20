@@ -113,10 +113,10 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
+
             let qualityReport = '## 📊 Code Quality Analysis\n\n';
             let hasIssues = false;
-            
+
             // Analyze Ruff results
             try {
               const ruffResults = JSON.parse(fs.readFileSync('secbrain/ruff-results.json', 'utf8'));
@@ -131,7 +131,7 @@ jobs:
             } catch (e) {
               qualityReport += `### 🔍 Ruff Linter\n- ✅ No issues found\n\n`;
             }
-            
+
             // Analyze MyPy results
             try {
               const mypyResults = fs.readFileSync('secbrain/mypy-results.txt', 'utf8');
@@ -147,7 +147,7 @@ jobs:
             } catch (e) {
               qualityReport += `### 🔎 MyPy Type Checker\n- ✅ No type errors\n\n`;
             }
-            
+
             // Analyze Pylint results
             try {
               const pylintResults = JSON.parse(fs.readFileSync('secbrain/pylint-results.json', 'utf8'));
@@ -164,11 +164,11 @@ jobs:
             } catch (e) {
               qualityReport += `### 📋 Pylint\n- ✅ No issues found\n\n`;
             }
-            
+
             // Analyze Radon complexity
             try {
               const radonResults = fs.readFileSync('secbrain/radon-results.txt', 'utf8');
-              const complexFunctions = radonResults.split('\n').filter(line => 
+              const complexFunctions = radonResults.split('\n').filter(line =>
                 line.includes('- ') && (line.includes(' F ') || line.includes(' E ') || line.includes(' D '))
               );
               qualityReport += `### 🔄 Cyclomatic Complexity (Radon)\n`;
@@ -182,7 +182,7 @@ jobs:
             } catch (e) {
               qualityReport += `### 🔄 Cyclomatic Complexity\n- Analysis complete\n\n`;
             }
-            
+
             // Analyze Vulture dead code
             try {
               const vultureResults = fs.readFileSync('secbrain/vulture-results.txt', 'utf8');
@@ -197,7 +197,7 @@ jobs:
             } catch (e) {
               qualityReport += `### 🦅 Dead Code Detection\n- ✅ No dead code detected\n\n`;
             }
-            
+
             // Add summary
             qualityReport += `### Summary\n`;
             if (hasIssues) {
@@ -205,13 +205,13 @@ jobs:
             } else {
               qualityReport += `✅ Code quality looks good! All checks passed.\n\n`;
             }
-            
+
             qualityReport += `### Recommendations\n`;
             qualityReport += `- Fix type errors for better IDE support and fewer runtime bugs\n`;
             qualityReport += `- Refactor complex functions for better maintainability\n`;
             qualityReport += `- Remove dead code to reduce cognitive load\n`;
             qualityReport += `- Follow linting suggestions for consistency\n`;
-            
+
             // Post as PR comment if this is a PR
             if (context.payload.pull_request) {
               await github.rest.issues.createComment({
@@ -221,7 +221,7 @@ jobs:
                 body: qualityReport
               });
             }
-            
+
             core.info('Code quality analysis complete');
 
       - name: Generate summary
@@ -229,7 +229,7 @@ jobs:
         run: |
           cat >> $GITHUB_STEP_SUMMARY << 'EOF'
           ## 📊 Code Quality Summary
-          
+
           ### Quality Checks Completed
           - ✅ **Black**: Code formatting check
           - ✅ **Ruff**: Fast Python linter
@@ -237,7 +237,7 @@ jobs:
           - ✅ **Pylint**: Comprehensive code analysis
           - ✅ **Radon**: Complexity metrics
           - ✅ **Vulture**: Dead code detection
-          
+
           ### Metrics Analyzed
           - Code style and formatting
           - Type safety and correctness
@@ -245,21 +245,21 @@ jobs:
           - Maintainability index
           - Unused code detection
           - Best practice adherence
-          
+
           ### Quality Standards
           - PEP 8 compliance
           - Type hints coverage
           - Function complexity (CC < 10 recommended)
           - Maintainability index (MI > 65 recommended)
           - Zero dead code policy
-          
+
           ### Next Steps
           1. Review quality analysis results
           2. Fix critical errors first
           3. Address type safety issues
           4. Refactor complex functions
           5. Remove dead code
-          
+
           ---
           *Maintaining high code quality for security research* 🎯
           EOF
