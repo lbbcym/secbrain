@@ -1,18 +1,48 @@
-# 📚 Git & Contribution Documentation Index
+# 📚 SecBrain Documentation Index
 
-Welcome! This directory contains all the guides you need to contribute to this project and understand Git/GitHub.
+Welcome! This directory contains comprehensive guides for contributing to SecBrain and understanding its various components.
 
-## 🎯 Start Here
+## 🗂️ Documentation Overview
 
-**New to Git?** → Start with [SUMMARY.md](SUMMARY.md)
+This docs directory contains contributor-focused guides. For core project documentation (architecture, workflows, operations), see [secbrain/docs/](../secbrain/docs/).
 
-**Need quick reference?** → Go to [GIT_QUICK_START.md](GIT_QUICK_START.md)
+## 🎯 Quick Navigation
 
-**Want full details?** → Read [../CONTRIBUTING.md](../CONTRIBUTING.md)
+| Topic | Guide |
+|-------|-------|
+| **New to Git?** | [SUMMARY.md](SUMMARY.md) |
+| **Quick Git reference** | [GIT_QUICK_START.md](GIT_QUICK_START.md) |
+| **Contributing workflow** | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
+| **CI/CD status** | [CI_STATUS.md](CI_STATUS.md) |
+| **Testing strategies** | [TESTING-STRATEGIES.md](TESTING-STRATEGIES.md) |
+| **Security patterns** | [SOLIDITY_SECURITY_PATTERNS.md](SOLIDITY_SECURITY_PATTERNS.md) |
+| **SBOM & supply chain** | [SBOM-SECURITY.md](SBOM-SECURITY.md) |
+| **Gas optimizations** | [GAS_OPTIMIZATIONS.md](GAS_OPTIMIZATIONS.md) |
 
-**Questions about CI?** → Check [CI_STATUS.md](CI_STATUS.md)
+## 📖 Documentation Categories
 
-## 📖 Documentation Files
+### 🔧 Testing & Quality
+
+- **[TESTING-STRATEGIES.md](TESTING-STRATEGIES.md)** - Complete guide to property-based testing, fuzzing, and mutation testing
+- **[TESTING-QUICK-REF.md](TESTING-QUICK-REF.md)** - Quick reference for running tests
+- **[testing-examples/](testing-examples/)** - Example test files (Echidna, Invariant tests)
+
+### 🔐 Security
+
+- **[SOLIDITY_SECURITY_PATTERNS.md](SOLIDITY_SECURITY_PATTERNS.md)** - Advanced security patterns for smart contracts
+- **[SBOM-SECURITY.md](SBOM-SECURITY.md)** - Software Bill of Materials and supply chain security
+- **[GAS_OPTIMIZATIONS.md](GAS_OPTIMIZATIONS.md)** - Gas optimization patterns implemented in the project
+
+### 🤝 Contributing
+
+- **[SUMMARY.md](SUMMARY.md)** - Overview of what was fixed and Git concepts
+- **[GIT_QUICK_START.md](GIT_QUICK_START.md)** - Daily Git reference for contributors
+- **[CI_STATUS.md](CI_STATUS.md)** - Current CI pipeline state and known issues
+- **[../CONTRIBUTING.md](../CONTRIBUTING.md)** - Complete contribution workflow guide
+
+---
+
+## 📖 Git & Contribution Guides
 
 ### For Beginners
 
@@ -165,3 +195,24 @@ Remember:
 
 **Last updated**: December 2024
 **Questions?** Open an issue or ask in your PR!
+
+---
+
+## 📦 Core Project Documentation
+
+For core project documentation, see the [secbrain/docs/](../secbrain/docs/) directory:
+
+| Document | Description |
+|----------|-------------|
+| [Architecture](../secbrain/docs/architecture-updated.md) | System design and component overview |
+| [Workflows](../secbrain/docs/workflows.md) | Run modes and phase documentation |
+| [Operations](../secbrain/docs/ops.md) | Setup, configuration, and usage guide |
+| [Threat Model](../secbrain/docs/threat_model.md) | Security considerations and mitigations |
+| [Automated Agents](../secbrain/docs/automated-agents.md) | Documentation for the automated agent suite |
+
+## 🔗 Related Documentation
+
+- **[Main README](../secbrain/README.md)** - Project overview and quick start
+- **[AUTOMATION-QUICK-REF.md](../AUTOMATION-QUICK-REF.md)** - Quick reference for automated agents
+- **[IMPLEMENTATION-SUMMARY.md](../IMPLEMENTATION-SUMMARY.md)** - Summary of implemented features
+- **[BADGES.md](../BADGES.md)** - Status badges for the project

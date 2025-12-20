@@ -105,7 +105,7 @@ secbrain run \
 
 ## Documentation
 
-- [Architecture](docs/architecture.md) - System design and components
+- [Architecture](docs/architecture-updated.md) - System design and components
 - [Workflows](docs/workflows.md) - Run modes and phases
 - [Threat Model](docs/threat_model.md) - Security considerations
 - [Operations](docs/ops.md) - Setup and usage guide
@@ -218,8 +218,8 @@ forge test --match-contract Invariant -vvv
 ```
 
 For advanced testing strategies including mutation testing and Echidna fuzzing, see:
-- 📚 [Complete Testing Guide](docs/TESTING-STRATEGIES.md)
-- ⚡ [Quick Reference](docs/TESTING-QUICK-REF.md)
+- 📚 [Complete Testing Guide](../docs/TESTING-STRATEGIES.md)
+- ⚡ [Quick Reference](../docs/TESTING-QUICK-REF.md)
 
 ## TODO
 
@@ -253,7 +253,7 @@ We welcome contributions! Whether you're fixing bugs, adding features, or improv
 
 ### For Beginners
 
-- 📖 **Start here**: [Git Quick Start Guide](docs/GIT_QUICK_START.md) - Learn the basics of Git and GitHub
+- 📖 **Start here**: [Git Quick Start Guide](../docs/GIT_QUICK_START.md) - Learn the basics of Git and GitHub
 - 📚 **Full guide**: [Contributing Guide](../CONTRIBUTING.md) - Detailed information about our workflow
 
 ### Quick Contribution Flow
