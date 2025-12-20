@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import uuid
 from dataclasses import dataclass, field
 from typing import Any, ClassVar
@@ -13,10 +14,6 @@ from jsonschema import ValidationError, validate
 
 from secbrain.agents.base import AgentResult, BaseAgent
 from secbrain.agents.oracle_manipulation_detector import OracleManipulationDetector
-from secbrain.agents.solidity_security_patterns import (
-    SoliditySecurityPatterns,
-    VulnerabilityPattern,
-)
 
 
 @dataclass(slots=True)
@@ -687,7 +684,7 @@ Additional note: The contract contains functions that may be vulnerable to preci
                 )
                 if attempt < max_retries - 1:
                     response = await self._call_worker(
-                        f"""Your JSON response was malformed. Error: {str(e)}
+                        f"""Your JSON response was malformed. Error: {e!s}
 
 Original response (first 300 chars):
 {response[:300]}
@@ -841,61 +838,61 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
             add("unchecked_arithmetic", f"Solc {solc_version} math functions could use unchecked{{}}", 0.55)
 
         # Advanced patterns (2023-2024)
-        
+
         # Read-only reentrancy detection
         view_funcs = [f for f in funcs_lower if "view" in f or "get" in f or "balanceof" in f or "totalsupply" in f]
         if view_funcs and any(c in "".join(funcs_lower) for c in external_callers):
             add("read_only_reentrancy", "View functions with external calls detected (read-only reentrancy risk)", 0.75)
-        
+
         # CEI pattern violation detection
         state_update_keywords = ["balance", "state", "storage", "mapping"]
         if any(c in "".join(funcs_lower) for c in external_callers) and any(any(k in f for k in state_update_keywords) for f in funcs_lower):
             add("cei_violation", "External calls with state updates (potential CEI violation)", 0.7)
-        
+
         # Flash loan attack patterns
         flash_keywords = ["flashloan", "borrow", "repay", "flashswap"]
         if any(any(k in f for k in flash_keywords) for f in funcs_lower):
             add("flash_loan_price_manipulation", "Flash loan functions detected", 0.8)
             add("same_block_borrow_repay", "Same-block borrow/repay pattern possible", 0.7)
-        
+
         # Oracle manipulation via flash loans
         oracle_flash_keywords = ["price", "oracle", "twap", "reserve"]
         if any(any(k in f for k in flash_keywords) for f in funcs_lower) and any(any(k in f for k in oracle_flash_keywords) for f in funcs_lower):
             add("oracle_manipulation_flash", "Flash loan + oracle manipulation risk", 0.85)
-        
+
         # Advanced access control patterns
         role_keywords = ["role", "permission", "grant", "revoke"]
         if any(any(k in f for k in admin_keywords) for f in funcs_lower):
             if not any(any(k in f for k in role_keywords) for f in funcs_lower):
                 add("role_based_access_needed", "Admin functions without role-based access control", 0.65)
-        
+
         # Front-running vulnerabilities
         frontrun_keywords = ["bid", "auction", "vote", "random", "lottery", "commit", "reveal"]
         if any(any(k in f for k in frontrun_keywords) for f in funcs_lower):
             if not any("commit" in f and "reveal" in f for f in funcs_lower):
                 add("missing_commit_reveal", "Front-running vulnerable functions without commit-reveal", 0.6)
-        
+
         # EIP-712 signature protection
         if any(any(k in f for k in sig_keywords) for f in funcs_lower):
             if not any("eip712" in f or "typehash" in f for f in funcs_lower):
                 add("missing_eip712_signature", "Signatures without EIP-712 protection", 0.55)
-        
+
         # Oracle security patterns
         oracle_keywords = ["oracle", "price", "feed", "chainlink", "aggregator"]
         if any(any(k in f for k in oracle_keywords) for f in funcs_lower):
             # Staleness check
             if not any("timestamp" in f or "updatedat" in f or "roundid" in f for f in funcs_lower):
                 add("stale_price_data", "Oracle price feed without staleness checks", 0.75)
-            
+
             # Single oracle dependency
             if not any("twap" in f or "median" in f or "consensus" in f for f in funcs_lower):
                 add("single_oracle_dependency", "Single oracle dependency without redundancy", 0.65)
-            
+
             # Missing TWAP
             spot_price_keywords = ["spot", "instant", "current"]
             if any(any(k in f for k in spot_price_keywords) for f in funcs_lower) and not any("twap" in f for f in funcs_lower):
                 add("missing_twap", "Spot price usage without TWAP protection", 0.7)
-            
+
             # Price deviation check
             if not any("deviation" in f or "threshold" in f or "limit" in f for f in funcs_lower):
                 add("no_price_deviation_check", "Oracle without price deviation checks", 0.6)
@@ -1193,29 +1190,73 @@ Respond with JSON:
         self,
         hypotheses: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
-        """Rank hypotheses by exploitability and profit signal."""
+        """Rank hypotheses by exploitability and profit signal.
+
+        Uses log-scaled profit to avoid capping mega-exploits. The formula:
+        - confidence (50%): Weight for LLM-generated confidence
+        - severity (30%): Weight based on vulnerability type
+        - profit (20%): Log-scaled to handle wide range of profits
+        - missing_penalty: Deduction for incomplete hypotheses
+        """
         def score(h: dict[str, Any]) -> float:
             confidence = float(h.get("confidence", 0))
             est_profit = float(h.get("expected_profit_hint_eth", 0) or 0)
+
+            # Severity weights for different vulnerability types
             severity_weight = {
                 "oracle_manipulation": 1.0,
+                "oracle_manipulation_flash": 1.0,
                 "mev": 0.95,
+                "mev_sandwich": 0.95,
                 "sandwich": 0.95,
-                "precision": 0.8,
-                "round": 0.8,
                 "flash_loan": 0.9,
+                "flash_loan_price_manipulation": 0.9,
                 "reentrancy": 0.9,
+                "read_only_reentrancy": 0.85,
+                "cross_function_reentrancy": 0.85,
+                "cei_violation": 0.85,
+                "precision": 0.8,
+                "precision_error": 0.8,
+                "round": 0.8,
+                "first_depositor_inflation": 0.8,
                 "access_control": 0.75,
+                "missing_access_control": 0.75,
+                "role_based_access_needed": 0.7,
                 "integer": 0.7,
+                "unchecked_arithmetic": 0.7,
                 "unchecked_call": 0.65,
                 "delegatecall": 0.65,
+                "delegatecall_confusion": 0.65,
+                "storage_collision": 0.65,
+                "signature_replay": 0.6,
                 "state_inconsistency": 0.6,
+                "same_block_borrow_repay": 0.6,
+                "stale_price_data": 0.55,
+                "single_oracle_dependency": 0.55,
                 "generic_contract": 0.5,
             }
             vt = h.get("vuln_type", "").lower()
-            sev_bonus = max((weight for key, weight in severity_weight.items() if key in vt), default=0.4)
+
+            # Find best matching severity weight
+            sev_bonus = max(
+                (weight for key, weight in severity_weight.items() if key in vt),
+                default=0.4
+            )
+
+            # Log-scale profit to avoid capping mega-exploits
+            # Normalized to 0-1 range for 0-100 ETH
+            profit_score = math.log1p(est_profit) / math.log1p(100) if est_profit > 0 else 0.0
+            profit_score = min(profit_score, 1.0)  # Cap at 1.0 for very large profits
+
+            # Penalty for missing required fields
             missing_penalty = 0.2 if (not h.get("contract_address") or not h.get("function_signature")) else 0.0
-            return confidence * 0.6 + sev_bonus * 0.2 + min(est_profit, 10) * 0.2 - missing_penalty
+
+            return (
+                confidence * 0.5 +  # Reduced from 0.6 - LLM confidence may be uncalibrated
+                sev_bonus * 0.3 +   # Increased from 0.2 - severity weights are defined
+                profit_score * 0.2  # Log-scaled profit
+                - missing_penalty
+            )
 
         ranked = sorted(hypotheses, key=score, reverse=True)
         for idx, h in enumerate(ranked):

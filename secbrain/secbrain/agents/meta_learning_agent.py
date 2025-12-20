@@ -157,6 +157,11 @@ class MetaLearningAgent(BaseAgent):
             total = successful + ineffective_types.get(vtype, 0)
             success_rates[vtype] = round(successful / total, 3) if total > 0 else 0
 
+        # Calculate hypothesis effectiveness with detailed breakdown
+        hypothesis_effectiveness = self._calculate_hypothesis_effectiveness(
+            hypotheses, findings
+        )
+
         return {
             "effective_types": effective_types,
             "ineffective_types": ineffective_types,
@@ -166,7 +171,77 @@ class MetaLearningAgent(BaseAgent):
                 key=lambda x: x[1],
                 reverse=True,
             )[:5],
+            "hypothesis_effectiveness": hypothesis_effectiveness,
         }
+
+    def _calculate_hypothesis_effectiveness(
+        self,
+        hypotheses: list[dict[str, Any]],
+        findings: list[dict[str, Any]],
+    ) -> dict[str, dict[str, Any]]:
+        """Track which hypothesis types yield confirmed findings.
+        
+        This method provides detailed statistics on hypothesis generation
+        effectiveness, helping identify which vulnerability types have the
+        highest success rates and should be prioritized in future runs.
+        
+        Args:
+            hypotheses: All generated hypotheses
+            findings: Confirmed findings from exploitation
+        
+        Returns:
+            Dictionary mapping vuln_type to stats including generated count,
+            confirmed count, and success rate.
+        """
+        by_type: dict[str, dict[str, Any]] = {}
+
+        # Initialize counts for all hypothesis types
+        for hyp in hypotheses:
+            vtype = hyp.get("vuln_type", "unknown")
+            if vtype not in by_type:
+                by_type[vtype] = {
+                    "generated": 0,
+                    "confirmed": 0,
+                    "success_rate": 0.0,
+                    "avg_confidence": 0.0,
+                    "confidence_sum": 0.0,
+                    "hypothesis_ids": [],
+                    "finding_ids": [],
+                }
+            by_type[vtype]["generated"] += 1
+            by_type[vtype]["hypothesis_ids"].append(hyp.get("id"))
+            by_type[vtype]["confidence_sum"] += float(hyp.get("confidence", 0) or 0)
+
+        # Track which hypotheses led to findings
+        for finding in findings:
+            hyp_id = finding.get("hypothesis_id")
+            if not hyp_id:
+                continue
+
+            # Find the matching hypothesis
+            matching_hyp = next(
+                (h for h in hypotheses if h.get("id") == hyp_id),
+                None
+            )
+            if matching_hyp:
+                vtype = matching_hyp.get("vuln_type", "unknown")
+                if vtype in by_type:
+                    by_type[vtype]["confirmed"] += 1
+                    by_type[vtype]["finding_ids"].append(finding.get("id"))
+
+        # Calculate success rates and average confidence
+        for vtype, stats in by_type.items():
+            if stats["generated"] > 0:
+                stats["success_rate"] = round(
+                    stats["confirmed"] / stats["generated"], 3
+                )
+                stats["avg_confidence"] = round(
+                    stats["confidence_sum"] / stats["generated"], 3
+                )
+            # Clean up temporary field
+            del stats["confidence_sum"]
+
+        return by_type
 
     async def _research_patterns(
         self,
