@@ -16,6 +16,9 @@
         }
     },
     "semgrep.enableCodeActions": false,
+    "semgrep.enable": false,
+    "semgrep.scan.onSave": false,
+    "semgrep.scan.runOnOpen": false,
     "semgrep.scan.onlyGitDirty": false,
     "wake.compiler.solc.remappings": [],
     "terminal.integrated.defaultProfile.windows": "PowerShell"

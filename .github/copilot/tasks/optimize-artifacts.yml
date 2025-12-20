@@ -1,0 +1,255 @@
+name: Optimize Workflow Artifacts
+description: Review and optimize artifacts generated from audit processes
+
+trigger:
+  on_workflow_completion:
+    - contract-audit-ci
+    - sota-coverage-ci
+  
+  on_schedule:
+    cron: "0 2 * * 0"  # Weekly review every Sunday at 2 AM
+
+inputs:
+  workflow_run_id:
+    description: Specific workflow run to analyze (optional)
+    required: false
+  
+  artifact_age_days:
+    description: Analyze artifacts from the last N days
+    default: 30
+    required: false
+
+task:
+  steps:
+    - name: Inventory artifacts
+      action: list_artifacts
+      with:
+        workflow: ${{ inputs.workflow_name }}
+        since: ${{ inputs.artifact_age_days }} days ago
+        include_metadata: true
+    
+    - name: Analyze artifact patterns
+      action: analyze_data
+      with:
+        data_source: artifacts
+        analyze:
+          - total_size
+          - size_by_type
+          - retention_patterns
+          - download_frequency
+          - compression_ratios
+    
+    - name: Identify optimization opportunities
+      action: ai_analysis
+      prompt: |
+        Analyze the workflow artifacts and identify optimization opportunities:
+        
+        1. **Size Optimization**:
+           - Large artifacts that could be compressed
+           - Redundant files across runs
+           - Unnecessary files being stored
+           - Files that could be generated on-demand
+        
+        2. **Retention Optimization**:
+           - Artifacts kept longer than needed
+           - Artifacts that are never downloaded
+           - Historical artifacts with minimal value
+        
+        3. **Storage Strategy**:
+           - Artifacts that could use external storage
+           - Opportunities for incremental artifacts
+           - Selective artifact storage (e.g., failures only)
+        
+        4. **Cost Analysis**:
+           - Estimate storage costs
+           - Calculate cost per artifact type
+           - Identify high-cost low-value artifacts
+        
+        For each opportunity, provide:
+        - Current situation and impact
+        - Recommended optimization
+        - Implementation steps
+        - Expected savings (size/cost)
+    
+    - name: Review artifact usage
+      action: analyze_data
+      with:
+        data_source: artifact_downloads
+        metrics:
+          - download_count_by_artifact
+          - time_to_first_download
+          - artifacts_never_downloaded
+    
+    - name: Analyze specific artifact types
+      action: detailed_analysis
+      artifact_types:
+        coverage_reports:
+          current_format: xml
+          alternatives: [json, html, cobertura]
+          optimization: |
+            - Use compressed XML or JSON format
+            - Store only diffs for incremental runs
+            - Integrate with external service (Codecov)
+        
+        logs:
+          current_handling: full_logs
+          optimization: |
+            - Compress logs before upload
+            - Store only failed step logs
+            - Use log streaming services
+            - Implement log rotation
+        
+        test_results:
+          current_format: verbose
+          optimization: |
+            - Store only failed test details
+            - Use JUnit XML for better tooling
+            - Aggregate results across runs
+        
+        workspace_artifacts:
+          current_handling: full_workspace
+          optimization: |
+            - Store only generated files, not dependencies
+            - Use .gitignore patterns
+            - Selective workspace archiving
+    
+    - name: Generate optimization recommendations
+      action: create_summary
+      template: |
+        ## Workflow Artifact Optimization Report
+        ### Analysis Period: {{ analysis.period }}
+        
+        ### Current State
+        - Total artifacts: {{ metrics.total_count }}
+        - Total size: {{ metrics.total_size_gb }} GB
+        - Average artifact size: {{ metrics.avg_size_mb }} MB
+        - Storage cost (estimated): ${{ costs.estimated_monthly }}
+        
+        ### Artifact Breakdown
+        {{ metrics.by_type }}
+        
+        ### Usage Patterns
+        - Downloads (last {{ inputs.artifact_age_days }} days): {{ metrics.downloads }}
+        - Unused artifacts: {{ metrics.unused_count }} ({{ metrics.unused_percentage }}%)
+        - Average time to download: {{ metrics.avg_time_to_download }}
+        
+        ### Size Analysis
+        #### Top 10 Largest Artifacts
+        {{ analysis.largest_artifacts }}
+        
+        #### Size Trends
+        {{ trends.size_over_time }}
+        
+        ### Optimization Opportunities
+        
+        #### High Priority (Quick Wins)
+        {{ recommendations.high_priority }}
+        
+        #### Medium Priority
+        {{ recommendations.medium_priority }}
+        
+        #### Long-term Improvements
+        {{ recommendations.long_term }}
+        
+        ### Estimated Savings
+        - Storage: {{ savings.storage_gb }} GB ({{ savings.storage_percentage }}%)
+        - Cost: ${{ savings.monthly_cost }} per month
+        - Build time: {{ savings.upload_time_seconds }} seconds per run
+        
+        ### Recommended Actions
+        {{ recommendations.actions }}
+        
+        ### Implementation Plan
+        {{ recommendations.implementation_plan }}
+
+outputs:
+  total_artifact_size:
+    description: Total size of all artifacts in GB
+  
+  optimization_opportunities:
+    description: List of identified optimization opportunities
+  
+  estimated_savings:
+    description: Estimated storage and cost savings
+  
+  recommended_actions:
+    description: Prioritized list of actions to take
+  
+  unused_artifacts:
+    description: List of artifacts that are never downloaded
+
+success_criteria:
+  - identified_savings > 0
+  - recommendations_generated > 0
+
+notifications:
+  on_large_artifacts:
+    - Create issue if single artifact > 100MB
+    - Include optimization suggestions
+    - 'Label: artifact-optimization, ci-cd'
+  
+  on_storage_threshold:
+    - Alert if total storage > 5GB
+    - Provide cleanup recommendations
+  
+  on_optimization_complete:
+    - Summarize implemented optimizations
+    - Report actual savings achieved
+
+optimization_strategies:
+  compression:
+    description: Compress artifacts before upload
+    implementation: |
+      - name: Compress artifacts
+        run: tar -czf artifacts.tar.gz <directory>
+      
+      - name: Upload compressed artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compressed-artifacts
+          path: artifacts.tar.gz
+    
+    expected_savings: "60-80% size reduction"
+  
+  selective_upload:
+    description: Upload artifacts only on failure
+    implementation: |
+      - name: Upload on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-logs
+          path: logs/
+    
+    expected_savings: "Reduces artifacts by ~95% (assuming 5% failure rate)"
+  
+  retention_policy:
+    description: Set appropriate retention periods
+    implementation: |
+      - name: Upload with retention
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: artifacts/
+          retention-days: 7
+    
+    expected_savings: "Reduces long-term storage costs"
+  
+  external_storage:
+    description: Use external services for large artifacts
+    examples:
+      - "Codecov for coverage reports"
+      - "Cloud storage for large binaries"
+      - "Log aggregation services for logs"
+    
+    expected_savings: "Reduces GitHub storage costs"
+
+best_practices:
+  - "Compress text-based artifacts (logs, coverage, reports)"
+  - "Upload artifacts only when needed (failures, releases)"
+  - "Set retention policies based on artifact importance"
+  - "Use external services for specialized artifacts"
+  - "Regularly audit and clean up old artifacts"
+  - "Document what each artifact contains"
+  - "Use consistent naming conventions"
+  - "Implement artifact size budgets"

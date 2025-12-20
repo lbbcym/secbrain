@@ -830,7 +830,7 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
         except Exception:
             return False
         conf = hyp.get("confidence")
-        if conf is None or not isinstance(conf, (float, int)):
+        if conf is None or not isinstance(conf, (float | int)):
             return False
         return 0.0 <= float(conf) <= 1.0
 
