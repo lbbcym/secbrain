@@ -164,6 +164,33 @@ secbrain/
 - Research caching uses simple in-memory dict (consider Redis)
 - Approval flow is auto-approve in dry-run only
 
+## Development
+
+### Code Quality
+
+The project uses `ruff` for linting and code formatting. To run the linter:
+
+```bash
+cd secbrain
+python -m ruff check .
+```
+
+To automatically fix fixable issues:
+
+```bash
+cd secbrain
+python -m ruff check . --fix
+```
+
+**Note**: Some ruff checks (F821 undefined-name, F841 unused-variable) are currently ignored in the configuration to allow development progress. These should be addressed in future PRs.
+
+### Running Tests
+
+```bash
+cd secbrain
+python -m pytest tests/ -v
+```
+
 ## TODO
 
 ### High Priority
