@@ -7,6 +7,7 @@ import json
 import os
 import re
 import shlex
+import hashlib
 import textwrap
 import tomllib
 from dataclasses import asdict, dataclass
@@ -88,6 +89,8 @@ class FoundryRunner:
             "forge test --match-test testExploit -vvvvv --json",
         )
         self.timeout = tools.get("forge_test_exploit", {}).get("timeout", 900)
+        self._compile_cache_dir = Path(run_context.workspace_path) / ".secbrain_cache" / "compile"
+        self._compile_cache_dir.mkdir(parents=True, exist_ok=True)
 
     async def run_exploit_attempt(
         self,
@@ -143,9 +146,11 @@ class FoundryRunner:
             )
 
         if not self.project_root:
+            # Fallback failure
             return FoundryRunResult(
                 status="failed",
                 profit_eth=None,
+                profit_tokens=None,
                 gas_used=None,
                 execution_trace=None,
                 revert_reason="missing_foundry_root",
@@ -205,6 +210,9 @@ class FoundryRunner:
 
         if profile_for_run:
             env["FOUNDRY_PROFILE"] = profile_for_run
+
+        # Precompile with cache per profile/solc/config to reduce latency
+        await self._compile_with_cache(profile_for_run)
 
         last_stdout = ""
         last_return_code: int | None = None

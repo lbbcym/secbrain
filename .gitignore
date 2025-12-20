@@ -8,3 +8,5 @@ secbrain/**/.env.*
 targets/**/instascope/out/
 targets/**/instascope/cache/
 targets/**/instascope/lib/
+**/__pycache__/
+*.py[cod]
