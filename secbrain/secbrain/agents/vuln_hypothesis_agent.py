@@ -13,6 +13,10 @@ from jsonschema import ValidationError, validate
 
 from secbrain.agents.base import AgentResult, BaseAgent
 from secbrain.agents.oracle_manipulation_detector import OracleManipulationDetector
+from secbrain.agents.solidity_security_patterns import (
+    SoliditySecurityPatterns,
+    VulnerabilityPattern,
+)
 
 
 @dataclass(slots=True)
@@ -126,6 +130,24 @@ class VulnHypothesisAgent(BaseAgent):
                         "first_depositor_inflation",
                         "cross_function_reentrancy",
                         "unchecked_arithmetic",
+                        # Advanced patterns (2023-2024)
+                        "read_only_reentrancy",
+                        "cei_violation",
+                        "flash_loan_price_manipulation",
+                        "flash_loan_governance_attack",
+                        "same_block_borrow_repay",
+                        "oracle_manipulation_flash",
+                        "missing_access_control",
+                        "weak_access_control",
+                        "role_based_access_needed",
+                        "front_running_vulnerable",
+                        "missing_commit_reveal",
+                        "no_timelock",
+                        "missing_eip712_signature",
+                        "stale_price_data",
+                        "single_oracle_dependency",
+                        "missing_twap",
+                        "no_price_deviation_check",
                     ],
                 },
                 "confidence": {"type": "number", "minimum": 0, "maximum": 1},
@@ -817,6 +839,66 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
         math_keywords = ["mul", "div", "add", "sub", "calc", "compute"]
         if solc_version and solc_version.startswith("0.8") and any(any(k in f for k in math_keywords) for f in funcs_lower):
             add("unchecked_arithmetic", f"Solc {solc_version} math functions could use unchecked{{}}", 0.55)
+
+        # Advanced patterns (2023-2024)
+        
+        # Read-only reentrancy detection
+        view_funcs = [f for f in funcs_lower if "view" in f or "get" in f or "balanceof" in f or "totalsupply" in f]
+        if view_funcs and any(c in "".join(funcs_lower) for c in external_callers):
+            add("read_only_reentrancy", "View functions with external calls detected (read-only reentrancy risk)", 0.75)
+        
+        # CEI pattern violation detection
+        state_update_keywords = ["balance", "state", "storage", "mapping"]
+        if any(c in "".join(funcs_lower) for c in external_callers) and any(any(k in f for k in state_update_keywords) for f in funcs_lower):
+            add("cei_violation", "External calls with state updates (potential CEI violation)", 0.7)
+        
+        # Flash loan attack patterns
+        flash_keywords = ["flashloan", "borrow", "repay", "flashswap"]
+        if any(any(k in f for k in flash_keywords) for f in funcs_lower):
+            add("flash_loan_price_manipulation", "Flash loan functions detected", 0.8)
+            add("same_block_borrow_repay", "Same-block borrow/repay pattern possible", 0.7)
+        
+        # Oracle manipulation via flash loans
+        oracle_flash_keywords = ["price", "oracle", "twap", "reserve"]
+        if any(any(k in f for k in flash_keywords) for f in funcs_lower) and any(any(k in f for k in oracle_flash_keywords) for f in funcs_lower):
+            add("oracle_manipulation_flash", "Flash loan + oracle manipulation risk", 0.85)
+        
+        # Advanced access control patterns
+        role_keywords = ["role", "permission", "grant", "revoke"]
+        if any(any(k in f for k in admin_keywords) for f in funcs_lower):
+            if not any(any(k in f for k in role_keywords) for f in funcs_lower):
+                add("role_based_access_needed", "Admin functions without role-based access control", 0.65)
+        
+        # Front-running vulnerabilities
+        frontrun_keywords = ["bid", "auction", "vote", "random", "lottery", "commit", "reveal"]
+        if any(any(k in f for k in frontrun_keywords) for f in funcs_lower):
+            if not any("commit" in f and "reveal" in f for f in funcs_lower):
+                add("missing_commit_reveal", "Front-running vulnerable functions without commit-reveal", 0.6)
+        
+        # EIP-712 signature protection
+        if any(any(k in f for k in sig_keywords) for f in funcs_lower):
+            if not any("eip712" in f or "typehash" in f for f in funcs_lower):
+                add("missing_eip712_signature", "Signatures without EIP-712 protection", 0.55)
+        
+        # Oracle security patterns
+        oracle_keywords = ["oracle", "price", "feed", "chainlink", "aggregator"]
+        if any(any(k in f for k in oracle_keywords) for f in funcs_lower):
+            # Staleness check
+            if not any("timestamp" in f or "updatedat" in f or "roundid" in f for f in funcs_lower):
+                add("stale_price_data", "Oracle price feed without staleness checks", 0.75)
+            
+            # Single oracle dependency
+            if not any("twap" in f or "median" in f or "consensus" in f for f in funcs_lower):
+                add("single_oracle_dependency", "Single oracle dependency without redundancy", 0.65)
+            
+            # Missing TWAP
+            spot_price_keywords = ["spot", "instant", "current"]
+            if any(any(k in f for k in spot_price_keywords) for f in funcs_lower) and not any("twap" in f for f in funcs_lower):
+                add("missing_twap", "Spot price usage without TWAP protection", 0.7)
+            
+            # Price deviation check
+            if not any("deviation" in f or "threshold" in f or "limit" in f for f in funcs_lower):
+                add("no_price_deviation_check", "Oracle without price deviation checks", 0.6)
 
         return hypotheses
 
