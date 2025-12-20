@@ -1,8 +1,8 @@
 {
-  "run_id": "c4bf6965",
+  "run_id": "85a9df58",
   "phase": "recon",
   "success": true,
-  "duration_seconds": 10.068127,
+  "duration_seconds": 10.284031,
   "errors": [],
   "data": {
     "assets": [
@@ -1402,5 +1402,5 @@
     "failed_count": 0,
     "foundry_root": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\originprotocol"
   },
-  "timestamp": "2025-12-20T05:12:28.804670"
+  "timestamp": "2025-12-20T05:26:57.560286"
 }

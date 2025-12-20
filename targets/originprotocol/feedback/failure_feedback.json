@@ -1,8 +1,8 @@
 {
-  "generated_at": "2025-12-20T06:36:30.327644Z",
+  "generated_at": "2025-12-20T11:26:57.550496Z",
   "entries": [
     {
-      "hypothesis_id": "hyp-a6ae36a7",
+      "hypothesis_id": "hyp-e40c2915",
       "contract_address": "0x1827F9eA98E0bf96550b2FC20F7233277FcD7E63",
       "function_signature": "admin()",
       "categories": {
@@ -16,8 +16,8 @@
       ]
     },
     {
-      "hypothesis_id": "hyp-78c1c10c",
-      "contract_address": "0xe75D77b1865Ae93c7eAa3040b038D7aA7BC02F70",
+      "hypothesis_id": "hyp-cbb54c4d",
+      "contract_address": "0xE75D77B1865Ae93c7eaa3040B038D7aA7BC02F70",
       "function_signature": "admin()",
       "categories": {
         "unknown_failure": 3
@@ -30,23 +30,22 @@
       ]
     },
     {
-      "hypothesis_id": "hyp-104c4dfb",
+      "hypothesis_id": "hyp-039ab0c3",
       "contract_address": "0xaF04828Ed923216c77dC22a2fc8E077FDaDAA87d",
       "function_signature": "admin()",
       "categories": {
-        "insufficient_profit": 3
+        "unknown_failure": 3
       },
       "targets": [
-        "exploit",
-        "hypothesis"
+        "exploit"
       ],
       "recommendations": [
-        "insufficient_profit: Profit below threshold. Target higher-value flows or leverage multipliers/flashloans. (x3)"
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x3)"
       ]
     },
     {
-      "hypothesis_id": "hyp-1e7562cd",
-      "contract_address": "0x7609C88e5880E934DD3a75BCfeF44E31B1BAdb8b",
+      "hypothesis_id": "hyp-0cc7a4ad",
+      "contract_address": "0x7609c88E5880e934dd3A75bCFef44E31b1Badb8b",
       "function_signature": "admin()",
       "categories": {
         "unknown_failure": 3
@@ -59,8 +58,8 @@
       ]
     },
     {
-      "hypothesis_id": "hyp-c95b6bfa",
-      "contract_address": "0x63898B3B6EF3D39332082178656E9862BEE45c57",
+      "hypothesis_id": "hyp-6bf1de96",
+      "contract_address": "0x63898b3b6Ef3d39332082178656E9862bee45C57",
       "function_signature": "admin()",
       "categories": {
         "unknown_failure": 3
@@ -74,7 +73,6 @@
     }
   ],
   "aggregate": {
-    "unknown_failure": 12,
-    "insufficient_profit": 3
+    "unknown_failure": 15
   }
 }
