@@ -23,12 +23,12 @@ pip install -q pip-audit cyclonedx-bom 2>/dev/null || true
 # Generate CycloneDX SBOM (JSON format)
 echo "📄 Generating CycloneDX SBOM (JSON)..."
 pip-audit --format cyclonedx-json --output "${SBOM_DIR}/sbom-cyclonedx.json" 2>/dev/null || \
-    cyclonedx-py -r requirements.lock -o "${SBOM_DIR}/sbom-cyclonedx.json" --format json || \
+    cyclonedx-py requirements -r requirements.lock -o "${SBOM_DIR}/sbom-cyclonedx.json" --format json || \
     echo "⚠️  CycloneDX JSON generation failed"
 
 # Generate CycloneDX SBOM (XML format for wider compatibility)
 echo "📄 Generating CycloneDX SBOM (XML)..."
-cyclonedx-py -r requirements.lock -o "${SBOM_DIR}/sbom-cyclonedx.xml" --format xml 2>/dev/null || \
+cyclonedx-py requirements -r requirements.lock -o "${SBOM_DIR}/sbom-cyclonedx.xml" --format xml 2>/dev/null || \
     echo "⚠️  CycloneDX XML generation failed"
 
 # Generate SPDX SBOM (JSON format)
