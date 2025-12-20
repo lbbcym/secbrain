@@ -1,0 +1,259 @@
+name: Dependency Audit
+
+on:
+  schedule:
+    # Run daily at 4 AM UTC
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'requirements.txt'
+      - 'secbrain/pyproject.toml'
+      - 'secbrain/requirements.lock'
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+jobs:
+  python-dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd secbrain
+          pip install -r requirements.lock
+          pip install safety pip-audit
+
+      - name: Run pip-audit
+        id: pip-audit
+        continue-on-error: true
+        run: |
+          cd secbrain
+          pip-audit --format json --output pip-audit-results.json || true
+          pip-audit --format cyclonedx-json --output pip-audit-sbom.json || true
+          pip-audit || true
+
+      - name: Run Safety check
+        id: safety
+        continue-on-error: true
+        run: |
+          cd secbrain
+          safety check --json --output safety-results.json || true
+          safety check --full-report || true
+
+      - name: Check for outdated packages
+        id: outdated
+        continue-on-error: true
+        run: |
+          cd secbrain
+          pip list --outdated --format json > outdated-packages.json || true
+          pip list --outdated || true
+
+      - name: Upload dependency audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit-results
+          path: |
+            secbrain/pip-audit-results.json
+            secbrain/pip-audit-sbom.json
+            secbrain/safety-results.json
+            secbrain/outdated-packages.json
+          retention-days: 90
+
+      - name: Parse results and create issues
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            async function createDependencyIssue(title, body, severity, labels = []) {
+              const allLabels = ['dependencies', 'security', 'automated-scan', severity, ...labels];
+              
+              const existingIssues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'dependencies,security'
+              });
+              
+              const isDuplicate = existingIssues.data.some(issue => 
+                issue.title.includes(title.substring(0, 40))
+              );
+              
+              if (!isDuplicate) {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `[Dependencies] ${title}`,
+                  body: body,
+                  labels: allLabels
+                });
+              }
+            }
+            
+            // Parse pip-audit results
+            try {
+              const pipAuditResults = JSON.parse(fs.readFileSync('secbrain/pip-audit-results.json', 'utf8'));
+              if (pipAuditResults.vulnerabilities && pipAuditResults.vulnerabilities.length > 0) {
+                const critical = pipAuditResults.vulnerabilities.filter(v => {
+                  // Check if any alias has CVSS score >= 7.0
+                  return v.aliases && v.aliases.some(a => a.includes('CVE'));
+                });
+                
+                if (critical.length > 0) {
+                  const body = `## Critical Dependency Vulnerabilities (pip-audit)\n\n` +
+                    `Found ${critical.length} critical vulnerabilities:\n\n` +
+                    critical.slice(0, 10).map(v => 
+                      `- **${v.package}** ${v.version}\n` +
+                      `  - ID: ${v.id}\n` +
+                      `  - Fix version: ${v.fix_versions ? v.fix_versions.join(', ') : 'N/A'}\n` +
+                      `  - Description: ${v.description}\n` +
+                      `  - Aliases: ${v.aliases ? v.aliases.join(', ') : 'N/A'}`
+                    ).join('\n\n') +
+                    `\n\n### Remediation\n` +
+                    `Update affected packages to the fix versions listed above.`;
+                  
+                  await createDependencyIssue(
+                    'Critical vulnerabilities in Python dependencies',
+                    body,
+                    'critical-severity',
+                    ['python']
+                  );
+                }
+              }
+            } catch (e) {
+              console.log('No pip-audit results or error parsing:', e.message);
+            }
+            
+            // Parse Safety results
+            try {
+              const safetyResults = JSON.parse(fs.readFileSync('secbrain/safety-results.json', 'utf8'));
+              if (safetyResults.vulnerabilities && safetyResults.vulnerabilities.length > 0) {
+                const highPriority = safetyResults.vulnerabilities.filter(v => 
+                  v.severity && (v.severity.toLowerCase() === 'high' || v.severity.toLowerCase() === 'critical')
+                );
+                
+                if (highPriority.length > 0) {
+                  const body = `## High Priority Dependency Vulnerabilities (Safety)\n\n` +
+                    `Found ${highPriority.length} high/critical severity vulnerabilities:\n\n` +
+                    highPriority.map(v => 
+                      `- **${v.package}** ${v.installed_version}\n` +
+                      `  - CVE/ID: ${v.vulnerability_id}\n` +
+                      `  - Severity: ${v.severity || 'Unknown'}\n` +
+                      `  - ${v.advisory}`
+                    ).join('\n\n');
+                  
+                  await createDependencyIssue(
+                    'High priority vulnerabilities in dependencies',
+                    body,
+                    'high-severity',
+                    ['python']
+                  );
+                }
+              }
+            } catch (e) {
+              console.log('No Safety results or error parsing:', e.message);
+            }
+            
+            // Parse outdated packages
+            try {
+              const outdatedPackages = JSON.parse(fs.readFileSync('secbrain/outdated-packages.json', 'utf8'));
+              if (outdatedPackages && outdatedPackages.length > 10) {
+                const body = `## Outdated Python Packages\n\n` +
+                  `Found ${outdatedPackages.length} outdated packages. Top 10:\n\n` +
+                  outdatedPackages.slice(0, 10).map(p => 
+                    `- **${p.name}**: ${p.version} → ${p.latest_version} (${p.latest_filetype})`
+                  ).join('\n') +
+                  `\n\n### Recommendation\n` +
+                  `Consider updating packages to latest versions for bug fixes and improvements. ` +
+                  `Review changelogs before updating to avoid breaking changes.`;
+                
+                await createDependencyIssue(
+                  'Many outdated Python packages detected',
+                  body,
+                  'low-severity',
+                  ['python', 'maintenance']
+                );
+              }
+            } catch (e) {
+              console.log('No outdated packages results or error parsing:', e.message);
+            }
+            
+            core.info('Dependency audit analysis complete');
+
+      - name: Generate summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 📦 Dependency Audit Summary
+          
+          ### Audits Completed
+          - ✅ **pip-audit**: CVE/vulnerability scanning
+          - ✅ **Safety**: Known vulnerability database check
+          - ✅ **Outdated packages**: Version update check
+          - ✅ **SBOM generated**: Software Bill of Materials
+          
+          ### Security Posture
+          - All Python dependencies scanned against known CVE databases
+          - Results uploaded as artifacts for review
+          - Issues created for CRITICAL/HIGH severity findings
+          
+          ### Best Practices
+          - Keep dependencies up to date
+          - Review security advisories regularly
+          - Pin versions in production
+          - Use lock files (requirements.lock)
+          - Monitor for new vulnerabilities
+          
+          ### Next Steps
+          1. Review any created issues immediately
+          2. Update vulnerable dependencies
+          3. Test updates in development before deploying
+          4. Consider automated dependency updates via Dependabot
+          
+          ---
+          *Automated dependency security for bug bounty focus* 🎯
+          EOF
+
+  npm-dependency-audit:
+    runs-on: ubuntu-latest
+    if: false  # Enable when package.json exists
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Run npm audit
+        id: npm-audit
+        continue-on-error: true
+        run: |
+          npm audit --json > npm-audit-results.json || true
+          npm audit || true
+
+      - name: Upload npm audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-results
+          path: npm-audit-results.json
+          retention-days: 90

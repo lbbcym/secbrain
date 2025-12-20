@@ -1,0 +1,100 @@
+# Foundry Configuration for SecBrain
+# This is a template for Solidity projects
+# Copy and customize for specific exploit attempt directories
+
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+test = "test"
+cache_path = "cache"
+
+# Compiler settings
+solc_version = "0.8.23"
+evm_version = "paris"
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+
+# Additional model checker settings for security
+model_checker_engine = "all"
+model_checker_targets = [
+    "assert",
+    "constantCondition",
+    "divByZero",
+    "outOfBounds",
+    "overflow",
+    "underflow",
+]
+
+# Verbosity
+verbosity = 3
+
+# Test settings
+fuzz_runs = 256
+fuzz_max_test_rejects = 65536
+invariant_runs = 256
+invariant_depth = 15
+
+# Gas reporting
+gas_reports = ["*"]
+
+# Formatting
+line_length = 100
+tab_width = 4
+bracket_spacing = true
+int_types = "long"
+quote_style = "double"
+number_underscore = "thousands"
+
+# Remappings (customize as needed)
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "forge-std/=lib/forge-std/src/",
+    "ds-test/=lib/ds-test/src/",
+]
+
+# Libraries
+libraries = []
+
+# Build info
+build_info = true
+extra_output = ["storageLayout", "metadata"]
+extra_output_files = ["metadata"]
+
+# RPC endpoints
+[rpc_endpoints]
+mainnet = "${MAINNET_RPC_URL}"
+goerli = "${GOERLI_RPC_URL}"
+sepolia = "${SEPOLIA_RPC_URL}"
+arbitrum = "${ARBITRUM_RPC_URL}"
+optimism = "${OPTIMISM_RPC_URL}"
+polygon = "${POLYGON_RPC_URL}"
+
+# Etherscan API keys
+[etherscan]
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
+goerli = { key = "${ETHERSCAN_API_KEY}" }
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
+arbitrum = { key = "${ARBISCAN_API_KEY}" }
+optimism = { key = "${OPTIMISTIC_ETHERSCAN_API_KEY}" }
+polygon = { key = "${POLYGONSCAN_API_KEY}" }
+
+# Profile for CI with higher fuzz runs
+[profile.ci]
+fuzz_runs = 10000
+invariant_runs = 1000
+invariant_depth = 20
+
+# Profile for intense fuzzing
+[profile.intense]
+fuzz_runs = 50000
+invariant_runs = 5000
+invariant_depth = 50
+fuzz_max_test_rejects = 1000000
+
+# Profile for quick testing
+[profile.quick]
+fuzz_runs = 32
+invariant_runs = 32
+invariant_depth = 5

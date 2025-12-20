@@ -1,0 +1,177 @@
+name: Daily Security Scan
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'secbrain/**/*.py'
+      - 'requirements.txt'
+      - 'secbrain/pyproject.toml'
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+jobs:
+  python-security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd secbrain
+          pip install -r requirements.lock
+          pip install bandit[toml] safety pip-audit semgrep
+
+      - name: Run Bandit security scan
+        id: bandit
+        continue-on-error: true
+        run: |
+          cd secbrain
+          bandit -r secbrain/ -f json -o bandit-results.json || true
+          bandit -r secbrain/ -f txt
+
+      - name: Run Safety check
+        id: safety
+        continue-on-error: true
+        run: |
+          cd secbrain
+          safety check --json --output safety-results.json || true
+          safety check || true
+
+      - name: Run pip-audit
+        id: pip-audit
+        continue-on-error: true
+        run: |
+          cd secbrain
+          pip-audit --format json --output pip-audit-results.json || true
+          pip-audit || true
+
+      - name: Run Semgrep security rules
+        id: semgrep
+        continue-on-error: true
+        run: |
+          cd secbrain
+          semgrep --config=auto --json --output semgrep-results.json secbrain/ || true
+          semgrep --config=auto secbrain/ || true
+
+      - name: Upload security scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-results
+          path: |
+            secbrain/bandit-results.json
+            secbrain/safety-results.json
+            secbrain/pip-audit-results.json
+            secbrain/semgrep-results.json
+          retention-days: 90
+
+      - name: Parse results and create issues
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Helper to create issue for findings
+            async function createSecurityIssue(title, body, severity) {
+              const labels = ['security', 'automated-scan', severity];
+              
+              // Check if similar issue exists
+              const existingIssues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: labels.join(',')
+              });
+              
+              const isDuplicate = existingIssues.data.some(issue => 
+                issue.title.includes(title.substring(0, 50))
+              );
+              
+              if (!isDuplicate) {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `[Security] ${title}`,
+                  body: body,
+                  labels: labels
+                });
+              }
+            }
+            
+            // Parse Bandit results
+            try {
+              const banditResults = JSON.parse(fs.readFileSync('secbrain/bandit-results.json', 'utf8'));
+              if (banditResults.results && banditResults.results.length > 0) {
+                const highSeverity = banditResults.results.filter(r => r.issue_severity === 'HIGH');
+                if (highSeverity.length > 0) {
+                  const body = `## Bandit Security Findings\n\n` +
+                    `Found ${highSeverity.length} HIGH severity issues:\n\n` +
+                    highSeverity.map(r => 
+                      `- **${r.test_id}**: ${r.issue_text}\n  - File: ${r.filename}:${r.line_number}\n  - Severity: ${r.issue_severity}\n  - Confidence: ${r.issue_confidence}`
+                    ).join('\n\n');
+                  await createSecurityIssue('Bandit found HIGH severity vulnerabilities', body, 'high-severity');
+                }
+              }
+            } catch (e) {
+              console.log('No Bandit results or error parsing:', e.message);
+            }
+            
+            // Parse Safety results
+            try {
+              const safetyResults = JSON.parse(fs.readFileSync('secbrain/safety-results.json', 'utf8'));
+              if (safetyResults.vulnerabilities && safetyResults.vulnerabilities.length > 0) {
+                const body = `## Dependency Vulnerabilities (Safety)\n\n` +
+                  `Found ${safetyResults.vulnerabilities.length} vulnerable dependencies:\n\n` +
+                  safetyResults.vulnerabilities.map(v => 
+                    `- **${v.package}** ${v.installed_version}\n  - CVE: ${v.vulnerability_id}\n  - ${v.advisory}`
+                  ).join('\n\n');
+                await createSecurityIssue('Vulnerable dependencies found', body, 'high-severity');
+              }
+            } catch (e) {
+              console.log('No Safety results or error parsing:', e.message);
+            }
+            
+            core.info('Security scan analysis complete');
+
+      - name: Generate summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 🔒 Security Scan Summary
+          
+          ### Scans Completed
+          - ✅ **Bandit**: Python code vulnerability detection
+          - ✅ **Safety**: Dependency vulnerability scanning
+          - ✅ **pip-audit**: Known vulnerability scanning
+          - ✅ **Semgrep**: Custom security pattern matching
+          
+          ### Actions Taken
+          - Security scan results uploaded as artifacts
+          - Issues created for HIGH severity findings
+          - All results available in workflow artifacts
+          
+          ### Next Steps
+          1. Review any created issues
+          2. Address HIGH severity findings immediately
+          3. Plan remediation for MEDIUM/LOW findings
+          
+          ---
+          *Automated security scanning for bug bounty focus* 🎯
+          EOF

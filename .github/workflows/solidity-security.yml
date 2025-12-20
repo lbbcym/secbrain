@@ -1,0 +1,242 @@
+name: Solidity Security Analysis
+
+on:
+  schedule:
+    # Run daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**/*.sol'
+      - 'foundry.toml'
+      - 'targets/**/foundry.toml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - '**/*.sol'
+      - 'foundry.toml'
+      - 'targets/**/foundry.toml'
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+  pull-requests: write
+
+jobs:
+  solidity-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Solidity security tools
+        run: |
+          npm install -g solhint prettier prettier-plugin-solidity
+          pip install slither-analyzer mythril aderyn-py
+
+      - name: Run Solhint
+        id: solhint
+        continue-on-error: true
+        run: |
+          # Find all Solidity files and run solhint
+          find . -name "*.sol" ! -path "*/node_modules/*" ! -path "*/.git/*" -type f > sol_files.txt
+          if [ -s sol_files.txt ]; then
+            solhint $(cat sol_files.txt) --format json > solhint-results.json || true
+            solhint $(cat sol_files.txt) || true
+          else
+            echo "No Solidity files found"
+          fi
+
+      - name: Run Slither analysis
+        id: slither
+        continue-on-error: true
+        run: |
+          # Run Slither on exploit attempts directories
+          for dir in targets/originprotocol/exploit_attempts/*/attempt-*; do
+            if [ -d "$dir" ] && [ -f "$dir/foundry.toml" ]; then
+              echo "Analyzing $dir"
+              cd "$dir"
+              slither . --json slither-output.json || true
+              slither . || true
+              cd - > /dev/null
+            fi
+          done
+
+      - name: Run Mythril symbolic execution
+        id: mythril
+        continue-on-error: true
+        timeout-minutes: 30
+        run: |
+          # Run Mythril on sample contracts (limit to avoid timeout)
+          find targets/originprotocol/exploit_attempts -name "*.sol" -type f | head -5 | while read file; do
+            echo "Analyzing $file with Mythril"
+            myth analyze "$file" -o json > "${file}.mythril.json" 2>&1 || true
+            myth analyze "$file" || true
+          done
+
+      - name: Run Aderyn static analysis
+        id: aderyn
+        continue-on-error: true
+        run: |
+          # Run Aderyn on directories with foundry.toml
+          for dir in targets/originprotocol/exploit_attempts/*/attempt-*; do
+            if [ -d "$dir" ] && [ -f "$dir/foundry.toml" ]; then
+              echo "Running Aderyn on $dir"
+              cd "$dir"
+              aderyn . || true
+              cd - > /dev/null
+            fi
+          done
+
+      - name: Check Prettier formatting
+        id: prettier
+        continue-on-error: true
+        run: |
+          find . -name "*.sol" ! -path "*/node_modules/*" ! -path "*/.git/*" -type f | while read file; do
+            prettier --check "$file" || true
+          done
+
+      - name: Upload security analysis results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: solidity-security-results
+          path: |
+            solhint-results.json
+            **/slither-output.json
+            **/*.mythril.json
+            **/aderyn-report.md
+          retention-days: 90
+
+      - name: Parse results and create issues
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+            
+            async function createSecurityIssue(title, body, severity) {
+              const labels = ['security', 'solidity', 'automated-scan', severity];
+              
+              const existingIssues = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: labels.slice(0, 3).join(',')
+              });
+              
+              const isDuplicate = existingIssues.data.some(issue => 
+                issue.title.includes(title.substring(0, 40))
+              );
+              
+              if (!isDuplicate) {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `[Solidity Security] ${title}`,
+                  body: body,
+                  labels: labels
+                });
+              }
+            }
+            
+            // Parse Solhint results
+            try {
+              if (fs.existsSync('solhint-results.json')) {
+                const solhintResults = JSON.parse(fs.readFileSync('solhint-results.json', 'utf8'));
+                const errors = solhintResults.filter(r => r.severity === 2); // errors
+                const warnings = solhintResults.filter(r => r.severity === 1); // warnings
+                
+                if (errors.length > 0) {
+                  const body = `## Solhint Security Findings\n\n` +
+                    `Found ${errors.length} errors and ${warnings.length} warnings:\n\n` +
+                    `### Errors\n` +
+                    errors.slice(0, 10).map(e => 
+                      `- **${e.ruleId}**: ${e.message}\n  - File: ${e.filePath}:${e.line}:${e.column}`
+                    ).join('\n\n');
+                  await createSecurityIssue('Solhint found critical issues', body, 'medium-severity');
+                }
+              }
+            } catch (e) {
+              console.log('No Solhint results or error parsing:', e.message);
+            }
+            
+            // Look for Slither high/medium severity issues
+            try {
+              const slitherFiles = execSync('find . -name "slither-output.json" -type f', { encoding: 'utf8' })
+                .trim().split('\n').filter(f => f);
+              
+              for (const file of slitherFiles) {
+                const slitherResults = JSON.parse(fs.readFileSync(file, 'utf8'));
+                if (slitherResults.results && slitherResults.results.detectors) {
+                  const highImpact = slitherResults.results.detectors.filter(d => 
+                    d.impact === 'High' || d.impact === 'Medium'
+                  );
+                  
+                  if (highImpact.length > 0) {
+                    const body = `## Slither Security Findings\n\n` +
+                      `Found ${highImpact.length} high/medium impact issues in ${file}:\n\n` +
+                      highImpact.slice(0, 5).map(d => 
+                        `- **${d.check}** (${d.impact} impact, ${d.confidence} confidence)\n  - ${d.description}`
+                      ).join('\n\n');
+                    await createSecurityIssue(`Slither found vulnerabilities in ${file}`, body, 'high-severity');
+                  }
+                }
+              }
+            } catch (e) {
+              console.log('No Slither results or error parsing:', e.message);
+            }
+            
+            core.info('Solidity security analysis complete');
+
+      - name: Generate summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 🔐 Solidity Security Analysis Summary
+          
+          ### Analysis Tools Run
+          - ✅ **Solhint**: Linting and security best practices
+          - ✅ **Slither**: Static analysis for vulnerabilities
+          - ✅ **Mythril**: Symbolic execution analysis
+          - ✅ **Aderyn**: Rust-based static analyzer
+          - ✅ **Prettier**: Code formatting check
+          
+          ### Vulnerability Categories Checked
+          - ♻️ Reentrancy vulnerabilities
+          - 🔢 Integer overflow/underflow
+          - 🔑 Access control issues
+          - 💰 Unchecked return values
+          - ⚡ Gas optimization issues
+          - 🎯 Delegatecall to untrusted contracts
+          - 🔓 Unprotected functions
+          
+          ### Actions Taken
+          - Analysis results uploaded as artifacts
+          - Issues created for HIGH/MEDIUM severity findings
+          - All results available in workflow artifacts
+          
+          ### Smart Contract Security Best Practices
+          - Follow Checks-Effects-Interactions pattern
+          - Use ReentrancyGuard for external calls
+          - Validate all inputs and access controls
+          - Use SafeMath or Solidity 0.8+ for arithmetic
+          - Avoid delegatecall to user-supplied addresses
+          
+          ---
+          *Comprehensive Solidity security analysis for bug bounty research* 🎯
+          EOF

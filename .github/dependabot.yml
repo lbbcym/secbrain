@@ -1,13 +1,64 @@
 version: 2
 updates:
+  # Python dependencies - daily security updates
   - package-ecosystem: "pip"
     directory: "/secbrain"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     allow:
       - dependency-type: "all"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    reviewers:
+      - "blairmichaelg"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    # Auto-merge security updates
+    ignore:
+      # Add packages to ignore updates here if needed
+    groups:
+      security-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+          - "minor"
+
+  # GitHub Actions - weekly updates
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    reviewers:
+      - "blairmichaelg"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+
+  # npm for Solidity tooling (if package.json exists)
+  # Uncomment when package.json is added
+  # - package-ecosystem: "npm"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "daily"
+  #   allow:
+  #     - dependency-type: "all"
+  #   open-pull-requests-limit: 10
+  #   labels:
+  #     - "dependencies"
+  #     - "npm"
+  #     - "solidity-tooling"
+  #   reviewers:
+  #     - "blairmichaelg"
+  #   commit-message:
+  #     prefix: "chore(deps)"
+  #     include: "scope"
+

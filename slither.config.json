@@ -1,0 +1,25 @@
+{
+  "filter_paths": "node_modules/|test/|scripts/",
+  "solc_remaps": [
+    "@openzeppelin=node_modules/@openzeppelin",
+    "forge-std=lib/forge-std/src",
+    "ds-test=lib/ds-test/src"
+  ],
+  "detectors_to_exclude": "naming-convention,solc-version,low-level-calls",
+  "exclude_informational": false,
+  "exclude_low": false,
+  "exclude_medium": false,
+  "exclude_high": false,
+  "disable_color": false,
+  "filter_paths_regex": ".*/(test|mock|mocks)/.*",
+  "json": "-",
+  "checklist": false,
+  "markdown": "-",
+  "detectors_to_run": "all",
+  "printers_to_run": "",
+  "exclude_dependencies": true,
+  "exclude_optimization": false,
+  "show_ignored_findings": false,
+  "legacy_ast": false,
+  "ignore_return_value": false
+}
