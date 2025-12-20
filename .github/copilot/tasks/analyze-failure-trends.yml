@@ -167,10 +167,10 @@ success_criteria:
 
 notifications:
   on_high_failure_rate:
-    - Create GitHub issue: "High Workflow Failure Rate Detected"
+    - 'Create GitHub issue: High Workflow Failure Rate Detected'
     - Include failure analysis and recommendations
     - Assign to team lead
-    - Labels: "critical", "ci-cd", "needs-attention"
+    - 'Labels: critical, ci-cd, needs-attention'
   
   on_pattern_detected:
     - Create discussion with pattern details

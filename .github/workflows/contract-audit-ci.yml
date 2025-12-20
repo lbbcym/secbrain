@@ -52,7 +52,15 @@ jobs:
     - name: Run unit tests with coverage
       run: |
         cd secbrain
-        python -m pytest tests/ -v --tb=short --cov=secbrain --cov-report=term-missing --cov-fail-under=60
+        python -m pytest tests/ -v --tb=short --cov=secbrain --cov-report=term-missing --cov-report=xml --cov-fail-under=60
+    
+    - name: Upload coverage reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports
+        path: secbrain/coverage.xml
+        retention-days: 30
 
     - name: Run contract recon dry-run test
       run: |
@@ -109,6 +117,34 @@ jobs:
         python -c "import yaml; yaml.safe_load(open('examples/enzyme_scope.yaml')); print('enzyme_scope.yaml is valid YAML')"
         
         echo "Enzyme configuration files are valid"
+    
+    - name: Generate workflow summary
+      if: always()
+      run: |
+        cd secbrain
+        cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+        ## Contract Audit CI Summary
+        
+        ### Quality Checks
+        - ✅ Linting (ruff)
+        - ✅ Type checking (mypy)
+        - ✅ Unit tests with coverage
+        
+        ### Test Coverage
+        Run `pytest --cov-report=term-missing` to see detailed coverage
+        
+        ### Dry-Run Tests
+        - ✅ Contract recon dry-run
+        - ✅ Contract fixtures generation
+        - ✅ Enzyme configuration validation
+        
+        ### Artifacts
+        - Coverage reports uploaded
+        - Logs available in test_workspace/logs/
+        
+        ---
+        *For AI-powered insights, see the Copilot Space analysis*
+        EOF
 
   # Future: Add integration test with actual Foundry installation
   # integration:

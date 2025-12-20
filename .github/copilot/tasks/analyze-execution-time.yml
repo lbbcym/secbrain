@@ -128,7 +128,7 @@ notifications:
   on_threshold_exceeded:
     - Create GitHub issue titled "Workflow Performance Degradation"
     - Include detailed analysis and recommendations
-    - Label: "performance", "ci-cd"
+    - 'Label: performance, ci-cd'
   
   on_anomaly:
     - Add comment to related PR if applicable

@@ -186,7 +186,7 @@ notifications:
   on_large_artifacts:
     - Create issue if single artifact > 100MB
     - Include optimization suggestions
-    - Label: "artifact-optimization", "ci-cd"
+    - 'Label: artifact-optimization, ci-cd'
   
   on_storage_threshold:
     - Alert if total storage > 5GB
