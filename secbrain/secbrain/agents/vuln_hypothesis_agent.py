@@ -121,6 +121,9 @@ class VulnHypothesisAgent(BaseAgent):
                         "precision_error",
                         "state_inconsistency",
                         "generic_contract",
+                        "storage_collision",
+                        "signature_replay",
+                        "first_depositor_inflation",
                     ],
                 },
                 "confidence": {"type": "number", "minimum": 0, "maximum": 1},
@@ -267,6 +270,15 @@ class VulnHypothesisAgent(BaseAgent):
         except Exception:
             scope_profit_tokens = []
 
+        # Static patterns: zero-cost heuristics before LLM
+        static_hypotheses = self._static_vulnerability_patterns(
+            abi,
+            functions,
+            metadata,
+            contract_address=address,
+            chain_id=chain_id,
+        )
+
         # Keep prompts bounded
         functions_preview = functions[:50]
         abi_preview = abi
@@ -364,6 +376,8 @@ Additional note: The contract contains functions that may be vulnerable to preci
             functions_preview=functions_preview,
         )
 
+        # Combine static + LLM results
+        combined_hypotheses = list(static_hypotheses)
         if raw_hypotheses:
             hypotheses: list[dict[str, Any]] = []
             for h in raw_hypotheses:
@@ -440,7 +454,7 @@ Additional note: The contract contains functions that may be vulnerable to preci
                     )
                     continue
 
-                hypotheses.append({
+                candidate = {
                     "id": f"hyp-{uuid.uuid4().hex[:8]}",
                     "asset_id": asset.get("id"),
                     "target": f"{name}@{address}" if name else address,
@@ -466,7 +480,13 @@ Additional note: The contract contains functions that may be vulnerable to preci
                     "function_param_types": param_types,
                     "exploit_body": exploit_body,
                     "status": "pending",
-                })
+                }
+
+                if not self._validate_hypothesis(candidate):
+                    self._log("invalid_hypothesis_discarded", hypothesis=candidate)
+                    continue
+
+                hypotheses.append(candidate)
 
             # Heuristic enrichment for MEV/sandwich and precision/rounding issues
             hypotheses.extend(
@@ -534,7 +554,7 @@ Additional note: The contract contains functions that may be vulnerable to preci
                     "exploit_body": exploit_body,
                 })
 
-            return hypotheses[: profile.budget]
+            combined_hypotheses.extend(hypotheses[: profile.budget])
 
         else:
             try:
@@ -548,7 +568,7 @@ Additional note: The contract contains functions that may be vulnerable to preci
                 )
                 return []
 
-            return [{
+            combined_hypotheses.append({
                 "id": f"hyp-{uuid.uuid4().hex[:8]}",
                 "asset_id": asset.get("id"),
                 "target": f"{name}@{address}" if name else address,
@@ -564,7 +584,9 @@ Additional note: The contract contains functions that may be vulnerable to preci
                 "abi": abi,
                 "profit_tokens": scope_profit_tokens,
                 "status": "pending",
-            }]
+            })
+
+        return combined_hypotheses
 
     async def _parse_hypotheses_with_validation(
         self,
@@ -672,6 +694,82 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
         if not is_address(addr):
             raise ValueError(f"invalid address: {address}")
         return to_checksum_address(addr)
+
+    def _static_vulnerability_patterns(
+        self,
+        abi: list[Any],
+        functions: list[str],
+        metadata: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """
+        Zero-cost heuristic hypotheses to reduce LLM dependence.
+        - Reentrancy: external call detected before state change
+        - Access control: common admin keywords missing modifiers
+        - Oracle manipulation: dependency hints from metadata
+        - Storage collision: delegatecall/proxy markers
+        - Signature replay: ecrecover usage without chain id
+        - First depositor inflation: ERC4626-like share semantics
+        """
+        hypotheses: list[dict[str, Any]] = []
+        funcs_lower = [f.lower() for f in functions]
+
+        def add(vuln_type: str, rationale: str, confidence: float = 0.6) -> None:
+            hypotheses.append(
+                {
+                    "id": f"hyp-{uuid.uuid4().hex[:8]}",
+                    "vuln_type": vuln_type,
+                    "confidence": confidence,
+                    "rationale": rationale,
+                    "function_signature": functions[0] if functions else None,
+                }
+            )
+
+        # Heuristic: storage collision / proxy patterns
+        has_delegate = any("delegatecall" in f for f in funcs_lower)
+        has_proxy_slot = any("eip1967" in f or "implementation" in f for f in funcs_lower)
+        if has_delegate or has_proxy_slot:
+            add("storage_collision", "Delegatecall/proxy slot usage detected", 0.75)
+
+        # Heuristic: signature replay
+        sig_keywords = ["ecrecover", "permit", "signature", "sig"]
+        if any(k in f for k in funcs_lower for k in sig_keywords):
+            add("signature_replay", "Signature recovery detected; chainid binding unknown", 0.55)
+
+        # Heuristic: first depositor inflation for vault-like contracts
+        vault_keywords = ["deposit", "withdraw", "mint", "redeem", "totalassets", "totalshares"]
+        if any(k in f for f in funcs_lower for k in vault_keywords):
+            add("first_depositor_inflation", "Share-based vault semantics detected", 0.65)
+
+        # Heuristic: reentrancy hooks (presence of external calls)
+        external_callers = ["call(", "delegatecall(", "staticcall("]
+        if any(c in "".join(funcs_lower) for c in external_callers):
+            add("reentrancy", "External call present; check ordering", 0.6)
+
+        # Heuristic: access control gaps
+        admin_keywords = ["owner", "admin", "governor"]
+        protected = any("only" in f for f in funcs_lower)
+        if any(k in "".join(funcs_lower) for k in admin_keywords) and not protected:
+            add("access_control", "Admin-like functions without protection hints", 0.55)
+
+        # Oracle hint from metadata
+        if metadata.get("oracle_dependency"):
+            add("oracle_manipulation", "Oracle dependency flagged in metadata", 0.7)
+
+        return hypotheses
+
+    def _validate_hypothesis(self, hyp: dict[str, Any]) -> bool:
+        """Cheap sanity gate before downstream phases."""
+        required_fields = ["vuln_type", "confidence", "contract_address", "function_signature"]
+        if not all(hyp.get(f) for f in required_fields):
+            return False
+        try:
+            self._checksum_address(hyp.get("contract_address"))
+        except Exception:
+            return False
+        conf = hyp.get("confidence")
+        if conf is None or not isinstance(conf, (float, int)):
+            return False
+        return 0.0 <= float(conf) <= 1.0
 
     def _heuristic_enrich_hypotheses(
         self,

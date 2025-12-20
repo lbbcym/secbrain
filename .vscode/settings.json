@@ -15,6 +15,7 @@
             "source.fixAll": "explicit"
         }
     },
+    "semgrep.enableCodeActions": false,
     "semgrep.scan.onlyGitDirty": false,
     "wake.compiler.solc.remappings": [],
     "terminal.integrated.defaultProfile.windows": "PowerShell"
