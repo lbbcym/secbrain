@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 
     from secbrain.core.context import RunContext
 
-from secbrain.agents.base import AgentResult
 from secbrain.agents.exploit_agent import ExploitAgent
 from secbrain.agents.meta_learning_agent import MetaLearningAgent
 from secbrain.agents.planner_agent import PlannerAgent

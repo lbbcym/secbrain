@@ -273,7 +273,6 @@ class SSRFHeuristicVerifier(ExploitVerifier):
         test_response,
         trace_id: str,
     ) -> VerificationResult:
-        baseline_text = (getattr(baseline_response, "text", "") or "").lower()
         test_text = (getattr(test_response, "text", "") or "").lower()
         baseline_status = int(getattr(baseline_response, "status_code", 0) or 0)
         test_status = int(getattr(test_response, "status_code", 0) or 0)
