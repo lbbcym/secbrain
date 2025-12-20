@@ -36,6 +36,14 @@ outdated-packages.json
 pip-audit-sbom.json
 npm-audit-results.json
 
+# SBOM and compliance reports
+sbom/
+license-report.json
+license-report.md
+license-report.csv
+license-compliance.json
+vendor-risk-assessment.json
+
 # Coverage reports
 .coverage
 htmlcov/
