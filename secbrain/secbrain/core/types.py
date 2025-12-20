@@ -311,6 +311,49 @@ class StorageProtocol(Protocol):
 # =============================================================================
 # SQL Injection Prevention with LiteralString
 # =============================================================================
+# The LiteralString type (PEP 675) provides compile-time protection against
+# SQL injection by ensuring query strings come from code literals, not user input.
+#
+# This is enforced by the type checker (mypy) at development time, catching
+# potential vulnerabilities before code reaches production.
+#
+# Example of SAFE usage:
+#     async def get_user(user_id: int) -> dict[str, Any]:
+#         # Query is a literal string - type checks ✓
+#         cursor = await storage._execute(
+#             "SELECT * FROM users WHERE id = ?",
+#             (user_id,)
+#         )
+#         return await cursor.fetchone()
+#
+# Example of UNSAFE usage (rejected by mypy):
+#     async def get_user_unsafe(table: str, user_id: int) -> dict[str, Any]:
+#         # Query built from variable - type error! ✗
+#         query = f"SELECT * FROM {table} WHERE id = ?"
+#         cursor = await storage._execute(query, (user_id,))  # mypy error!
+#         return await cursor.fetchone()
+#
+# Correct way to handle dynamic table names:
+#     # Use a mapping to validate table names
+#     ALLOWED_TABLES = {"users": "users", "sessions": "sessions"}
+#
+#     async def get_record(table_key: str, record_id: int) -> dict[str, Any]:
+#         table = ALLOWED_TABLES.get(table_key)
+#         if table is None:
+#             raise ValueError(f"Invalid table: {table_key}")
+#
+#         # Now we can use literal strings with the validated table name
+#         if table == "users":
+#             cursor = await storage._execute(
+#                 "SELECT * FROM users WHERE id = ?",
+#                 (record_id,)
+#             )
+#         elif table == "sessions":
+#             cursor = await storage._execute(
+#                 "SELECT * FROM sessions WHERE id = ?",
+#                 (record_id,)
+#             )
+#         return await cursor.fetchone()
 
 
 def execute_safe_query(query: LiteralString, params: tuple[Any, ...] = ()) -> None:
@@ -334,7 +377,8 @@ def execute_safe_query(query: LiteralString, params: tuple[Any, ...] = ()) -> No
 
     Note:
         This is a placeholder showing the pattern. Actual database
-        operations use the storage module.
+        operations use the storage module (tools/storage.py), which
+        implements LiteralString on its _execute and _executescript methods.
     """
 
 
@@ -343,6 +387,7 @@ def build_safe_table_name(prefix: LiteralString, suffix: LiteralString) -> Liter
     Build a safe table name from literal components.
 
     Demonstrates using LiteralString for dynamic but safe SQL construction.
+    When combining LiteralStrings, the result is also a LiteralString.
 
     Args:
         prefix: Literal table name prefix
@@ -350,6 +395,15 @@ def build_safe_table_name(prefix: LiteralString, suffix: LiteralString) -> Liter
 
     Returns:
         Combined table name (still a LiteralString)
+
+    Example:
+        # Safe: both inputs are literals, output is LiteralString
+        table = build_safe_table_name("findings", "archive")
+        execute_safe_query(f"SELECT * FROM {table}", ())  # Type checks ✓
+
+        # Unsafe: if prefix comes from user input
+        user_prefix = get_user_input()
+        table = build_safe_table_name(user_prefix, "archive")  # Type error! ✗
     """
     return f"{prefix}_{suffix}"
 
