@@ -124,6 +124,8 @@ class VulnHypothesisAgent(BaseAgent):
                         "storage_collision",
                         "signature_replay",
                         "first_depositor_inflation",
+                        "cross_function_reentrancy",
+                        "unchecked_arithmetic",
                     ],
                 },
                 "confidence": {"type": "number", "minimum": 0, "maximum": 1},
@@ -271,13 +273,25 @@ class VulnHypothesisAgent(BaseAgent):
             scope_profit_tokens = []
 
         # Static patterns: zero-cost heuristics before LLM
-        static_hypotheses = self._static_vulnerability_patterns(
-            abi,
-            functions,
-            metadata,
-            contract_address=address,
-            chain_id=chain_id,
-        )
+        static_hypotheses = [
+            hyp
+            for hyp in self._static_vulnerability_patterns(
+                abi=abi,
+                functions=functions,
+                metadata=metadata,
+                contract_address=address,
+                chain_id=chain_id,
+                foundry_profile=foundry_profile,
+                solc=solc,
+                scope_profit_tokens=scope_profit_tokens,
+            )
+            if self._feasibility_gate(hyp, abi, functions) and self._validate_hypothesis(hyp)
+        ]
+
+        # If static signals are strong and numerous, skip LLM to save cost/latency
+        static_conf_ok = [h for h in static_hypotheses if float(h.get("confidence", 0)) >= 0.6]
+        if len(static_conf_ok) >= 3:
+            return static_hypotheses
 
         # Keep prompts bounded
         functions_preview = functions[:50]
@@ -482,6 +496,9 @@ Additional note: The contract contains functions that may be vulnerable to preci
                     "status": "pending",
                 }
 
+                if not self._feasibility_gate(candidate, abi):
+                    self._log("hypothesis_infeasible_dropped", hypothesis=candidate)
+                    continue
                 if not self._validate_hypothesis(candidate):
                     self._log("invalid_hypothesis_discarded", hypothesis=candidate)
                     continue
@@ -697,18 +714,28 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
 
     def _static_vulnerability_patterns(
         self,
+        *,
         abi: list[Any],
         functions: list[str],
         metadata: dict[str, Any],
+        contract_address: str | None,
+        chain_id: int | None,
+        foundry_profile: str | None,
+        solc: str | None,
+        scope_profit_tokens: list[dict[str, Any]] | None,
     ) -> list[dict[str, Any]]:
         """
         Zero-cost heuristic hypotheses to reduce LLM dependence.
-        - Reentrancy: external call detected before state change
-        - Access control: common admin keywords missing modifiers
-        - Oracle manipulation: dependency hints from metadata
-        - Storage collision: delegatecall/proxy markers
-        - Signature replay: ecrecover usage without chain id
-        - First depositor inflation: ERC4626-like share semantics
+        Covers top missing classes from review:
+        - Reentrancy (single + cross-function)
+        - Access control
+        - Oracle manipulation
+        - Storage collision (upgradeable proxies)
+        - Signature replay (permit/ecrecover)
+        - First depositor inflation (ERC4626-style)
+        - Unchecked arithmetic (Solc 0.8+ unchecked blocks)
+        - Precision/rounding errors (share protocols)
+        - MEV/Sandwich for AMM-like flows
         """
         hypotheses: list[dict[str, Any]] = []
         funcs_lower = [f.lower() for f in functions]
@@ -721,39 +748,73 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
                     "confidence": confidence,
                     "rationale": rationale,
                     "function_signature": functions[0] if functions else None,
+                    "contract_address": contract_address,
+                    "chain_id": chain_id,
+                    "foundry_profile": foundry_profile,
+                    "solc": solc,
+                    "profit_tokens": scope_profit_tokens,
+                    "status": "pending",
                 }
             )
 
-        # Heuristic: storage collision / proxy patterns
+        # Storage collision / proxy patterns
         has_delegate = any("delegatecall" in f for f in funcs_lower)
+        has_upgrade = any("upgrade" in f or "initialize" in f for f in funcs_lower)
         has_proxy_slot = any("eip1967" in f or "implementation" in f for f in funcs_lower)
-        if has_delegate or has_proxy_slot:
-            add("storage_collision", "Delegatecall/proxy slot usage detected", 0.75)
+        if has_delegate or has_proxy_slot or has_upgrade:
+            add("storage_collision", "Delegatecall/proxy slot usage detected", 0.7)
 
-        # Heuristic: signature replay
+        # Signature replay (permit/ecrecover)
         sig_keywords = ["ecrecover", "permit", "signature", "sig"]
-        if any(k in f for k in funcs_lower for k in sig_keywords):
-            add("signature_replay", "Signature recovery detected; chainid binding unknown", 0.55)
+        if any(any(k in f for k in sig_keywords) for f in funcs_lower):
+            add("signature_replay", "Signature recovery detected; nonce/deadline unknown", 0.6)
 
-        # Heuristic: first depositor inflation for vault-like contracts
-        vault_keywords = ["deposit", "withdraw", "mint", "redeem", "totalassets", "totalshares"]
-        if any(k in f for f in funcs_lower for k in vault_keywords):
-            add("first_depositor_inflation", "Share-based vault semantics detected", 0.65)
+        # First depositor inflation for vault-like contracts (ERC4626 semantics)
+        vault_keywords = ["deposit", "withdraw", "mint", "redeem", "totalassets", "totalsupply", "totalshares"]
+        if any(any(k in f for k in vault_keywords) for f in funcs_lower):
+            add("first_depositor_inflation", "Share-based vault semantics detected", 0.7)
 
-        # Heuristic: reentrancy hooks (presence of external calls)
+        # Reentrancy hooks (external calls)
         external_callers = ["call(", "delegatecall(", "staticcall("]
         if any(c in "".join(funcs_lower) for c in external_callers):
-            add("reentrancy", "External call present; check ordering", 0.6)
+            add("reentrancy", "External call present; check ordering", 0.65)
 
-        # Heuristic: access control gaps
-        admin_keywords = ["owner", "admin", "governor"]
-        protected = any("only" in f for f in funcs_lower)
-        if any(k in "".join(funcs_lower) for k in admin_keywords) and not protected:
+        # Cross-function reentrancy (withdraw + deposit/mint)
+        withdraw_funcs = [f for f in funcs_lower if any(k in f for k in ["withdraw", "redeem", "claim"])]
+        deposit_funcs = [f for f in funcs_lower if any(k in f for k in ["deposit", "mint", "stake"])]
+        if withdraw_funcs and deposit_funcs:
+            add(
+                "cross_function_reentrancy",
+                f"Withdraw {withdraw_funcs[0]} paired with deposit/mint {deposit_funcs[0]}",
+                0.7,
+            )
+
+        # Access control gaps
+        admin_keywords = ["owner", "admin", "governor", "upgrade", "pause", "set"]
+        protected = any("only" in f or "auth" in f for f in funcs_lower)
+        if any(any(k in f for k in admin_keywords) for f in funcs_lower) and not protected:
             add("access_control", "Admin-like functions without protection hints", 0.55)
 
         # Oracle hint from metadata
         if metadata.get("oracle_dependency"):
-            add("oracle_manipulation", "Oracle dependency flagged in metadata", 0.7)
+            add("oracle_manipulation", "Oracle dependency flagged in metadata", 0.75)
+
+        # Precision / rounding errors in share-based protocols
+        precision_keywords = ["share", "rebalance", "round", "ceil", "floor"]
+        if any(any(k in f for k in precision_keywords) for f in funcs_lower):
+            add("precision_error", "Share/rounding semantics detected", 0.65)
+
+        # MEV/Sandwich heuristic for AMM-like functions
+        amm_keywords = ["swap", "router", "pair", "pool", "reserve"]
+        price_keywords = ["price", "twap"]
+        if any(any(k in f for k in amm_keywords) for f in funcs_lower) and any(any(k in f for k in price_keywords) for f in funcs_lower):
+            add("mev_sandwich", "AMM-like swap + price functions detected", 0.65)
+
+        # Unchecked arithmetic hint (Solc 0.8+ unchecked blocks) - rely on metadata.solc if present
+        solc_version = metadata.get("solc")
+        math_keywords = ["mul", "div", "add", "sub", "calc", "compute"]
+        if solc_version and solc_version.startswith("0.8") and any(any(k in f for k in math_keywords) for f in funcs_lower):
+            add("unchecked_arithmetic", f"Solc {solc_version} math functions could use unchecked{{}}", 0.55)
 
         return hypotheses
 
@@ -770,6 +831,53 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
         if conf is None or not isinstance(conf, (float, int)):
             return False
         return 0.0 <= float(conf) <= 1.0
+
+    def _feasibility_gate(self, hyp: dict[str, Any], abi: list[Any], functions: list[str] | None = None) -> bool:
+        """
+        Eliminate impossible hypotheses before downstream execution.
+        Checks:
+        - Function exists in ABI
+        - Non-view/pure for exploitation
+        - Payable alignment if hinted
+        - Basic oracle dependency for oracle_manipulation
+        """
+        func_sig = hyp.get("function_signature")
+        if not func_sig:
+            return False
+        fn_name = str(func_sig).split("(")[0]
+        abi_entry = self._get_abi_entry(fn_name, abi)
+        if not abi_entry:
+            return False
+
+        state_mut = str(abi_entry.get("stateMutability") or "")
+        if state_mut in {"view", "pure"}:
+            return False
+        if hyp.get("requires_payable") and state_mut != "payable":
+            return False
+
+        if hyp.get("vuln_type") in {"oracle_manipulation"}:
+            oracle_info = self._oracle_detector.detect_oracle_dependency(abi, functions or [])
+            if not oracle_info.get("has_oracle"):
+                return False
+
+        if hyp.get("vuln_type") in {"cross_function_reentrancy"}:
+            lowers = [f.lower() for f in functions or []]
+            has_withdraw = any(k in f for f in lowers for k in ["withdraw", "redeem", "claim"])
+            has_deposit = any(k in f for f in lowers for k in ["deposit", "mint", "stake"])
+            if not (has_withdraw and has_deposit):
+                return False
+
+        return True
+
+    def _get_abi_entry(self, fn_name: str, abi: list[Any]) -> dict[str, Any] | None:
+        for item in abi or []:
+            if not isinstance(item, dict):
+                continue
+            if item.get("type") != "function":
+                continue
+            if item.get("name") == fn_name:
+                return item
+        return None
 
     def _heuristic_enrich_hypotheses(
         self,

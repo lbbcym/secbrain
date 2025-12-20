@@ -222,10 +222,11 @@ Respond with JSON:
         if not attempts:
             return {"decision": "SKIP", "reason": "no_attempts", "max_profit_eth": 0.0}
 
-        eth_price = 3000.0  # placeholder; wire real feed later
+        eth_price = 3000.0  # fallback; prefer attempt-provided estimates
         max_profit_eth = 0.0
         max_profit_usd = 0.0
         gas_used = None
+        gas_price_wei = None
 
         for att in attempts:
             try:
@@ -234,11 +235,17 @@ Respond with JSON:
             except (TypeError, ValueError):
                 continue
 
+            # Use any ETH price hint attached to attempt
+            try:
+                eth_price = float(att.get("eth_price_usd") or eth_price)
+            except Exception:
+                pass
+
             # Derive USD from ETH if not provided
             if not p_usd and eth_price:
                 p_usd = p_eth * eth_price
 
-            # Include token breakdown if present
+            # Include token breakdown if present (already USD or normalized values)
             breakdown = att.get("profit_breakdown") or {}
             if isinstance(breakdown, dict):
                 try:
@@ -250,20 +257,45 @@ Respond with JSON:
             if p_eth > max_profit_eth:
                 max_profit_eth = p_eth
                 gas_used = att.get("gas_used")
+                gas_price_wei = att.get("gas_price_wei") or att.get("gas_price")
             if p_usd > max_profit_usd:
                 max_profit_usd = p_usd
 
-        gas_cost = (gas_used or 0) * 30e-9 * eth_price  # assume 30 gwei, convert to USD
+        # Estimate gas cost with EIP-1559-style baseline + priority fee if available
+        base_gas_price_wei = 50e9  # 50 gwei fallback
+        try:
+            if gas_price_wei:
+                base_gas_price_wei = float(gas_price_wei)
+        except Exception:
+            pass
+        gas_cost_eth = (float(gas_used or 0) * base_gas_price_wei) / 1e18
+        gas_cost = gas_cost_eth * eth_price if eth_price else 0.0
         net_usd = max_profit_usd - gas_cost
 
-        decision = "PURSUE" if max_profit_usd >= 300 else "CONSIDER" if max_profit_usd > 0 else "SKIP"
+        gas_ratio = (gas_cost / max_profit_usd) if max_profit_usd > 0 else float("inf")
+        min_profit_threshold = 300
+        if gas_ratio > 0.5:
+            decision = "SKIP"
+            reason = "Gas cost too high relative to profit"
+        elif net_usd >= min_profit_threshold:
+            decision = "PURSUE"
+            reason = f"Net profit ${net_usd:.0f} exceeds threshold"
+        elif net_usd > 0:
+            decision = "CONSIDER"
+            reason = f"Marginal profit ${net_usd:.0f}"
+        else:
+            decision = "SKIP"
+            reason = "Negative or zero profit"
+
         return {
             "decision": decision,
+            "reason": reason,
             "max_profit_eth": max_profit_eth,
             "max_profit_usd": round(max_profit_usd, 2),
             "gas_used": gas_used,
             "gas_cost_usd_est": round(gas_cost, 2) if gas_used else 0,
             "net_usd_est": round(net_usd, 2),
             "threshold_eth": 0.1,
-            "threshold_usd": 300,
+            "threshold_usd": min_profit_threshold,
+            "gas_price_wei": base_gas_price_wei,
         }

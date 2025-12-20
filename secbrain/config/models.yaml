@@ -2,16 +2,17 @@
 
 worker:
   provider: openai_compatible
-  model: qwen/qwen-2.5-72b-instruct
+  model: deepseek-ai/DeepSeek-V3          # Hypothesis generation / complex reasoning
   base_url: https://api.together.xyz/v1
-  max_tokens: 4096
-  temperature: 0.7
+  max_tokens: 16384
+  temperature: 0.3
 
 advisor:
-  provider: gemini
-  model: gemini-pro
-  max_tokens: 8192
-  temperature: 0.3
+  provider: openai_compatible
+  model: Qwen/Qwen2.5-Coder-32B-Instruct  # Severity / validation
+  base_url: https://api.together.xyz/v1
+  max_tokens: 4096
+  temperature: 0.2
 
 research:
   provider: perplexity
