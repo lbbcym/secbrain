@@ -7,7 +7,6 @@ import uuid
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
 from typing import Any, Protocol
-from datetime import datetime
 
 from secbrain.core.verification import (
     EvidenceBundle,
@@ -72,27 +71,6 @@ class VerificationHttpResponse(Protocol):
     text: str | None
     status_code: int | None
     duration_ms: float | int | None
-        test_passed: bool,
-        confidence_score: float,
-        notes: str | None = None,
-    ) -> EvidenceBundle:
-        payload_hash = hashlib.sha256(payload.encode("utf-8", errors="replace")).hexdigest()
-
-        return EvidenceBundle(
-            evidence_id=str(uuid.uuid4()),
-            trace_id=trace_id,
-            method=str(getattr(test_response, "method", "GET")),
-            url_path=get_url_path(str(getattr(test_response, "url", target_url))),
-            injected_parameter=parameter_name,
-            payload_hash=payload_hash,
-            baseline_response=ResponseFingerprint.from_http_response(baseline_response),
-            test_response=ResponseFingerprint.from_http_response(test_response),
-            verification_method=verification_method,
-            test_passed=test_passed,
-            confidence_score=confidence_score,
-            timestamp=datetime.utcnow(),
-            notes=notes,
-        )
 
 
 class ReflectedXSSVerifier(ExploitVerifier):
