@@ -1,0 +1,50 @@
+{"run_id": "ed02289d", "phases": ["ingest", "plan", "recon", "hypothesis", "exploit", "static", "triage", "report", "meta"], "dry_run": false, "event": "workflow_started", "level": "info", "timestamp": "2025-12-18T12:22:45.459448"}
+{"run_id": "ed02289d", "phase": "ingest", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:22:45.459961"}
+{"run_id": "ed02289d", "phase": "ingest", "from_phase": "ingest", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:22:45.460419"}
+{"run_id": "ed02289d", "agent": "program_ingest", "phase": "ingest", "event": "starting_ingest", "level": "info", "timestamp": "2025-12-18T12:22:45.460748"}
+{"run_id": "ed02289d", "phase": "ingest", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:22:45.461398"}
+{"run_id": "ed02289d", "phase": "plan", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:22:45.461786"}
+{"run_id": "ed02289d", "phase": "plan", "from_phase": "plan", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:22:45.462106"}
+{"run_id": "ed02289d", "agent": "planner", "phase": "plan", "event": "starting_planning", "level": "info", "timestamp": "2025-12-18T12:22:45.462414"}
+{"run_id": "ed02289d", "phase": "plan", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:22:45.462792"}
+{"run_id": "ed02289d", "phase": "recon", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:22:45.463149"}
+{"run_id": "ed02289d", "phase": "recon", "from_phase": "recon", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:22:45.463474"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "starting_recon", "level": "info", "timestamp": "2025-12-18T12:22:45.463792"}
+{"run_id": "ed02289d", "domains_count": 0, "contracts_count": 7, "agent": "recon", "phase": "recon", "event": "debug_scope", "level": "info", "timestamp": "2025-12-18T12:22:45.464093"}
+{"run_id": "ed02289d", "name": "Proxy", "address": "0x85b78aCa6DeaE198fBf201c82dAf6cA21942ACc6", "agent": "recon", "phase": "recon", "event": "first_contract", "level": "info", "timestamp": "2025-12-18T12:22:45.464477"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "Starting contract recon for 7 contracts", "level": "info", "timestamp": "2025-12-18T12:22:45.465088"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "Compiling contract Proxy with profile contract_Proxy_85b7", "level": "info", "timestamp": "2025-12-18T12:22:45.499538"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "Compiling contract ConvexEthMetaStrategyProxy with profile contract_ConvexEthMetaStrategyProxy_1827", "level": "info", "timestamp": "2025-12-18T12:22:46.654565"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "Compiling contract VaultProxy with profile contract_VaultProxy_e75d", "level": "info", "timestamp": "2025-12-18T12:22:50.023097"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "Compiling contract OETHCurveAMOProxy with profile contract_OETHCurveAMOProxy_af04", "level": "info", "timestamp": "2025-12-18T12:22:52.702315"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "Compiling contract FixedRateRewardsSourceProxy with profile contract_FixedRateRewardsSourceProxy_7609", "level": "info", "timestamp": "2025-12-18T12:22:55.206568"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "Compiling contract ExponentialStakingProxy with profile contract_ExponentialStakingProxy_6389", "level": "info", "timestamp": "2025-12-18T12:22:57.191744"}
+{"run_id": "ed02289d", "agent": "recon", "phase": "recon", "event": "Compiling contract InitializeGovernedUpgradeabilityProxy with profile contract_InitializeGovernedUpgradeabilityProxy_5018", "level": "info", "timestamp": "2025-12-18T12:22:59.156550"}
+{"run_id": "ed02289d", "phase": "recon", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:23:01.856019"}
+{"run_id": "ed02289d", "phase": "hypothesis", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:23:01.856650"}
+{"run_id": "ed02289d", "phase": "hypothesis", "from_phase": "hypothesis", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:23:01.857254"}
+{"run_id": "ed02289d", "agent": "vuln_hypothesis", "phase": "hypothesis", "event": "starting_hypothesis_generation", "level": "info", "timestamp": "2025-12-18T12:23:01.857757"}
+{"run_id": "ed02289d", "count": 1, "total": 7, "agent": "vuln_hypothesis", "phase": "hypothesis", "event": "hypotheses_missing_contract_or_function", "level": "info", "timestamp": "2025-12-18T12:23:01.859117"}
+{"run_id": "ed02289d", "phase": "hypothesis", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:23:01.859718"}
+{"run_id": "ed02289d", "phase": "exploit", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:23:01.860239"}
+{"run_id": "ed02289d", "phase": "exploit", "from_phase": "exploit", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:23:01.860697"}
+{"run_id": "ed02289d", "agent": "exploit", "phase": "exploit", "event": "starting_exploitation", "level": "info", "timestamp": "2025-12-18T12:23:01.863808"}
+{"run_id": "ed02289d", "phase": "exploit", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.111448"}
+{"run_id": "ed02289d", "phase": "static", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.115666"}
+{"run_id": "ed02289d", "phase": "static", "from_phase": "static", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:31:04.116699"}
+{"run_id": "ed02289d", "agent": "static_analysis", "phase": "static", "event": "starting_static_analysis", "level": "info", "timestamp": "2025-12-18T12:31:04.118197"}
+{"run_id": "ed02289d", "phase": "static", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.119149"}
+{"run_id": "ed02289d", "phase": "triage", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.120256"}
+{"run_id": "ed02289d", "phase": "triage", "from_phase": "triage", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:31:04.121405"}
+{"run_id": "ed02289d", "agent": "triage", "phase": "triage", "event": "starting_triage", "level": "info", "timestamp": "2025-12-18T12:31:04.125073"}
+{"run_id": "ed02289d", "phase": "triage", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.126357"}
+{"run_id": "ed02289d", "phase": "report", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.127094"}
+{"run_id": "ed02289d", "phase": "report", "from_phase": "report", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:31:04.127689"}
+{"run_id": "ed02289d", "agent": "reporting", "phase": "report", "event": "starting_reporting", "level": "info", "timestamp": "2025-12-18T12:31:04.128242"}
+{"run_id": "ed02289d", "phase": "report", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.129051"}
+{"run_id": "ed02289d", "phase": "meta", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.130260"}
+{"run_id": "ed02289d", "phase": "meta", "from_phase": "meta", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T12:31:04.131239"}
+{"run_id": "ed02289d", "agent": "meta_learning", "phase": "meta", "event": "starting_meta_learning", "level": "info", "timestamp": "2025-12-18T12:31:04.132529"}
+{"run_id": "ed02289d", "path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\targets\\originprotocol\\learnings\\ed02289d.json", "agent": "meta_learning", "phase": "meta", "event": "learnings_stored", "level": "info", "timestamp": "2025-12-18T12:31:04.134500"}
+{"run_id": "ed02289d", "phase": "meta", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T12:31:04.136516"}
+{"run_id": "ed02289d", "success": true, "phases_completed": ["ingest", "plan", "recon", "hypothesis", "exploit", "static", "triage", "report", "meta"], "findings": 0, "duration": 498.681128, "event": "workflow_completed", "level": "info", "timestamp": "2025-12-18T12:31:04.140609"}

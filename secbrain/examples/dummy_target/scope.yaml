@@ -1,0 +1,20 @@
+domains:
+  - "localhost"
+  - "127.0.0.1"
+
+urls:
+  - "http://localhost"
+  - "http://127.0.0.1"
+
+excluded_paths: []
+
+allowed_methods:
+  - GET
+  - POST
+  - HEAD
+  - OPTIONS
+
+# Safe defaults for a solo dry-run target
+max_requests_per_second: 2
+respect_robots_txt: true
+avoid_logout_endpoints: true

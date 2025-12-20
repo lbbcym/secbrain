@@ -1,0 +1,14 @@
+{
+  "name": "dummy-localhost",
+  "platform": "solo-lab",
+  "focus_areas": ["http", "static"],
+  "rules": [
+    "Localhost-only testing",
+    "No real external network calls",
+    "Dry-run preferred"
+  ],
+  "rewards": {
+    "bounties": false,
+    "notes": "Local practice only"
+  }
+}

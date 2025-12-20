@@ -1,0 +1,41 @@
+{
+  "run_id": "247521d8",
+  "success": true,
+  "phases_completed": [
+    "ingest",
+    "plan",
+    "recon",
+    "hypothesis",
+    "exploit",
+    "static",
+    "triage",
+    "report",
+    "meta"
+  ],
+  "phases_failed": [],
+  "findings_count": 0,
+  "reports_generated": 0,
+  "duration_seconds": 491.981988,
+  "errors": [],
+  "economic": {
+    "decision": "SKIP",
+    "max_profit_eth": 0.0,
+    "gas_used": null,
+    "gas_cost_usd_est": 0,
+    "net_usd_est": 0.0,
+    "threshold_eth": 0.1
+  },
+  "attempts_count": 15,
+  "meta_metrics": {
+    "hypotheses_count": 7,
+    "hypotheses_with_concrete_target": 6,
+    "missing_targets": {
+      "missing_contract_or_function": 1,
+      "total_hypotheses": 7
+    },
+    "attempts_count": 15,
+    "attempts_with_profit": 0,
+    "economic_decision": "SKIP",
+    "total_duration_seconds": 491.981988
+  }
+}

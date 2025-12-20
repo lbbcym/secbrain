@@ -1,0 +1,10 @@
+globs:
+  - "**/*.md"
+
+ignores:
+  - "**/node_modules/**"
+  - ".windsurf/rules/system-prompt.md"
+
+config:
+  MD013: false
+  MD024: false

@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "name": "SOTA Vulnerability Coverage Program",
+  "description": "Test program for SOTA vulnerability coverage features",
+  "phases": [
+    {
+      "name": "recon",
+      "description": "Initial reconnaissance phase to discover endpoints and parameters",
+      "enabled": true,
+      "tools": ["endpoint_discovery", "parameter_extraction"]
+    },
+    {
+      "name": "static_analysis",
+      "description": "Static analysis of discovered endpoints and parameters",
+      "enabled": true,
+      "tools": ["semgrep_analysis", "pattern_matching"]
+    },
+    {
+      "name": "business_logic_testing",
+      "description": "Test for business logic vulnerabilities",
+      "enabled": true,
+      "tools": ["workflow_bypass", "price_manipulation", "race_condition"]
+    },
+    {
+      "name": "auth_testing",
+      "description": "Test authentication and authorization controls",
+      "enabled": true,
+      "tools": ["auth_bypass", "session_management", "jwt_attacks"]
+    },
+    {
+      "name": "ssrf_testing",
+      "description": "Test for Server-Side Request Forgery vulnerabilities",
+      "enabled": true,
+      "tools": ["blind_ssrf", "oob_ssrf"]
+    },
+    {
+      "name": "injection_testing",
+      "description": "Test for various injection vulnerabilities",
+      "enabled": true,
+      "tools": ["sql_injection", "nosql_injection", "command_injection", "ssti"]
+    },
+    {
+      "name": "reporting",
+      "description": "Generate test reports and evidence",
+      "enabled": true,
+      "tools": ["report_generator", "evidence_bundler"]
+    }
+  ],
+  "tools_config": {
+    "endpoint_discovery": {
+      "max_depth": 3,
+      "follow_redirects": true,
+      "include_parameters": true
+    },
+    "business_logic_testing": {
+      "max_iterations": 100,
+      "test_cases": [
+        "price_manipulation",
+        "negative_quantities",
+        "workflow_bypass",
+        "race_conditions"
+      ]
+    },
+    "ssrf_testing": {
+      "oob_server": "oob.example.com",
+      "test_cases": [
+        "dns_lookup",
+        "http_request",
+        "gopher",
+        "file_protocol"
+      ]
+    },
+    "auth_testing": {
+      "test_cases": [
+        "jwt_none_alg",
+        "jwt_kid_injection",
+        "session_fixation",
+        "session_timeout"
+      ]
+    }
+  },
+  "safety_controls": {
+    "max_requests_per_second": 10,
+    "max_concurrent_requests": 5,
+    "exclude_paths": [
+      "/api/v1/logout",
+      "/api/v1/account/delete"
+    ],
+    "sensitive_parameters": [
+      "password",
+      "token",
+      "api_key",
+      "secret"
+    ]
+  },
+  "reporting": {
+    "format": "json",
+    "include_evidence": true,
+    "severity_threshold": "low",
+    "output_dir": "reports"
+  },
+  "notifications": {
+    "slack_webhook": "${SLACK_WEBHOOK}",
+    "email_recipients": ["security@example.com"]
+  }
+}

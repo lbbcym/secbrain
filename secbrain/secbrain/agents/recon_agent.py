@@ -1,0 +1,485 @@
+"""Reconnaissance agent for discovering assets and gathering information."""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import os
+import shutil
+import tomllib
+import uuid
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+from secbrain.agents.base import AgentResult, BaseAgent
+from secbrain.tools.recon_cli_wrappers import ReconToolRunner
+
+
+class ReconAgent(BaseAgent):
+    """
+    Recon agent.
+
+    Responsibilities:
+    - Orchestrates recon tools
+    - Builds endpoint/asset map
+    - Research substep: given recon results, asks Perplexity about stack/vuln classes
+    """
+
+    name = "recon"
+    phase = "recon"
+
+    async def run(self, **kwargs: Any) -> AgentResult:
+        """Execute reconnaissance phase."""
+        self._log("starting_recon")
+
+        if self._check_kill_switch():
+            return self._failure("Kill-switch activated")
+
+        domains = self.run_context.scope.domains
+        contracts = self.run_context.scope.contracts
+
+        # Debug logging
+        self._log("debug_scope", domains_count=len(domains), contracts_count=len(contracts))
+        if contracts:
+            self._log("first_contract", name=contracts[0].name, address=contracts[0].address)
+
+        # Check if we have contracts to recon
+        if contracts:
+            return await self._recon_contracts(contracts)
+
+        # Fall back to web-based recon
+        if not domains:
+            return self._failure("No domains or contracts in scope for recon")
+
+        # Collect all assets
+        all_assets: list[dict[str, Any]] = []
+        technologies: list[str] = []
+
+        # Run subdomain enumeration
+        subdomains = await self._enumerate_subdomains(domains)
+        all_assets.extend(subdomains)
+
+        # Run HTTP probing
+        if subdomains:
+            live_hosts = await self._probe_http([a["value"] for a in subdomains])
+            all_assets.extend(live_hosts)
+
+            # Extract technologies
+            for host in live_hosts:
+                techs = host.get("metadata", {}).get("technologies", [])
+                technologies.extend(techs)
+
+        # Research: understand the technology stack
+        tech_research = {}
+        if technologies and self.research_client:
+            unique_techs = list(set(technologies))[:5]  # Limit to top 5
+            tech_research = await self._research_technologies(unique_techs)
+
+        # Store assets
+        if self.storage:
+            for asset in all_assets:
+                await self.storage.save_asset(asset)
+
+        return self._success(
+            message=f"Recon complete: {len(all_assets)} assets discovered",
+            data={
+                "assets": all_assets,
+                "subdomains_count": len(subdomains),
+                "live_hosts_count": len([a for a in all_assets if a.get("type") == "live_host"]),
+                "technologies": list(set(technologies)),
+                "tech_research": tech_research,
+            },
+            next_actions=["hypothesis"],
+        )
+
+    async def _enumerate_subdomains(
+        self,
+        domains: list[str],
+    ) -> list[dict[str, Any]]:
+        """Enumerate subdomains for given domains."""
+
+        assets: list[dict[str, Any]] = []
+        runner = ReconToolRunner(self.run_context)
+
+        for domain in domains:
+            # Skip wildcard prefix
+            if domain.startswith("*."):
+                domain = domain[2:]
+
+            self._log("enumerating_subdomains", domain=domain)
+
+            result = await runner.run_subfinder(domain)
+
+            if result.success:
+                for item in result.parsed_data:
+                    subdomain = item.get("subdomain", "")
+                    if subdomain:
+                        assets.append({
+                            "id": f"sub-{uuid.uuid4().hex[:8]}",
+                            "type": "subdomain",
+                            "value": subdomain,
+                            "metadata": {"source": "subfinder", "parent_domain": domain},
+                        })
+
+        return assets
+
+    async def _probe_http(
+        self,
+        targets: list[str],
+    ) -> list[dict[str, Any]]:
+        """Probe targets for live HTTP services."""
+
+        assets: list[dict[str, Any]] = []
+        runner = ReconToolRunner(self.run_context)
+
+        # Add protocol prefixes for httpx
+        urls = []
+        for target in targets:
+            if not target.startswith("http"):
+                urls.append(f"https://{target}")
+                urls.append(f"http://{target}")
+            else:
+                urls.append(target)
+
+        self._log("probing_http", count=len(urls))
+
+        result = await runner.run_httpx(urls[:100])  # Limit to 100 for safety
+
+        if result.success:
+            for item in result.parsed_data:
+                url = item.get("url", "")
+                if url:
+                    assets.append({
+                        "id": f"host-{uuid.uuid4().hex[:8]}",
+                        "type": "live_host",
+                        "value": url,
+                        "metadata": {
+                            "status_code": item.get("status_code"),
+                            "title": item.get("title"),
+                            "technologies": item.get("tech", []),
+                            "content_length": item.get("content_length"),
+                            "webserver": item.get("webserver"),
+                        },
+                    })
+
+        return assets
+
+    async def _research_technologies(
+        self,
+        technologies: list[str],
+    ) -> dict[str, Any]:
+        """Research identified technologies for vulnerabilities."""
+        research_results = {}
+
+        for tech in technologies[:3]:  # Limit to 3 to save API calls
+            result = await self._research(
+                question=f"What are common security vulnerabilities and attack vectors for {tech}?",
+                context="Technology stack analysis during recon phase",
+            )
+            research_results[tech] = {
+                "answer": result.get("answer", "")[:500],
+                "sources": result.get("sources", []),
+            }
+
+        return research_results
+
+    def _extract_contract_metadata(
+        self,
+        foundry_root: str | Path,
+        contract_name: str,
+    ) -> tuple[list[Any], list[str]]:
+        foundry_root_path = Path(foundry_root)
+        out_dir = foundry_root_path / "out"
+        if not out_dir.exists():
+            return [], []
+
+        candidate_paths = list(out_dir.rglob(f"{contract_name}.json"))
+        if not candidate_paths:
+            for p in out_dir.rglob("*.json"):
+                try:
+                    data = json.loads(p.read_text(encoding="utf-8"))
+                except Exception:
+                    continue
+                if data.get("contractName") == contract_name and "abi" in data:
+                    candidate_paths.append(p)
+                    break
+
+        artifact = None
+        for p in candidate_paths:
+            try:
+                data = json.loads(p.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if "abi" in data:
+                artifact = data
+                break
+
+        if not artifact:
+            return [], []
+
+        abi = artifact.get("abi") or []
+        functions: list[str] = []
+        if isinstance(abi, list):
+            for item in abi:
+                if not isinstance(item, dict):
+                    continue
+                if item.get("type") != "function":
+                    continue
+                fn_name = item.get("name")
+                inputs = item.get("inputs") or []
+                if not fn_name or not isinstance(inputs, list):
+                    continue
+                arg_types: list[str] = []
+                for inp in inputs:
+                    if isinstance(inp, dict) and inp.get("type"):
+                        arg_types.append(str(inp.get("type")))
+                functions.append(f"{fn_name}({','.join(arg_types)})")
+
+        return abi, sorted(set(functions))
+
+    async def _recon_contracts(self, contracts: list) -> AgentResult:
+        """Perform contract reconnaissance using Foundry."""
+        self._log(f"Starting contract recon for {len(contracts)} contracts")
+
+        all_assets = []
+        compiled_contracts = []
+        semaphore = asyncio.Semaphore(5)
+
+        # Check if Foundry is available
+        if not self.run_context.dry_run:
+            try:
+                import subprocess
+                result = subprocess.run(["forge", "--version"], capture_output=True, text=True)
+                if result.returncode != 0:
+                    return self._failure("Foundry not installed or not in PATH")
+            except FileNotFoundError:
+                return self._failure("Foundry not installed or not in PATH")
+
+        # Get Foundry root from scope
+        foundry_root = self.run_context.scope.foundry_root
+        if not foundry_root:
+            return self._failure("No foundry_root specified in scope")
+
+        foundry_root_path = Path(foundry_root)
+
+        # Clean SecBrain-generated tests so they don't break `forge build` in subsequent runs.
+        secbrain_test_dir = foundry_root_path / "test" / "secbrain"
+        if secbrain_test_dir.exists():
+            try:
+                shutil.rmtree(secbrain_test_dir, ignore_errors=True)
+            except Exception:
+                pass
+
+        foundry_toml = {}
+        try:
+            foundry_toml_path = foundry_root_path / "foundry.toml"
+            if foundry_toml_path.exists():
+                foundry_toml = tomllib.loads(foundry_toml_path.read_text(encoding="utf-8"))
+        except Exception:
+            foundry_toml = {}
+
+        # Compile each contract using its profile
+        async def _compile_contract(contract) -> dict[str, Any]:
+            async with semaphore:
+                if self._check_kill_switch():
+                    return {"killed": True, "assets": [], "compiled": False}
+
+                profile = contract.foundry_profile
+                if not profile:
+                    self._log(f"Skipping {contract.name} - no Foundry profile")
+                    return {"killed": False, "assets": [], "compiled": False}
+
+                self._log(f"Compiling contract {contract.name} with profile {profile}")
+                metadata = getattr(contract, "metadata", {}) or {}
+                abi: list[Any] = metadata.get("abi", []) or []
+                functions: list[str] = metadata.get("functions", []) or []
+
+                if self.run_context.dry_run:
+                    classification = self._classify_contract(contract.name, functions)
+                    asset = {
+                        "type": "contract",
+                        "value": contract.address,
+                        "name": contract.name,
+                        "chain_id": contract.chain_id,
+                        "profile": profile,
+                        "status": "simulated_compiled",
+                        "metadata": {
+                            "source_path": str(contract.source_path) if contract.source_path else None,
+                            "verified": contract.verified,
+                            "classification": classification,
+                        },
+                    }
+                    return {"killed": False, "assets": [asset], "compiled": True, "address": contract.address}
+
+                try:
+                    env = os.environ.copy()
+                    env["FOUNDRY_PROFILE"] = profile
+                    
+                    proc = await asyncio.create_subprocess_exec(
+                        "forge", "build",
+                        cwd=foundry_root,
+                        env=env,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                    )
+                    
+                    try:
+                        stdout_bytes, stderr_bytes = await asyncio.wait_for(
+                            proc.communicate(),
+                            timeout=300
+                        )
+                        stdout = stdout_bytes.decode()
+                        stderr = stderr_bytes.decode()
+                        return_code = proc.returncode
+                        
+                        if return_code == 0:
+                            solc_version = None
+                            try:
+                                solc_version = (
+                                    (foundry_toml.get("profile", {}) or {})
+                                    .get(profile, {})
+                                    .get("solc")
+                                )
+                            except Exception:
+                                solc_version = None
+                            
+                            abi, functions = self._extract_contract_metadata(foundry_root, contract.name)
+                            classification = self._classify_contract(contract.name, functions)
+                            
+                            asset = {
+                                "type": "contract",
+                                "value": contract.address,
+                                "name": contract.name,
+                                "chain_id": contract.chain_id,
+                                "profile": profile,
+                                "status": "compiled",
+                                "metadata": {
+                                    "source_path": str(contract.source_path) if contract.source_path else None,
+                                    "verified": contract.verified,
+                                    "build_output": stdout,
+                                    "solc": solc_version,
+                                    "abi": abi,
+                                    "functions": functions,
+                                    "classification": classification,
+                                },
+                            }
+                            
+                            if self.storage:
+                                await self.storage.save_asset(asset)
+                            
+                            return {"killed": False, "assets": [asset], "compiled": True, "address": contract.address}
+                        else:
+                            error_asset = {
+                                "id": f"error-{uuid.uuid4().hex[:8]}",
+                                "type": "compilation_error",
+                                "value": contract.address,
+                                "name": contract.name,
+                                "chain_id": contract.chain_id,
+                                "status": "compilation_failed",
+                                "metadata": {
+                                    "error": stderr,
+                                    "output": stdout,
+                                },
+                            }
+                            if self.storage:
+                                await self.storage.save_asset(error_asset)
+                            return {"killed": False, "assets": [error_asset], "compiled": False}
+                            
+                    except asyncio.TimeoutError:
+                        error_asset = {
+                            "id": f"error-{uuid.uuid4().hex[:8]}",
+                            "type": "compilation_error",
+                            "value": contract.address,
+                            "name": contract.name,
+                            "chain_id": contract.chain_id,
+                            "status": "compilation_timeout",
+                            "metadata": {
+                                "error": "Forge build timeout after 300s",
+                                "timestamp": datetime.now().isoformat(),
+                            },
+                        }
+                        if self.storage:
+                            await self.storage.save_asset(error_asset)
+                        return {"killed": False, "assets": [error_asset], "compiled": False}
+
+                except Exception as e:
+                    error_asset = {
+                        "id": f"error-{uuid.uuid4().hex[:8]}",
+                        "type": "compilation_error",
+                        "value": contract.address,
+                        "name": contract.name,
+                        "chain_id": contract.chain_id,
+                        "status": "compilation_error",
+                        "metadata": {
+                            "error": str(e),
+                            "error_type": type(e).__name__,
+                            "timestamp": datetime.now().isoformat(),
+                        },
+                    }
+                    if self.storage:
+                        await self.storage.save_asset(error_asset)
+                    return {"killed": False, "assets": [error_asset], "compiled": False}
+
+        tasks = [asyncio.create_task(_compile_contract(contract)) for contract in contracts]
+        compile_results = await asyncio.gather(*tasks)
+
+        for res in compile_results:
+            if res.get("killed"):
+                return self._failure("Kill-switch activated during contract compilation")
+            all_assets.extend(res.get("assets") or [])
+            if res.get("compiled") and res.get("address"):
+                compiled_contracts.append(res["address"])
+
+        return self._success(
+            message=f"Contract recon complete: {len(compiled_contracts)}/{len(contracts)} contracts compiled",
+            data={
+                "assets": all_assets,
+                "contracts_count": len(contracts),
+                "compiled_count": len(compiled_contracts),
+                "failed_count": len(contracts) - len(compiled_contracts),
+                "foundry_root": str(foundry_root),
+            },
+            next_actions=["static"],
+        )
+
+    def _classify_contract(self, name: str | None, functions: list[str]) -> dict[str, Any]:
+        """Rudimentary protocol classification to inform downstream agents."""
+        name = (name or "").lower()
+        lower_functions = [f.lower() for f in functions or []]
+
+        protocol_signatures = {
+            "defi_vault": ["vault", "strategy", "oeth", "share", "rebalance", "deposit", "withdraw"],
+            "amm": ["pool", "swap", "router", "pair", "liquidity", "exchange", "curve"],
+            "lending": ["lend", "borrow", "collateral", "reserve", "interest", "rate", "loan"],
+            "governance": ["gov", "dao", "proposal", "vote", "timelock", "delegate"],
+        }
+
+        def _matches_keywords(keywords: list[str]) -> bool:
+            if any(k in name for k in keywords):
+                return True
+            return any(any(k in fn for k in keywords) for fn in lower_functions)
+
+        protocol_type = "generic"
+        indicators: list[str] = []
+        for proto, keywords in protocol_signatures.items():
+            if _matches_keywords(keywords):
+                protocol_type = proto
+                indicators = keywords
+                break
+
+        withdrawal_funcs = [fn for fn in lower_functions if any(w in fn for w in ["withdraw", "redeem", "claim"])]
+        deposit_funcs = [fn for fn in lower_functions if any(w in fn for w in ["deposit", "mint", "stake", "supply"])]
+        approval_funcs = [fn for fn in lower_functions if "approve" in fn or "permit" in fn]
+        delegatecall_funcs = [fn for fn in lower_functions if "delegatecall" in fn]
+
+        classification = {
+            "protocol_type": protocol_type,
+            "indicators": indicators,
+            "function_count": len(functions),
+            "withdrawal_functions": withdrawal_funcs,
+            "deposit_functions": deposit_funcs,
+            "approval_functions": approval_funcs,
+            "delegatecall_functions": delegatecall_funcs,
+        }
+        return classification

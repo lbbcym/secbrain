@@ -1,0 +1,61 @@
+contracts:
+  - name: Proxy
+    address: "0x85b78aCa6DeaE198fBf201c82dAf6cA21942ACc6"
+    chain_id: 1
+    foundry_profile: "contract_Proxy_85b7"
+    verified: true
+  - name: ConvexEthMetaStrategyProxy
+    address: "0x1827F9eA98E0bf96550b2FC20F7233277FcD7E63"
+    chain_id: 1
+    foundry_profile: "contract_ConvexEthMetaStrategyProxy_1827"
+    verified: true
+  - name: VaultProxy
+    address: "0xe75D77b1865Ae93c7eAa3040b038D7aA7BC02F70"
+    chain_id: 1
+    foundry_profile: "contract_VaultProxy_e75d"
+    verified: true
+  - name: OETHCurveAMOProxy
+    address: "0xaF04828Ed923216c77dC22a2fc8E077FDaDAA87d"
+    chain_id: 1
+    foundry_profile: "contract_OETHCurveAMOProxy_af04"
+    verified: true
+  - name: FixedRateRewardsSourceProxy
+    address: "0x7609C88e5880E934DD3a75BCfeF44E31B1BAdb8b"
+    chain_id: 1
+    foundry_profile: "contract_FixedRateRewardsSourceProxy_7609"
+    verified: true
+  - name: ExponentialStakingProxy
+    address: "0x63898B3B6EF3D39332082178656E9862BEE45c57"
+    chain_id: 1
+    foundry_profile: "contract_ExponentialStakingProxy_6389"
+    verified: true
+  - name: InitializeGovernedUpgradeabilityProxy
+    address: "0x501804B374EF06fa9C427476147ac09F1551B9A0"
+    chain_id: 1
+    foundry_profile: "contract_InitializeGovernedUpgradeabilityProxy_5018"
+    verified: true
+
+domains: []
+ips: []
+urls: []
+excluded_paths: []
+allowed_methods: [GET, POST, PUT, HEAD, OPTIONS]
+notes: "Origin Protocol (Immunefi) contract-only run. Use forked execution; do not test on mainnet directly."
+foundry_root: C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\originprotocol
+max_requests_per_second: 10
+respect_robots_txt: true
+
+rpc_urls:
+  - "https://ethereum.publicnode.com"
+  - "https://eth.llamarpc.com"
+
+profit_tokens:
+  - symbol: "OETH"
+    address: "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3"
+    decimals: 18
+  - symbol: "stETH"
+    address: "0xae7ab96520de3a18e5e111b5eaab095312d7fe84"
+    decimals: 18
+  - symbol: "USDC"
+    address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+    decimals: 6

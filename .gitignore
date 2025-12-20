@@ -1,0 +1,7 @@
+node_modules/
+
+secbrain/secbrain/models/api-keys
+secbrain/.env
+secbrain/.env.*
+secbrain/**/.env
+secbrain/**/.env.*

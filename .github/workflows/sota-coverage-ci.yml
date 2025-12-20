@@ -1,0 +1,99 @@
+name: SOTA Vulnerability Coverage CI
+
+on:
+  push:
+    branches: [ feat/sota-coverage ]
+    paths:
+      - 'secbrain/**'
+      - 'tests/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ feat/sota-coverage ]
+    paths:
+      - 'secbrain/**'
+      - 'tests/**'
+      - '.github/workflows/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        pip install pytest-cov
+    
+    - name: Run unit tests with coverage
+      run: |
+        cd secbrain
+        python -m pytest tests/ -v --cov=secbrain --cov-report=xml
+      
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: secbrain/coverage.xml
+        fail_ci_if_error: true
+    
+    - name: Run type checking
+      run: |
+        cd secbrain
+        mypy .
+    
+    - name: Run linter
+      run: |
+        cd secbrain
+        ruff check .
+    
+    - name: Run security audit
+      run: |
+        pip install safety
+        safety check --full-report
+
+  integration:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e "[dev]"
+    
+    - name: Run integration tests
+      run: |
+        cd secbrain
+        python -m pytest tests/integration/ -v
+    
+    - name: Run SOTA coverage dry-run
+      run: |
+        cd secbrain
+        python -m secbrain.cli.secbrain_cli run \
+          --scope tests/fixtures/sota_scope.yaml \
+          --program tests/fixtures/sota_program.json \
+          --workspace sota_workspace \
+          --dry-run
+      
+    - name: Verify SOTA artifacts
+      run: |
+        cd secbrain
+        if [ ! -d "sota_workspace/logs" ]; then
+          echo "ERROR: No logs directory created"
+          exit 1
+        fi
+        echo "SOTA dry-run completed successfully"

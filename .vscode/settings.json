@@ -1,0 +1,6 @@
+{
+    "python.languageServer": "None",
+    "semgrep.scan.onlyGitDirty": false,
+    "wake.compiler.solc.remappings": [],
+    "terminal.integrated.defaultProfile.windows": "PowerShell"
+}

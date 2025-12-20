@@ -1,0 +1,73 @@
+# SOTA Vulnerability Testing Scope
+# Defines the target scope and rules for testing
+
+# General scope configuration
+version: "1.0"
+name: "SOTA Vulnerability Coverage Test Scope"
+description: "Test scope for SOTA vulnerability coverage features"
+
+# Target configuration
+targets:
+  - name: "Test API Server"
+    type: "api"
+    base_url: "https://api.example.com/v1"
+    
+    # Authentication configuration
+    auth:
+      type: "jwt"
+      token: "${AUTH_TOKEN}"  # Will be replaced with actual token in CI
+      
+    # Rate limiting configuration
+    rate_limits:
+      requests_per_second: 10
+      burst_limit: 30
+
+    # Scope boundaries
+    include:
+      - '^/api/v1/.*$'
+      
+    exclude:
+      - '^/api/v1/admin/.*$'
+      - '.*\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$'
+
+# Test configuration
+test_config:
+  # Maximum concurrency for tests
+  max_concurrent_requests: 5
+  
+  # Test timeouts (in seconds)
+  request_timeout: 30
+  test_timeout: 3600
+  
+  # Evidence collection settings
+  evidence:
+    enabled: true
+    level: "detailed"  # basic, detailed, verbose
+    include_http: true
+    include_screenshots: false  # For web interfaces
+    
+  # Safety controls
+  safety:
+    max_request_size_kb: 1024
+    max_response_size_mb: 10
+    disallowed_headers:
+      - "X-Forwarded-For"
+      - "X-Real-IP"
+    
+  # Reporting configuration
+  reporting:
+    format: "json"
+    output_dir: "reports"
+    
+# Vulnerability classes to test
+vulnerability_classes:
+  - "business_logic"
+  - "auth_bypass"
+  - "ssrf"
+  - "idor"
+  - "injection"
+  - "xxe"
+  - "ssti"
+  - "deserialization"
+  - "file_upload"
+  - "path_traversal"

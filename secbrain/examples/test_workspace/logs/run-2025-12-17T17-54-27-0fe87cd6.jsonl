@@ -1,0 +1,5 @@
+{"event": "test_started", "run_id": "0fe87cd6", "message": "Dry-run test initiated"}
+{"event": "workflow_started", "run_id": "0fe87cd6", "phases": ["ingest", "plan"], "dry_run": true}
+{"event": "workflow_error", "run_id": "0fe87cd6", "error": "secbrain.core.logging._StdlibBoundLogger.info() got multiple values for keyword argument 'phase'"}
+{"event": "workflow_completed", "run_id": "0fe87cd6", "success": false, "phases_completed": [], "findings": 0, "duration": 0.000599}
+{"event": "test_completed", "run_id": "0fe87cd6", "success": false}

@@ -1,0 +1,762 @@
+[
+  {
+    "name": "ZeroExV4Adapter",
+    "address": "0x00000000000000000000000000000000000049af",
+    "foundry_profile": "contract_ZeroExV4Adapter_49af",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ZeroExV4Adapter_49af",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "NoDepegOnRedeemSharesForSpecificAssetsPolicy",
+    "address": "0x00000000000000000000000000000000000096ef",
+    "foundry_profile": "contract_NoDepegOnRedeemSharesForSpecificAssetsPolicy_96ef",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\NoDepegOnRedeemSharesForSpecificAssetsPolicy_96ef",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "FeeManager",
+    "address": "0x000000000000000000000000000000000000af0d",
+    "foundry_profile": "contract_FeeManager_af0d",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\FeeManager_af0d",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ExitRateBurnFee",
+    "address": "0x00000000000000000000000000000000000006b1",
+    "foundry_profile": "contract_ExitRateBurnFee_06b1",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ExitRateBurnFee_06b1",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ValueInterpreter",
+    "address": "0x000000000000000000000000000000000000d7b0",
+    "foundry_profile": "contract_ValueInterpreter_d7b0",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ValueInterpreter_d7b0",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ThreeOneThirdAdapter",
+    "address": "0x0000000000000000000000000000000000005a1c",
+    "foundry_profile": "contract_ThreeOneThirdAdapter_5a1c",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ThreeOneThirdAdapter_5a1c",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "FundDeployer",
+    "address": "0x0000000000000000000000000000000000004f1c",
+    "foundry_profile": "contract_FundDeployer_4f1c",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\FundDeployer_4f1c",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "DisallowedAdapterIncomingAssetsPolicy",
+    "address": "0x0000000000000000000000000000000000005e21",
+    "foundry_profile": "contract_DisallowedAdapterIncomingAssetsPolicy_5e21",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\DisallowedAdapterIncomingAssetsPolicy_5e21",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ExternalPositionManager",
+    "address": "0x0000000000000000000000000000000000001e3d",
+    "foundry_profile": "contract_ExternalPositionManager_1e3d",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ExternalPositionManager_1e3d",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ArbitraryLoanPositionLib",
+    "address": "0x00000000000000000000000000000000000073cb",
+    "foundry_profile": "contract_ArbitraryLoanPositionLib_73cb",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ArbitraryLoanPositionLib_73cb",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "StaderStakingAdapter",
+    "address": "0x0000000000000000000000000000000000007f1b",
+    "foundry_profile": "contract_StaderStakingAdapter_7f1b",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\StaderStakingAdapter_7f1b",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "EtherFiEthPriceFeed",
+    "address": "0x0000000000000000000000000000000000003110",
+    "foundry_profile": "contract_EtherFiEthPriceFeed_3110",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\EtherFiEthPriceFeed_3110",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ExitRateDirectFee",
+    "address": "0x0000000000000000000000000000000000003a09",
+    "foundry_profile": "contract_ExitRateDirectFee_3a09",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ExitRateDirectFee_3a09",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedExternalPositionTypesPerManagerPolicy",
+    "address": "0x00000000000000000000000000000000000047fb",
+    "foundry_profile": "contract_AllowedExternalPositionTypesPerManagerPolicy_47fb",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedExternalPositionTypesPerManagerPolicy_47fb",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ConvexVotingPositionParser",
+    "address": "0x0000000000000000000000000000000000004619",
+    "foundry_profile": "contract_ConvexVotingPositionParser_4619",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ConvexVotingPositionParser_4619",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ConvexVotingPositionLib",
+    "address": "0x00000000000000000000000000000000000012fa",
+    "foundry_profile": "contract_ConvexVotingPositionLib_12fa",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ConvexVotingPositionLib_12fa",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "NonStandardPrecisionSimulatedAggregator",
+    "address": "0x000000000000000000000000000000000000ca28",
+    "foundry_profile": "contract_NonStandardPrecisionSimulatedAggregator_ca28",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\NonStandardPrecisionSimulatedAggregator_ca28",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ERC4626Adapter",
+    "address": "0x00000000000000000000000000000000000064fa",
+    "foundry_profile": "contract_ERC4626Adapter_64fa",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ERC4626Adapter_64fa",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedAdaptersPolicy",
+    "address": "0x000000000000000000000000000000000000720e",
+    "foundry_profile": "contract_AllowedAdaptersPolicy_720e",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedAdaptersPolicy_720e",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "FundValueCalculatorRouter",
+    "address": "0x0000000000000000000000000000000000007c72",
+    "foundry_profile": "contract_FundValueCalculatorRouter_7c72",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\FundValueCalculatorRouter_7c72",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AaveV3Adapter",
+    "address": "0x0000000000000000000000000000000000009cfb",
+    "foundry_profile": "contract_AaveV3Adapter_9cfb",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AaveV3Adapter_9cfb",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "PeggedDerivativesPriceFeed",
+    "address": "0x0000000000000000000000000000000000008653",
+    "foundry_profile": "contract_PeggedDerivativesPriceFeed_8653",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\PeggedDerivativesPriceFeed_8653",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "UintListRegistry",
+    "address": "0x0000000000000000000000000000000000006ffd",
+    "foundry_profile": "contract_UintListRegistry_6ffd",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\UintListRegistry_6ffd",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "GasRelayPaymasterLib",
+    "address": "0x000000000000000000000000000000000000131c",
+    "foundry_profile": "contract_GasRelayPaymasterLib_131c",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\GasRelayPaymasterLib_131c",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "OnlyUntrackDustOrPricelessAssetsPolicy",
+    "address": "0x000000000000000000000000000000000000747b",
+    "foundry_profile": "contract_OnlyUntrackDustOrPricelessAssetsPolicy_747b",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\OnlyUntrackDustOrPricelessAssetsPolicy_747b",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "TransferAssetsAdapter",
+    "address": "0x000000000000000000000000000000000000e030",
+    "foundry_profile": "contract_TransferAssetsAdapter_e030",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\TransferAssetsAdapter_e030",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "DispatcherOwnedBeaconFactory",
+    "address": "0x000000000000000000000000000000000000d6e8",
+    "foundry_profile": "contract_DispatcherOwnedBeaconFactory_d6e8",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\DispatcherOwnedBeaconFactory_d6e8",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "OnlyRemoveDustExternalPositionPolicy",
+    "address": "0x000000000000000000000000000000000000966e",
+    "foundry_profile": "contract_OnlyRemoveDustExternalPositionPolicy_966e",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\OnlyRemoveDustExternalPositionPolicy_966e",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ERC4626RateAggregatorFactory",
+    "address": "0x00000000000000000000000000000000000000f6",
+    "foundry_profile": "contract_ERC4626RateAggregatorFactory_00f6",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ERC4626RateAggregatorFactory_00f6",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AaveV3ATokenListOwner",
+    "address": "0x000000000000000000000000000000000000cfe2",
+    "foundry_profile": "contract_AaveV3ATokenListOwner_cfe2",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AaveV3ATokenListOwner_cfe2",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "UnpermissionedActionsWrapper",
+    "address": "0x000000000000000000000000000000000000cfab",
+    "foundry_profile": "contract_UnpermissionedActionsWrapper_cfab",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\UnpermissionedActionsWrapper_cfab",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "StaderWithdrawalsPositionLib",
+    "address": "0x0000000000000000000000000000000000005cf4",
+    "foundry_profile": "contract_StaderWithdrawalsPositionLib_5cf4",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\StaderWithdrawalsPositionLib_5cf4",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "UniswapV3LiquidityPositionParser",
+    "address": "0x0000000000000000000000000000000000002380",
+    "foundry_profile": "contract_UniswapV3LiquidityPositionParser_2380",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\UniswapV3LiquidityPositionParser_2380",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "GlobalConfigProxy",
+    "address": "0x0000000000000000000000000000000000005611",
+    "foundry_profile": "contract_GlobalConfigProxy_5611",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\GlobalConfigProxy_5611",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "SharesSplitterFactory",
+    "address": "0x000000000000000000000000000000000000fc8e",
+    "foundry_profile": "contract_SharesSplitterFactory_fc8e",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\SharesSplitterFactory_fc8e",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "GasRelayPaymasterFactory",
+    "address": "0x000000000000000000000000000000000000846b",
+    "foundry_profile": "contract_GasRelayPaymasterFactory_846b",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\GasRelayPaymasterFactory_846b",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ParaSwapV6Adapter",
+    "address": "0x000000000000000000000000000000000000b3ec",
+    "foundry_profile": "contract_ParaSwapV6Adapter_b3ec",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ParaSwapV6Adapter_b3ec",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "LidoWithdrawalsPositionParser",
+    "address": "0x0000000000000000000000000000000000005010",
+    "foundry_profile": "contract_LidoWithdrawalsPositionParser_5010",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\LidoWithdrawalsPositionParser_5010",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedAdapterIncomingAssetsPolicy",
+    "address": "0x0000000000000000000000000000000000002f0e",
+    "foundry_profile": "contract_AllowedAdapterIncomingAssetsPolicy_2f0e",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedAdapterIncomingAssetsPolicy_2f0e",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "GlobalConfigLib",
+    "address": "0x0000000000000000000000000000000000006682",
+    "foundry_profile": "contract_GlobalConfigLib_6682",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\GlobalConfigLib_6682",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedAssetsForRedemptionPolicy",
+    "address": "0x000000000000000000000000000000000000823c",
+    "foundry_profile": "contract_AllowedAssetsForRedemptionPolicy_823c",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedAssetsForRedemptionPolicy_823c",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ArbitraryLoanPositionParser",
+    "address": "0x000000000000000000000000000000000000e959",
+    "foundry_profile": "contract_ArbitraryLoanPositionParser_e959",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ArbitraryLoanPositionParser_e959",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ManualValueOracleFactory",
+    "address": "0x0000000000000000000000000000000000000edb",
+    "foundry_profile": "contract_ManualValueOracleFactory_0edb",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ManualValueOracleFactory_0edb",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "MinSharesSupplyFee",
+    "address": "0x000000000000000000000000000000000000bc9d",
+    "foundry_profile": "contract_MinSharesSupplyFee_bc9d",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\MinSharesSupplyFee_bc9d",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "EntranceRateDirectFee",
+    "address": "0x000000000000000000000000000000000000fb8d",
+    "foundry_profile": "contract_EntranceRateDirectFee_fb8d",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\EntranceRateDirectFee_fb8d",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "SharePriceThrottledAssetManagerLib",
+    "address": "0x000000000000000000000000000000000000fde8",
+    "foundry_profile": "contract_SharePriceThrottledAssetManagerLib_fde8",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\SharePriceThrottledAssetManagerLib_fde8",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ERC4626PriceFeed",
+    "address": "0x00000000000000000000000000000000000066aa",
+    "foundry_profile": "contract_ERC4626PriceFeed_66aa",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ERC4626PriceFeed_66aa",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ComptrollerLib",
+    "address": "0x00000000000000000000000000000000000003f7",
+    "foundry_profile": "contract_ComptrollerLib_03f7",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ComptrollerLib_03f7",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "MinMaxInvestmentPolicy",
+    "address": "0x000000000000000000000000000000000000ebda",
+    "foundry_profile": "contract_MinMaxInvestmentPolicy_ebda",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\MinMaxInvestmentPolicy_ebda",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "GatedRedemptionQueueSharesWrapperLib",
+    "address": "0x000000000000000000000000000000000000e971",
+    "foundry_profile": "contract_GatedRedemptionQueueSharesWrapperLib_e971",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\GatedRedemptionQueueSharesWrapperLib_e971",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "SharePriceThrottledAssetManagerFactory",
+    "address": "0x0000000000000000000000000000000000000883",
+    "foundry_profile": "contract_SharePriceThrottledAssetManagerFactory_0883",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\SharePriceThrottledAssetManagerFactory_0883",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "StaderSDPriceFeed",
+    "address": "0x0000000000000000000000000000000000009938",
+    "foundry_profile": "contract_StaderSDPriceFeed_9938",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\StaderSDPriceFeed_9938",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "UniswapV3LiquidityPositionLib",
+    "address": "0x00000000000000000000000000000000000020a2",
+    "foundry_profile": "contract_UniswapV3LiquidityPositionLib_20a2",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\UniswapV3LiquidityPositionLib_20a2",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "UsdEthSimulatedAggregator",
+    "address": "0x0000000000000000000000000000000000009579",
+    "foundry_profile": "contract_UsdEthSimulatedAggregator_9579",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\UsdEthSimulatedAggregator_9579",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AddressListRegistry",
+    "address": "0x0000000000000000000000000000000000004eb4",
+    "foundry_profile": "contract_AddressListRegistry_4eb4",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AddressListRegistry_4eb4",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ProtocolFeeReserveProxy",
+    "address": "0x000000000000000000000000000000000000b746",
+    "foundry_profile": "contract_ProtocolFeeReserveProxy_b746",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ProtocolFeeReserveProxy_b746",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "SmarDexUsdnNativeRateUsdAggregator",
+    "address": "0x000000000000000000000000000000000000d500",
+    "foundry_profile": "contract_SmarDexUsdnNativeRateUsdAggregator_d500",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\SmarDexUsdnNativeRateUsdAggregator_d500",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "Dispatcher",
+    "address": "0x000000000000000000000000000000000000c3dc",
+    "foundry_profile": "contract_Dispatcher_c3dc",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\Dispatcher_c3dc",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "IntegrationManager",
+    "address": "0x0000000000000000000000000000000000003132",
+    "foundry_profile": "contract_IntegrationManager_3132",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\IntegrationManager_3132",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ArbitraryLoanTotalNominalDeltaOracleModule",
+    "address": "0x0000000000000000000000000000000000007f2a",
+    "foundry_profile": "contract_ArbitraryLoanTotalNominalDeltaOracleModule_7f2a",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ArbitraryLoanTotalNominalDeltaOracleModule_7f2a",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "PerformanceFee",
+    "address": "0x000000000000000000000000000000000000fedc",
+    "foundry_profile": "contract_PerformanceFee_fedc",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\PerformanceFee_fedc",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedExternalPositionTypesPolicy",
+    "address": "0x0000000000000000000000000000000000009e07",
+    "foundry_profile": "contract_AllowedExternalPositionTypesPolicy_9e07",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedExternalPositionTypesPolicy_9e07",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AaveV3DebtPositionParser",
+    "address": "0x0000000000000000000000000000000000004010",
+    "foundry_profile": "contract_AaveV3DebtPositionParser_4010",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AaveV3DebtPositionParser_4010",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "EnzymeVaultPriceFeed",
+    "address": "0x0000000000000000000000000000000000002a07",
+    "foundry_profile": "contract_EnzymeVaultPriceFeed_2a07",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\EnzymeVaultPriceFeed_2a07",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "StaderWithdrawalsPositionParser",
+    "address": "0x000000000000000000000000000000000000aefe",
+    "foundry_profile": "contract_StaderWithdrawalsPositionParser_aefe",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\StaderWithdrawalsPositionParser_aefe",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "SingleAssetRedemptionQueueLib",
+    "address": "0x0000000000000000000000000000000000000012",
+    "foundry_profile": "contract_SingleAssetRedemptionQueueLib_0012",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\SingleAssetRedemptionQueueLib_0012",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "PeggedRateDeviationAggregatorFactory",
+    "address": "0x000000000000000000000000000000000000d718",
+    "foundry_profile": "contract_PeggedRateDeviationAggregatorFactory_d718",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\PeggedRateDeviationAggregatorFactory_d718",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedDepositRecipientsPolicy",
+    "address": "0x000000000000000000000000000000000000a66b",
+    "foundry_profile": "contract_AllowedDepositRecipientsPolicy_a66b",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedDepositRecipientsPolicy_a66b",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "UniswapV3Adapter",
+    "address": "0x000000000000000000000000000000000000ed6a",
+    "foundry_profile": "contract_UniswapV3Adapter_ed6a",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\UniswapV3Adapter_ed6a",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedAdaptersPerManagerPolicy",
+    "address": "0x000000000000000000000000000000000000a450",
+    "foundry_profile": "contract_AllowedAdaptersPerManagerPolicy_a450",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedAdaptersPerManagerPolicy_a450",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "EnzymeV4VaultAdapter",
+    "address": "0x0000000000000000000000000000000000002b4f",
+    "foundry_profile": "contract_EnzymeV4VaultAdapter_2b4f",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\EnzymeV4VaultAdapter_2b4f",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "MinAssetBalancesPostRedemptionPolicy",
+    "address": "0x00000000000000000000000000000000000058c0",
+    "foundry_profile": "contract_MinAssetBalancesPostRedemptionPolicy_58c0",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\MinAssetBalancesPostRedemptionPolicy_58c0",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "PolicyManager",
+    "address": "0x000000000000000000000000000000000000adf5",
+    "foundry_profile": "contract_PolicyManager_adf5",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\PolicyManager_adf5",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "DepositWrapper",
+    "address": "0x00000000000000000000000000000000000065bb",
+    "foundry_profile": "contract_DepositWrapper_65bb",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\DepositWrapper_65bb",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AavePriceFeed",
+    "address": "0x000000000000000000000000000000000000e9cf",
+    "foundry_profile": "contract_AavePriceFeed_e9cf",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AavePriceFeed_e9cf",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "PendleV2Adapter",
+    "address": "0x000000000000000000000000000000000000e77b",
+    "foundry_profile": "contract_PendleV2Adapter_e77b",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\PendleV2Adapter_e77b",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ExternalPositionFactory",
+    "address": "0x0000000000000000000000000000000000000aac",
+    "foundry_profile": "contract_ExternalPositionFactory_0aac",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ExternalPositionFactory_0aac",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "SingleAssetRedemptionQueueFactory",
+    "address": "0x000000000000000000000000000000000000fe84",
+    "foundry_profile": "contract_SingleAssetRedemptionQueueFactory_fe84",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\SingleAssetRedemptionQueueFactory_fe84",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedRedeemersForSpecificAssetsPolicy",
+    "address": "0x000000000000000000000000000000000000ed4a",
+    "foundry_profile": "contract_AllowedRedeemersForSpecificAssetsPolicy_ed4a",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedRedeemersForSpecificAssetsPolicy_ed4a",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AllowedSharesTransferRecipientsPolicy",
+    "address": "0x000000000000000000000000000000000000ebe3",
+    "foundry_profile": "contract_AllowedSharesTransferRecipientsPolicy_ebe3",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AllowedSharesTransferRecipientsPolicy_ebe3",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ProtocolFeeTracker",
+    "address": "0x000000000000000000000000000000000000e979",
+    "foundry_profile": "contract_ProtocolFeeTracker_e979",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ProtocolFeeTracker_e979",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AaveV3FlashLoanAssetManagerLib",
+    "address": "0x0000000000000000000000000000000000008aa6",
+    "foundry_profile": "contract_AaveV3FlashLoanAssetManagerLib_8aa6",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AaveV3FlashLoanAssetManagerLib_8aa6",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ChainlinkLikeWstethPriceFeed",
+    "address": "0x0000000000000000000000000000000000009282",
+    "foundry_profile": "contract_ChainlinkLikeWstethPriceFeed_9282",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ChainlinkLikeWstethPriceFeed_9282",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ManagementFee",
+    "address": "0x000000000000000000000000000000000000faf2",
+    "foundry_profile": "contract_ManagementFee_faf2",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ManagementFee_faf2",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "LidoWithdrawalsPositionLib",
+    "address": "0x000000000000000000000000000000000000a511",
+    "foundry_profile": "contract_LidoWithdrawalsPositionLib_a511",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\LidoWithdrawalsPositionLib_a511",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ConvertedQuoteAggregatorFactory",
+    "address": "0x0000000000000000000000000000000000008f1e",
+    "foundry_profile": "contract_ConvertedQuoteAggregatorFactory_8f1e",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ConvertedQuoteAggregatorFactory_8f1e",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "VaultLib",
+    "address": "0x000000000000000000000000000000000000891d",
+    "foundry_profile": "contract_VaultLib_891d",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\VaultLib_891d",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "EntranceRateBurnFee",
+    "address": "0x000000000000000000000000000000000000cdec",
+    "foundry_profile": "contract_EntranceRateBurnFee_cdec",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\EntranceRateBurnFee_cdec",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "CumulativeSlippageTolerancePolicy",
+    "address": "0x0000000000000000000000000000000000003a49",
+    "foundry_profile": "contract_CumulativeSlippageTolerancePolicy_3a49",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\CumulativeSlippageTolerancePolicy_3a49",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ProtocolFeeReserveLib",
+    "address": "0x000000000000000000000000000000000000a0ed",
+    "foundry_profile": "contract_ProtocolFeeReserveLib_a0ed",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ProtocolFeeReserveLib_a0ed",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "GatedRedemptionQueueSharesWrapperFactory",
+    "address": "0x00000000000000000000000000000000000070c1",
+    "foundry_profile": "contract_GatedRedemptionQueueSharesWrapperFactory_70c1",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\GatedRedemptionQueueSharesWrapperFactory_70c1",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "AaveV3DebtPositionLib",
+    "address": "0x000000000000000000000000000000000000e72b",
+    "foundry_profile": "contract_AaveV3DebtPositionLib_e72b",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\AaveV3DebtPositionLib_e72b",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "OneInchV5Adapter",
+    "address": "0x0000000000000000000000000000000000006c62",
+    "foundry_profile": "contract_OneInchV5Adapter_6c62",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\OneInchV5Adapter_6c62",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "FundValueCalculator",
+    "address": "0x000000000000000000000000000000000000490e",
+    "foundry_profile": "contract_FundValueCalculator_490e",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\FundValueCalculator_490e",
+    "chain_id": 1,
+    "verified": true
+  },
+  {
+    "name": "ProtocolFeeReserveLib",
+    "address": "0x000000000000000000000000000000000000d462",
+    "foundry_profile": "contract_ProtocolFeeReserveLib_d462",
+    "source_path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\src\\ProtocolFeeReserveLib_d462",
+    "chain_id": 1,
+    "verified": true
+  }
+]

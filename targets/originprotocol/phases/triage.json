@@ -1,0 +1,20 @@
+{
+  "run_id": "247521d8",
+  "phase": "triage",
+  "success": true,
+  "duration_seconds": 0.000525,
+  "errors": [],
+  "data": {
+    "findings": [],
+    "triaged": 0,
+    "economic": {
+      "decision": "SKIP",
+      "max_profit_eth": 0.0,
+      "gas_used": null,
+      "gas_cost_usd_est": 0,
+      "net_usd_est": 0.0,
+      "threshold_eth": 0.1
+    }
+  },
+  "timestamp": "2025-12-20T00:36:32.417814"
+}

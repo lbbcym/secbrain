@@ -1,0 +1,30 @@
+# Example scope configuration for SecBrain
+# This defines the boundaries for security testing
+
+domains:
+  - "*.example.com"
+  - "api.example.com"
+  - "app.example.com"
+
+urls:
+  - "https://example.com"
+  - "https://api.example.com/v1"
+  - "https://app.example.com"
+
+excluded_paths:
+  - "/admin/*"
+  - "/internal/*"
+  - "*.pdf"
+  - "*.doc"
+
+allowed_methods:
+  - GET
+  - POST
+  - PUT
+  - DELETE
+  - OPTIONS
+
+# Additional constraints
+max_requests_per_second: 10
+respect_robots_txt: true
+avoid_logout_endpoints: true

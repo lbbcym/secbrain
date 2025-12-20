@@ -1,0 +1,934 @@
+"""Vulnerability hypothesis agent - generates hypotheses for testing."""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import uuid
+from dataclasses import dataclass, field
+from typing import Any, ClassVar
+
+from eth_utils import is_address, to_checksum_address
+from jsonschema import ValidationError, validate
+
+from secbrain.agents.base import AgentResult, BaseAgent
+from secbrain.agents.oracle_manipulation_detector import OracleManipulationDetector
+
+
+@dataclass(slots=True)
+class ProtocolProfile:
+    """Protocol-aware sampling configuration."""
+
+    protocol_type: str
+    budget: int
+    patterns: list[str] = field(default_factory=list)
+    description: str = ""
+
+    _DEFAULT_PATTERNS: ClassVar[dict[str, list[str]]] = {
+        "defi_vault": [
+            "share_inflation",
+            "rebasing_extraction",
+            "flash_loan_drainage",
+            "oracle_manipulation",
+            "fee_extraction",
+        ],
+        "amm": [
+            "sandwich_attack",
+            "price_manipulation",
+            "slippage_extraction",
+            "flash_loan_arbitrage",
+            "pool_balance_manipulation",
+        ],
+        "lending": [
+            "collateral_extraction",
+            "liquidation_oracle_attack",
+            "reserve_drainage",
+            "interest_manipulation",
+            "flashloan_liquidation_loop",
+        ],
+        "governance": [
+            "admin_key_extraction",
+            "voting_manipulation",
+            "timelock_bypass",
+            "parameter_extraction",
+            "treasury_drainage",
+        ],
+        "generic": [
+            "reentrancy",
+            "access_control",
+            "integer_overflow",
+            "unchecked_call",
+            "delegatecall_confusion",
+        ],
+    }
+
+    _BUDGETS: ClassVar[dict[str, int]] = {
+        "defi_vault": 10,
+        "amm": 8,
+        "lending": 10,
+        "governance": 6,
+        "generic": 5,
+    }
+
+    _DESCRIPTIONS: ClassVar[dict[str, str]] = {
+        "defi_vault": "Focus on vault share accounting, rebasing, and flash-loanable TVL manipulations.",
+        "amm": "Focus on swap routing, price manipulation, and MEV-prone flow control.",
+        "lending": "Prioritize collateral, liquidation, and reserve accounting exploits.",
+        "governance": "Prioritize voting power escalation, timelock bypass, and treasury drains.",
+        "generic": "Use broad on-chain exploit classes (reentrancy, access control, arithmetic).",
+    }
+
+    @classmethod
+    def from_type(cls, protocol_type: str | None) -> ProtocolProfile:
+        key = (protocol_type or "generic").lower()
+        patterns = list(cls._DEFAULT_PATTERNS.get(key, cls._DEFAULT_PATTERNS["generic"]))
+        budget = cls._BUDGETS.get(key, cls._BUDGETS["generic"])
+        desc = cls._DESCRIPTIONS.get(key, cls._DESCRIPTIONS["generic"])
+        return cls(protocol_type=key, budget=budget, patterns=patterns, description=desc)
+
+
+class VulnHypothesisAgent(BaseAgent):
+    """
+    Vulnerability hypothesis agent.
+
+    Responsibilities:
+    - Generates vulnerability hypotheses per asset/endpoint
+    - Research substep for validation
+    - Advisor review at the end
+    """
+
+    name = "vuln_hypothesis"
+    phase = "hypothesis"
+    CONFIDENCE_THRESHOLD: ClassVar[float] = 0.4
+
+    HYPOTHESIS_SCHEMA = {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "required": ["vuln_type", "confidence", "contract_address", "function_signature"],
+            "properties": {
+                "vuln_type": {
+                    "type": "string",
+                    "enum": [
+                        "reentrancy",
+                        "access_control",
+                        "integer_overflow",
+                        "unchecked_call",
+                        "delegatecall_confusion",
+                        "oracle_manipulation",
+                        "flash_loan",
+                        "mev_sandwich",
+                        "precision_error",
+                        "state_inconsistency",
+                        "generic_contract",
+                    ],
+                },
+                "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+                "contract_address": {"type": "string", "pattern": "^0x[a-fA-F0-9]{40}$"},
+                "function_signature": {"type": "string", "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*\\(.*\\)$"},
+                "rationale": {"type": "string"},
+                "attack_description": {"type": "string"},
+                "expected_profit_hint_eth": {"type": "number", "minimum": 0},
+                "exploit_notes": {"type": "array"},
+            },
+        },
+    }
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._oracle_detector = OracleManipulationDetector()
+        self._contract_llm_sem = asyncio.Semaphore(5)
+
+    async def run(self, **kwargs: Any) -> AgentResult:
+        """Generate vulnerability hypotheses."""
+        self._log("starting_hypothesis_generation")
+
+        if self._check_kill_switch():
+            return self._failure("Kill-switch activated")
+
+        recon_data = kwargs.get("recon_data", {})
+        assets = recon_data.get("assets", [])
+        technologies = recon_data.get("technologies", [])
+
+        if not assets:
+            return self._failure("No assets available for hypothesis generation")
+
+        # Generate hypotheses for each asset type
+        all_hypotheses: list[dict[str, Any]] = []
+
+        # Filter to live hosts for hypothesis generation
+        live_hosts = [a for a in assets if a.get("type") == "live_host"]
+
+        # Filter to contracts for hypothesis generation
+        contract_assets = [a for a in assets if a.get("type") == "contract"]
+
+        # Parallelize with modest bounds to avoid flooding LLM or RPC
+        host_sem = asyncio.Semaphore(5)
+        contract_sem = asyncio.Semaphore(5)
+
+        async def _gen_host(asset: dict[str, Any]) -> list[dict[str, Any]]:
+            async with host_sem:
+                return await self._generate_hypotheses_for_asset(asset, technologies)
+
+        async def _gen_contract(asset: dict[str, Any]) -> list[dict[str, Any]]:
+            async with contract_sem:
+                return await self._generate_hypotheses_for_contract_asset(asset)
+
+        host_tasks = [asyncio.create_task(_gen_host(h)) for h in live_hosts[:10]]
+        contract_tasks = [asyncio.create_task(_gen_contract(c)) for c in contract_assets[:10]]
+
+        if host_tasks:
+            host_results = await asyncio.gather(*host_tasks)
+            for hs in host_results:
+                all_hypotheses.extend(hs or [])
+
+        if contract_tasks:
+            contract_results = await asyncio.gather(*contract_tasks)
+            for cs in contract_results:
+                all_hypotheses.extend(cs or [])
+
+        # Research: validate hypothesis viability
+        if all_hypotheses and self.research_client:
+            all_hypotheses = await self._research_validate_hypotheses(all_hypotheses)
+
+        # Sort by exploit focus and cut to top 5 with confidence threshold
+        ranked = self._rank_hypotheses(all_hypotheses)
+        confidence_threshold = self.CONFIDENCE_THRESHOLD
+        filtered = [h for h in ranked if h.get("confidence", 0) >= confidence_threshold]
+        top_hypotheses = filtered[:5]
+        self._log(
+            "hypothesis_confidence_filter",
+            total=len(ranked),
+            above_threshold=len(filtered),
+            threshold=confidence_threshold,
+        )
+
+        review = await self._advisor_review_hypotheses(top_hypotheses)
+
+        missing_targets = [h for h in ranked if not h.get("contract_address") or not h.get("function_signature")]
+        if missing_targets:
+            self._log(
+                "hypotheses_missing_contract_or_function",
+                count=len(missing_targets),
+                total=len(ranked),
+            )
+            # Expose summary in data for downstream metrics
+            missing_summary = {
+                "missing_contract_or_function": len(missing_targets),
+                "total_hypotheses": len(ranked),
+            }
+        else:
+            missing_summary = {"missing_contract_or_function": 0, "total_hypotheses": len(ranked)}
+
+        # Store hypotheses
+        if self.storage:
+            for hyp in all_hypotheses:
+                await self.storage.save_hypothesis(hyp)
+
+        return self._success(
+            message=f"Generated {len(all_hypotheses)} hypotheses",
+            data={
+                "hypotheses": ranked,
+                "top_hypotheses": top_hypotheses,
+                "review": review,
+                "by_vuln_type": self._group_by_type(all_hypotheses),
+                "missing_targets": missing_summary,
+            },
+            next_actions=["exploit"],
+        )
+
+    async def _generate_hypotheses_for_contract_asset(
+        self,
+        asset: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Generate vulnerability hypotheses for a single contract asset."""
+        try:
+            contract_address = self._checksum_address(asset.get("value"))
+        except ValueError as e:
+            self._log_error(
+                "invalid_contract_address",
+                contract=asset.get("name"),
+                address=asset.get("value"),
+                error=str(e),
+            )
+            return []
+        address = contract_address
+        name = asset.get("name", "")
+        chain_id = asset.get("chain_id")
+        foundry_profile = asset.get("foundry_profile") or asset.get("profile")
+        metadata = asset.get("metadata", {})
+        functions = metadata.get("functions", []) or []
+        abi = metadata.get("abi", []) or []
+        solc = metadata.get("solc")
+
+        scope_profit_tokens = []
+        try:
+            scope_profit_tokens = getattr(getattr(self.run_context, "scope", None), "profit_tokens", None) or []
+        except Exception:
+            scope_profit_tokens = []
+
+        # Keep prompts bounded
+        functions_preview = functions[:50]
+        abi_preview = abi
+        try:
+            abi_preview_str = json.dumps(abi_preview)
+        except Exception:
+            abi_preview_str = "[]"
+
+        classification = (asset.get("metadata", {}) or {}).get("classification", {})
+        protocol_type = classification.get("protocol_type", "generic")
+        profile = ProtocolProfile.from_type(protocol_type)
+        pattern_hint = ", ".join(profile.patterns)
+        pool_registry = None
+        try:
+            pool_registry = getattr(getattr(self.run_context, "scope", None), "pool_registry", None)
+        except Exception:
+            pool_registry = None
+
+        lower_functions = [fn.lower() for fn in functions]
+        existing_types: set[str] = set()
+        has_deposit = any("deposit" in fn for fn in lower_functions)
+        has_withdraw = any("withdraw" in fn for fn in lower_functions)
+        has_share = any("share" in fn for fn in lower_functions)
+
+        prompt = f"""Analyze this on-chain contract target and generate exploit-focused vulnerability hypotheses.
+
+Contract name: {name}
+Contract address: {address}
+Chain ID: {chain_id}
+Known function signatures (partial): {functions_preview}
+ABI (may be truncated): {abi_preview_str[:2000]}
+Protocol type: {protocol_type}
+Targeted exploit patterns to prioritize: {pattern_hint}
+
+For each hypothesis, provide:
+1. vuln_type (e.g., reentrancy, access_control, oracle, price_manipulation, signature_replay, accounting)
+2. confidence (0.0 to 1.0)
+3. rationale
+4. test_approach (what to do in a forked Foundry test)
+5. REQUIRED on-chain fields:
+   - contract_address (hex)
+   - chain_id (int)
+   - function_signature (pick an actual target from the provided functions if possible)
+6. Optional:
+   - exploit_notes (short array of bullet points)
+   - expected_profit_hint_eth (float)
+
+Output as JSON array ONLY (no markdown, no prose):
+[
+  {{
+    \"vuln_type\": \"...\",
+    \"confidence\": 0.7,
+    \"rationale\": \"...\",
+    \"test_approach\": \"...\",
+    \"contract_address\": \"0x...\",
+    \"chain_id\": 1,
+    \"function_signature\": \"withdraw(uint256)\",
+    \"exploit_notes\": [\"...\",\"...\"],
+    \"expected_profit_hint_eth\": 1.2
+  }}
+]
+
+Focus on realistic, Immunefi-grade issues aligned with {protocol_type}. Limit to {profile.budget} hypotheses."""
+
+        async with self._contract_llm_sem:
+            if "mev_sandwich" not in existing_types:
+                mev_keywords = ["swap", "router", "pair", "pool", "uniswap", "curve", "balancer"]
+                price_keywords = ["price", "reserve", "twap"]
+                has_swap = any("swap" in fn for fn in lower_functions)
+                has_pool = any("pair" in fn or "pool" in fn for fn in lower_functions)
+                has_price = any(any(pk in fn for pk in price_keywords) for fn in lower_functions)
+                if has_swap and has_pool and has_price and any(any(k in fn for k in mev_keywords) for fn in lower_functions):
+                    if has_deposit or has_withdraw or has_share:
+                        prompt += f"""
+
+Additional note: The contract contains functions that may be vulnerable to precision errors, such as {', '.join(precision_keywords)}. Please consider this when generating hypotheses."""
+
+            if "precision_error" not in existing_types:
+                precision_keywords = ["share", "rebalance", "mint", "redeem", "deposit", "withdraw", "round", "ceil", "floor"]
+                has_deposit = any("deposit" in fn for fn in lower_functions)
+                has_withdraw = any("withdraw" in fn for fn in lower_functions)
+                has_share = any("share" in fn for fn in lower_functions)
+                if has_deposit or has_withdraw or has_share:
+                    prompt += f"""
+
+Additional note: The contract contains functions that may be vulnerable to precision errors, such as {', '.join(precision_keywords)}. Please consider this when generating hypotheses."""
+
+            response = await self._call_worker(prompt)
+        raw_hypotheses = await self._parse_hypotheses_with_validation(
+            response=response,
+            contract_name=name,
+            chain_id=chain_id,
+            functions=functions,
+            address=address,
+            functions_preview=functions_preview,
+        )
+
+        if raw_hypotheses:
+            hypotheses: list[dict[str, Any]] = []
+            for h in raw_hypotheses:
+                func_sig = h.get("function_signature") or (functions[0] if functions else None)
+                fn_name = (str(func_sig).split("(")[0] if func_sig else "").strip()
+                abi_entry: dict[str, Any] | None = None
+                if fn_name and isinstance(abi, list):
+                    for item in abi:
+                        if not isinstance(item, dict):
+                            continue
+                        if item.get("type") != "function":
+                            continue
+                        if item.get("name") == fn_name:
+                            abi_entry = item
+                            break
+
+                state_mutability = ""
+                param_types: list[str] = []
+                returns_value = False
+                is_payable = False
+                writes_state = False
+                if abi_entry:
+                    state_mutability = str(abi_entry.get("stateMutability") or "")
+                    inputs = abi_entry.get("inputs") or []
+                    outputs = abi_entry.get("outputs") or []
+                    if isinstance(inputs, list):
+                        for inp in inputs:
+                            if isinstance(inp, dict) and inp.get("type"):
+                                param_types.append(str(inp.get("type")))
+                    returns_value = isinstance(outputs, list) and len(outputs) > 0
+                    is_payable = state_mutability == "payable"
+                    writes_state = state_mutability in {"nonpayable", "payable"}
+
+                # Oracle manipulation augmentation
+                oracle_detector = OracleManipulationDetector()
+                oracle_info = oracle_detector.detect_oracle_dependency(abi, functions)
+                if oracle_info.get("has_oracle"):
+                    self._log(
+                        "oracle_functions_detected",
+                        contract=name,
+                        address=address,
+                        oracle_functions=oracle_info.get("oracle_functions"),
+                        phase=self.phase,
+                        agent=self.name,
+                    )
+                exploit_notes = h.get("exploit_notes", [])
+                exploit_body = h.get("exploit_body")
+                if oracle_info.get("has_oracle") and h.get("vuln_type") == "oracle_manipulation":
+                    exploit_body = oracle_detector.generate_manipulation_exploit(
+                        {"contract_address": h.get("contract_address") or address},
+                        oracle_info,
+                        pool_registry=pool_registry,
+                    )
+                    exploit_notes = exploit_notes or [
+                        "Flash swap to skew reserves",
+                        "Oracle reads manipulated price",
+                        "Execute price-dependent path",
+                    ]
+                    self._log(
+                        "oracle_vulnerability_detected",
+                        contract=name,
+                        address=address,
+                        oracle_functions=oracle_info.get("oracle_functions"),
+                    )
+
+                try:
+                    normalized_addr = self._checksum_address(h.get("contract_address") or contract_address)
+                except ValueError as e:
+                    self._log_error(
+                        "hypothesis_contract_address_invalid",
+                        contract=name,
+                        address=h.get("contract_address"),
+                        error=str(e),
+                    )
+                    continue
+
+                hypotheses.append({
+                    "id": f"hyp-{uuid.uuid4().hex[:8]}",
+                    "asset_id": asset.get("id"),
+                    "target": f"{name}@{address}" if name else address,
+                    "vuln_type": h.get("vuln_type", "unknown"),
+                    "confidence": min(max(float(h.get("confidence", 0.5)), 0.0), 1.0),
+                    "rationale": h.get("rationale", ""),
+                    "test_approach": h.get("test_approach", ""),
+                    "contract_address": normalized_addr,
+                    "chain_id": h.get("chain_id") or chain_id,
+                    "function_signature": func_sig,
+                    "foundry_profile": foundry_profile,
+                    "solc": solc,
+                    "abi": abi,
+                    "oracle_functions": oracle_info.get("oracle_functions"),
+                    "profit_tokens": scope_profit_tokens,
+                    "exploit_notes": h.get("exploit_notes", []),
+                    "expected_profit_hint_eth": h.get("expected_profit_hint_eth"),
+                    "function_state_mutability": state_mutability,
+                    "function_is_payable": is_payable,
+                    "function_writes_state": writes_state,
+                    "function_returns_value": returns_value,
+                    "function_param_count": len(param_types),
+                    "function_param_types": param_types,
+                    "exploit_body": exploit_body,
+                    "status": "pending",
+                })
+
+            # Heuristic enrichment for MEV/sandwich and precision/rounding issues
+            hypotheses.extend(
+                self._heuristic_enrich_hypotheses(
+                    hypotheses,
+                    address=address,
+                    name=name,
+                    chain_id=chain_id,
+                    foundry_profile=foundry_profile,
+                    solc=solc,
+                    abi=abi,
+                    functions=functions,
+                    scope_profit_tokens=scope_profit_tokens,
+                )
+            )
+
+            # If oracle functions detected but not already captured, add a dedicated oracle hypothesis
+            oracle_info = self._oracle_detector.detect_oracle_dependency(abi, functions)
+            if oracle_info.get("has_oracle"):
+                oracle_sig = oracle_info["oracle_functions"][0] if oracle_info["oracle_functions"] else (functions[0] if functions else None)
+                exploit_body = self._oracle_detector.generate_manipulation_exploit(
+                    {"contract_address": address},
+                    oracle_info,
+                    pool_registry=pool_registry,
+                )
+                try:
+                    normalized_addr = self._checksum_address(address)
+                except ValueError as e:
+                    self._log_error(
+                        "hypothesis_contract_address_invalid",
+                        contract=name,
+                        address=address,
+                        error=str(e),
+                    )
+                    return []
+
+                hypotheses.append({
+                    "id": f"hyp-{uuid.uuid4().hex[:8]}",
+                    "asset_id": asset.get("id"),
+                    "target": f"{name}@{address}" if name else address,
+                    "vuln_type": "oracle_manipulation",
+                    "confidence": 0.85,
+                    "rationale": f"Detected oracle functions: {', '.join(oracle_info['oracle_functions'])}",
+                    "test_approach": "Manipulate oracle via flash swap and trigger price-dependent path.",
+                    "contract_address": normalized_addr,
+                    "chain_id": chain_id,
+                    "function_signature": oracle_sig,
+                    "foundry_profile": foundry_profile,
+                    "solc": solc,
+                    "abi": abi,
+                    "profit_tokens": scope_profit_tokens,
+                    "exploit_notes": [
+                        "Flash swap to skew reserves",
+                        "Oracle reads manipulated price",
+                        "Execute settlement with favorable price",
+                    ],
+                    "expected_profit_hint_eth": 5.0,
+                    "function_state_mutability": state_mutability,
+                    "function_is_payable": is_payable,
+                    "function_writes_state": writes_state,
+                    "function_returns_value": returns_value,
+                    "function_param_count": len(param_types),
+                    "function_param_types": param_types,
+                    "status": "pending",
+                    "exploit_body": exploit_body,
+                })
+
+            return hypotheses[: profile.budget]
+
+        else:
+            try:
+                normalized_addr = self._checksum_address(address)
+            except ValueError as e:
+                self._log_error(
+                    "hypothesis_contract_address_invalid",
+                    contract=name,
+                    address=address,
+                    error=str(e),
+                )
+                return []
+
+            return [{
+                "id": f"hyp-{uuid.uuid4().hex[:8]}",
+                "asset_id": asset.get("id"),
+                "target": f"{name}@{address}" if name else address,
+                "vuln_type": "generic_contract",
+                "confidence": 0.3,
+                "rationale": "Generic on-chain testing hypothesis",
+                "test_approach": "Write a forked Foundry test for common exploit patterns",
+                "contract_address": normalized_addr,
+                "chain_id": chain_id,
+                "function_signature": functions[0] if functions else None,
+                "foundry_profile": foundry_profile,
+                "solc": solc,
+                "abi": abi,
+                "profit_tokens": scope_profit_tokens,
+                "status": "pending",
+            }]
+
+    async def _parse_hypotheses_with_validation(
+        self,
+        response: str,
+        contract_name: str,
+        chain_id: int | None,
+        functions: list[str],
+        address: str,
+        functions_preview: list[str],
+        max_retries: int = 2,
+    ) -> list[dict[str, Any]]:
+        """Parse hypothesis JSON with schema validation and corrective prompting."""
+
+        def _extract_json_array(text: str) -> list[dict[str, Any]]:
+            if not text:
+                raise json.JSONDecodeError("empty", text, 0)
+            s = text.strip()
+            if "```" in s:
+                parts = s.split("```")
+                if len(parts) >= 2:
+                    s = parts[1].strip()
+                    if s.startswith("json"):
+                        s = s[4:].strip()
+            start = s.find("[")
+            end = s.rfind("]")
+            if start != -1 and end != -1 and end > start:
+                s = s[start : end + 1]
+            data = json.loads(s)
+            if not isinstance(data, list):
+                raise ValueError("expected list")
+            out: list[dict[str, Any]] = []
+            for item in data:
+                if isinstance(item, dict):
+                    out.append(item)
+            return out
+
+        parsed: list[dict[str, Any]] = []
+
+        for attempt in range(max_retries):
+            try:
+                raw = _extract_json_array(response)
+                validate(instance=raw, schema=self.HYPOTHESIS_SCHEMA)
+                parsed = raw
+                self._log(
+                    "hypothesis_validation_success",
+                    contract=contract_name,
+                    count=len(parsed),
+                    attempt=attempt + 1,
+                )
+                break
+            except json.JSONDecodeError as e:
+                self._log(
+                    "hypothesis_json_parse_error",
+                    contract=contract_name,
+                    error=str(e),
+                    response_preview=response[:500],
+                )
+                if attempt < max_retries - 1:
+                    response = await self._call_worker(
+                        f"""Your JSON response was malformed. Error: {str(e)}
+
+Original response (first 300 chars):
+{response[:300]}
+
+Return ONLY a JSON array with objects containing:
+- vuln_type (string: reentrancy, access_control, oracle_manipulation, flash_loan, mev_sandwich, precision_error, state_inconsistency, generic_contract)
+- confidence (0-1)
+- contract_address (0x + 40 hex)
+- chain_id (int)
+- function_signature (use one from: {functions_preview})
+"""
+                    )
+                continue
+            except ValidationError as e:
+                self._log(
+                    "hypothesis_schema_validation_error",
+                    contract=contract_name,
+                    error=str(e),
+                    failed_item=str(e.instance)[:200],
+                )
+                if attempt < max_retries - 1:
+                    response = await self._call_worker(
+                        f"""Your hypotheses failed validation: {e.message}
+
+Failed item:
+{json.dumps(e.instance, indent=2)[:200]}
+
+Fix and return ONLY a JSON array matching the schema and using function signatures from: {functions_preview}
+"""
+                    )
+                continue
+            except Exception as e:
+                self._log("hypothesis_parse_error", contract=contract_name, error=str(e))
+                if attempt == max_retries - 1:
+                    parsed = []
+                continue
+
+        return parsed
+
+    def _checksum_address(self, address: str | None) -> str:
+        """Validate and return checksum address."""
+        if not address or not isinstance(address, str):
+            raise ValueError("missing address")
+        addr = address.strip()
+        if not is_address(addr):
+            raise ValueError(f"invalid address: {address}")
+        return to_checksum_address(addr)
+
+    def _heuristic_enrich_hypotheses(
+        self,
+        existing: list[dict[str, Any]],
+        *,
+        address: str,
+        name: str,
+        chain_id: int | None,
+        foundry_profile: str | None,
+        solc: str | None,
+        abi: list[Any],
+        functions: list[str],
+        scope_profit_tokens: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Heuristically enrich hypotheses with additional information."""
+        enriched: list[dict[str, Any]] = []
+        for h in existing:
+            if h.get("vuln_type") == "mev_sandwich":
+                mev_hypothesis = {
+                    "id": f"hyp-{uuid.uuid4().hex[:8]}",
+                    "asset_id": h.get("asset_id"),
+                    "target": h.get("target"),
+                    "vuln_type": "mev_sandwich",
+                    "confidence": h.get("confidence", 0.5),
+                    "rationale": h.get("rationale", ""),
+                    "test_approach": h.get("test_approach", ""),
+                    "contract_address": h.get("contract_address"),
+                    "chain_id": h.get("chain_id"),
+                    "function_signature": h.get("function_signature"),
+                    "foundry_profile": foundry_profile,
+                    "solc": solc,
+                    "abi": abi,
+                    "profit_tokens": scope_profit_tokens,
+                    "exploit_notes": h.get("exploit_notes", []),
+                    "expected_profit_hint_eth": h.get("expected_profit_hint_eth"),
+                    "status": "pending",
+                }
+                enriched.append(mev_hypothesis)
+            elif h.get("vuln_type") == "precision_error":
+                precision_hypothesis = {
+                    "id": f"hyp-{uuid.uuid4().hex[:8]}",
+                    "asset_id": h.get("asset_id"),
+                    "target": h.get("target"),
+                    "vuln_type": "precision_error",
+                    "confidence": h.get("confidence", 0.5),
+                    "rationale": h.get("rationale", ""),
+                    "test_approach": h.get("test_approach", ""),
+                    "contract_address": h.get("contract_address"),
+                    "chain_id": h.get("chain_id"),
+                    "function_signature": h.get("function_signature"),
+                    "foundry_profile": foundry_profile,
+                    "solc": solc,
+                    "abi": abi,
+                    "profit_tokens": scope_profit_tokens,
+                    "exploit_notes": h.get("exploit_notes", []),
+                    "expected_profit_hint_eth": h.get("expected_profit_hint_eth"),
+                    "status": "pending",
+                }
+                enriched.append(precision_hypothesis)
+        return enriched
+
+    async def _generate_hypotheses_for_asset(
+        self,
+        asset: dict[str, Any],
+        technologies: list[str],
+    ) -> list[dict[str, Any]]:
+        """Generate vulnerability hypotheses for a single asset."""
+        url = asset.get("value", "")
+        metadata = asset.get("metadata", {})
+        tech_list = metadata.get("technologies", []) + technologies
+
+        prompt = f"""Analyze this web asset and generate vulnerability hypotheses.
+
+URL: {url}
+Status Code: {metadata.get('status_code')}
+Title: {metadata.get('title')}
+Technologies: {tech_list[:10]}
+Webserver: {metadata.get('webserver')}
+
+For each potential vulnerability, provide:
+1. Vulnerability type (e.g., XSS, SQLi, IDOR, SSRF)
+2. Confidence level (0.0 to 1.0)
+3. Rationale for why this might exist
+4. Initial test approach
+5. Optional on-chain fields if applicable:
+   - contract_address (hex)
+   - chain_id (int)
+   - function_signature (e.g., transfer(address,uint256))
+   - exploit_notes (short array of bullet points)
+   - expected_profit_hint_eth (float)
+
+Output as JSON array:
+[
+  {{
+    "vuln_type": "...",
+    "confidence": 0.7,
+    "rationale": "...",
+    "test_approach": "...",
+    "contract_address": "0x...",
+    "chain_id": 1,
+    "function_signature": "withdraw(uint256)",
+    "exploit_notes": ["...","..."],
+    "expected_profit_hint_eth": 1.2
+  }}
+]
+
+Focus on realistic, high-value vulnerabilities. Limit to 5 hypotheses."""
+
+        response = await self._call_worker(prompt)
+
+        try:
+            if "```" in response:
+                json_str = response.split("```")[1]
+                if json_str.startswith("json"):
+                    json_str = json_str[4:]
+                raw_hypotheses = json.loads(json_str.strip())
+            else:
+                raw_hypotheses = json.loads(response)
+
+            hypotheses = []
+            for h in raw_hypotheses:
+                hypotheses.append({
+                    "id": f"hyp-{uuid.uuid4().hex[:8]}",
+                    "asset_id": asset.get("id"),
+                    "target": url,
+                    "vuln_type": h.get("vuln_type", "unknown"),
+                    "confidence": min(max(float(h.get("confidence", 0.5)), 0.0), 1.0),
+                    "rationale": h.get("rationale", ""),
+                    "test_approach": h.get("test_approach", ""),
+                    "contract_address": h.get("contract_address"),
+                    "chain_id": h.get("chain_id"),
+                    "function_signature": h.get("function_signature"),
+                    "exploit_notes": h.get("exploit_notes", []),
+                    "expected_profit_hint_eth": h.get("expected_profit_hint_eth"),
+                    "status": "pending",
+                })
+
+            return hypotheses
+
+        except (json.JSONDecodeError, ValueError):
+            # Return a generic hypothesis on parse failure
+            return [{
+                "id": f"hyp-{uuid.uuid4().hex[:8]}",
+                "asset_id": asset.get("id"),
+                "target": url,
+                "vuln_type": "generic",
+                "confidence": 0.3,
+                "rationale": "Generic testing hypothesis",
+                "test_approach": "Standard vulnerability scanning",
+                "status": "pending",
+            }]
+
+    async def _research_validate_hypotheses(
+        self,
+        hypotheses: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Use research to validate and enhance hypotheses."""
+        # Group hypotheses by vuln type
+        by_type: dict[str, list[dict[str, Any]]] = {}
+        for h in hypotheses:
+            vtype = h.get("vuln_type", "unknown")
+            if vtype not in by_type:
+                by_type[vtype] = []
+            by_type[vtype].append(h)
+
+        # Research each vulnerability type
+        for vtype, hyps in list(by_type.items())[:3]:  # Limit to 3 types
+            research = await self._research(
+                question=f"What are effective testing techniques for {vtype} vulnerabilities in web applications?",
+                context=f"Validating {len(hyps)} hypotheses for {vtype}",
+            )
+
+            # Enhance hypotheses with research
+            for h in hyps:
+                h["research_context"] = research.get("answer", "")[:200]
+
+        return hypotheses
+
+    async def _advisor_review_hypotheses(
+        self,
+        hypotheses: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Get advisor review of top hypotheses."""
+        if not self.advisor_model or not hypotheses:
+            return {"reviewed": False}
+
+        prompt = f"""Review these vulnerability hypotheses for a bug bounty program.
+
+Hypotheses:
+{json.dumps(hypotheses[:10], indent=2)}
+
+Evaluate:
+1. Which hypotheses are most likely to yield real vulnerabilities?
+2. Which should be deprioritized or skipped?
+3. Are there any safety concerns with testing these?
+
+Respond with JSON:
+{{
+  "priority_hypotheses": ["hyp-id-1", "hyp-id-2"],
+  "skip_hypotheses": ["hyp-id-3"],
+  "safety_concerns": ["..."],
+  "recommendations": ["..."]
+}}"""
+
+        response = await self._call_advisor(prompt)
+
+        try:
+            if "```" in response:
+                json_str = response.split("```")[1]
+                if json_str.startswith("json"):
+                    json_str = json_str[4:]
+                return json.loads(json_str.strip())
+            return json.loads(response)
+        except json.JSONDecodeError:
+            return {"reviewed": True, "error": "Failed to parse advisor response"}
+
+    def _group_by_type(
+        self,
+        hypotheses: list[dict[str, Any]],
+    ) -> dict[str, int]:
+        """Group hypotheses by vulnerability type."""
+        counts: dict[str, int] = {}
+        for h in hypotheses:
+            vtype = h.get("vuln_type", "unknown")
+            counts[vtype] = counts.get(vtype, 0) + 1
+        return counts
+
+    def _rank_hypotheses(
+        self,
+        hypotheses: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Rank hypotheses by exploitability and profit signal."""
+        def score(h: dict[str, Any]) -> float:
+            confidence = float(h.get("confidence", 0))
+            est_profit = float(h.get("expected_profit_hint_eth", 0) or 0)
+            severity_weight = {
+                "oracle_manipulation": 1.0,
+                "mev": 0.95,
+                "sandwich": 0.95,
+                "precision": 0.8,
+                "round": 0.8,
+                "flash_loan": 0.9,
+                "reentrancy": 0.9,
+                "access_control": 0.75,
+                "integer": 0.7,
+                "unchecked_call": 0.65,
+                "delegatecall": 0.65,
+                "state_inconsistency": 0.6,
+                "generic_contract": 0.5,
+            }
+            vt = h.get("vuln_type", "").lower()
+            sev_bonus = max((weight for key, weight in severity_weight.items() if key in vt), default=0.4)
+            missing_penalty = 0.2 if (not h.get("contract_address") or not h.get("function_signature")) else 0.0
+            return confidence * 0.6 + sev_bonus * 0.2 + min(est_profit, 10) * 0.2 - missing_penalty
+
+        ranked = sorted(hypotheses, key=score, reverse=True)
+        for idx, h in enumerate(ranked):
+            h["exploit_score"] = round(score(h), 4)
+            h["rank"] = idx + 1
+        return ranked

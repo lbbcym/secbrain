@@ -1,0 +1,70 @@
+{
+  "name": "Enzyme Finance Bug Bounty",
+  "platform": "Immunefi",
+  "bounty_range": "Up to $200,000",
+  "url": "https://immunefi.com/bug-bounty/enzymefinance/",
+  "in_scope": [
+    "Direct theft of any user funds, whether at-rest or in-motion, other than unclaimed yield (Critical)",
+    "Permanent freezing of funds (Critical)",
+    "Protocol insolvency (Critical)",
+    "Theft of unclaimed yield (High)",
+    "Permanent freezing of unclaimed yield (High)",
+    "Temporary freezing of funds (High)",
+    "Smart contract unable to operate due to lack of token funds (Medium)",
+    "Griefing (e.g. no profit motive for an attacker, but damage to the users or the protocol) (Medium)"
+  ],
+  "out_of_scope": [
+    "Any testing on mainnet or public testnet deployed code",
+    "Any testing with pricing oracles or third-party smart contracts",
+    "Phishing or social engineering attacks against project's employees and/or customers",
+    "Testing with third-party systems and applications (e.g. browser extensions) as well as websites (e.g. SSO providers, advertising networks)",
+    "Denial of service attacks that are executed against project assets",
+    "Automated testing of services that generates significant amounts of traffic",
+    "Public disclosure of an unpatched vulnerability in an embargoed bounty",
+    "Any other actions prohibited by the Immunefi Rules",
+    "Incorrect data supplied by third party oracles (except oracle manipulation/flash loan attacks)",
+    "Impacts requiring basic economic and governance attacks (e.g. 51% attack)",
+    "Lack of liquidity impacts",
+    "Impacts from Sybil attacks",
+    "Impacts involving centralization risks",
+    "Impacts requiring attacks that the reporter has already exploited themselves, leading to damage",
+    "Impacts caused by attacks requiring access to leaked keys/credentials",
+    "Impacts caused by attacks requiring access to privileged addresses (including governance and strategist contracts) without additional modifications",
+    "Impacts relying on attacks involving the depegging of an external stablecoin where the attacker does not directly cause the depegging",
+    "Mentions of secrets, access tokens, API keys, private keys, etc. in Github will be considered out of scope without proof that they are in-use in production",
+    "Best practice recommendations",
+    "Feature requests",
+    "Impacts on test files and configuration files unless stated otherwise in the bug bounty program"
+  ],
+  "rules": [
+    "All testing must be done on local-forks of either public testnet or mainnet",
+    "Proof of Concept is required for all severities",
+    "No KYC required for payouts",
+    "Rewards distributed in USDC up to $200,000",
+    "Critical smart contract vulnerabilities capped at 10% of funds at risk",
+    "Minimum reward to discourage withholding bug reports",
+    "All payouts are done by the Enzyme Finance team directly",
+    "Payouts are denominated in USD"
+  ],
+  "focus_areas": [
+    "Smart contract vulnerabilities",
+    "Loss of user funds",
+    "DeFi asset management security",
+    "On-chain investment vehicles",
+    "Protocol insolvency scenarios",
+    "Fund freezing vulnerabilities",
+    "Yield theft mechanisms",
+    "Griefing attacks on users or protocol"
+  ],
+  "rewards": {
+    "critical": "Up to $200,000 (10% of funds at risk) - Direct theft of user funds, permanent freezing, protocol insolvency",
+    "high": "Based on Immunefi Severity Classification System - Theft/freezing of unclaimed yield, temporary fund freezing",
+    "medium": "Based on Immunefi Severity Classification System - Contract inoperability, griefing attacks",
+    "low": "Based on Immunefi Severity Classification System"
+  },
+  "notes": "Enzyme Finance (formerly Melon Protocol) is an Ethereum-based protocol for decentralized on-chain asset management. This bug bounty program is focused around the Enzyme Finance smart contracts and is primarily concerned with the loss of user funds. All accepted impacts are based on the Immunefi Vulnerability Severity Classification System.",
+  "contacts": {
+    "platform": "Immunefi",
+    "team": "Enzyme Finance team"
+  }
+}

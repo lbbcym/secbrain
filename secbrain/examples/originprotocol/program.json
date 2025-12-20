@@ -1,0 +1,13 @@
+{
+  "name": "Origin Protocol",
+  "platform": "immunefi",
+  "program_url": "https://immunefi.com/bug-bounty/originprotocol/",
+  "focus_areas": ["Smart contracts", "Web/App"],
+  "rules": [
+    "PoC required for all severities",
+    "Do not test on mainnet or public testnets; use local forks",
+    "Avoid DoS / significant traffic",
+    "Follow Immunefi safe harbor and rules"
+  ],
+  "notes": "Targets and profiles sourced from local Instascope Foundry project under originprotocol/."
+}

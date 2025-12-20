@@ -1,0 +1,13 @@
+[
+  {
+    "id": "test-asset-1",
+    "run_id": "25a113c0",
+    "type": "subdomain",
+    "value": "test.example.com",
+    "technologies": [],
+    "metadata": {
+      "source": "test"
+    },
+    "discovered_at": "2025-12-17T18:34:10.412516"
+  }
+]

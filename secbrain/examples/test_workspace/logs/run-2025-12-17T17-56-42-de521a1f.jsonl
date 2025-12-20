@@ -1,0 +1,44 @@
+{"event": "workflow_started", "run_id": "de521a1f", "phases": ["ingest", "plan", "recon", "hypothesis", "exploit", "static", "triage", "report", "meta"], "dry_run": true}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "ingest", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "ingest", "from_phase": "ingest"}
+{"event": "starting_ingest", "run_id": "de521a1f", "agent": "program_ingest", "phase": "ingest"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "ingest", "success": true, "agent": "supervisor"}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "plan", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "plan", "from_phase": "plan"}
+{"event": "starting_planning", "run_id": "de521a1f", "agent": "planner", "phase": "plan"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "plan", "success": true, "agent": "supervisor"}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "recon", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "recon", "from_phase": "recon"}
+{"event": "starting_recon", "run_id": "de521a1f", "agent": "recon", "phase": "recon"}
+{"event": "enumerating_subdomains", "run_id": "de521a1f", "domain": "example.com", "agent": "recon", "phase": "recon"}
+{"event": "enumerating_subdomains", "run_id": "de521a1f", "domain": "api.example.com", "agent": "recon", "phase": "recon"}
+{"event": "enumerating_subdomains", "run_id": "de521a1f", "domain": "app.example.com", "agent": "recon", "phase": "recon"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "recon", "success": true, "agent": "supervisor"}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "hypothesis", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "hypothesis", "from_phase": "hypothesis"}
+{"event": "starting_hypothesis_generation", "run_id": "de521a1f", "agent": "vuln_hypothesis", "phase": "hypothesis"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "hypothesis", "success": false, "agent": "supervisor"}
+{"event": "Phase hypothesis failed", "run_id": "de521a1f", "errors": ["No assets available for hypothesis generation"], "agent": "supervisor", "phase": "orchestration"}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "exploit", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "exploit", "from_phase": "exploit"}
+{"event": "starting_exploitation", "run_id": "de521a1f", "agent": "exploit", "phase": "exploit"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "exploit", "success": false, "agent": "supervisor"}
+{"event": "Phase exploit failed", "run_id": "de521a1f", "errors": ["No hypotheses to test"], "agent": "supervisor", "phase": "orchestration"}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "static", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "static", "from_phase": "static"}
+{"event": "starting_static_analysis", "run_id": "de521a1f", "agent": "static_analysis", "phase": "static"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "static", "success": true, "agent": "supervisor"}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "triage", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "triage", "from_phase": "triage"}
+{"event": "starting_triage", "run_id": "de521a1f", "agent": "triage", "phase": "triage"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "triage", "success": true, "agent": "supervisor"}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "report", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "report", "from_phase": "report"}
+{"event": "starting_reporting", "run_id": "de521a1f", "agent": "reporting", "phase": "report"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "report", "success": true, "agent": "supervisor"}
+{"event": "pre_phase_check", "run_id": "de521a1f", "phase": "meta", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "de521a1f", "phase": "meta", "from_phase": "meta"}
+{"event": "starting_meta_learning", "run_id": "de521a1f", "agent": "meta_learning", "phase": "meta"}
+{"event": "learnings_stored", "run_id": "de521a1f", "path": "examples\\test_workspace\\learnings\\de521a1f.json", "agent": "meta_learning", "phase": "meta"}
+{"event": "post_phase_check", "run_id": "de521a1f", "phase": "meta", "success": true, "agent": "supervisor"}
+{"event": "workflow_completed", "run_id": "de521a1f", "success": true, "phases_completed": ["ingest", "plan", "recon", "static", "triage", "report", "meta"], "findings": 0, "duration": 0.093283}

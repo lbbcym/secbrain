@@ -1,0 +1,28 @@
+{
+  "name": "Example Corp Bug Bounty",
+  "platform": "hackerone",
+  "url": "https://hackerone.com/example",
+  "focus_areas": [
+    "Authentication",
+    "Authorization",
+    "API Security",
+    "Business Logic"
+  ],
+  "rules": [
+    "No automated scanning without rate limiting",
+    "Do not access other users' data",
+    "Report findings within 24 hours",
+    "No denial of service testing"
+  ],
+  "rewards": {
+    "critical": "$10000-$25000",
+    "high": "$5000-$10000",
+    "medium": "$1000-$5000",
+    "low": "$100-$1000"
+  },
+  "notes": "Focus on API endpoints. Mobile apps are out of scope.",
+  "contacts": {
+    "security_email": "security@example.com",
+    "response_time": "24 hours"
+  }
+}

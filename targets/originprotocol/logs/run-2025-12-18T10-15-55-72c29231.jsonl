@@ -1,0 +1,58 @@
+{"run_id": "72c29231", "phases": ["ingest", "plan", "recon", "hypothesis", "exploit", "static", "triage", "report", "meta"], "dry_run": false, "event": "workflow_started", "level": "info", "timestamp": "2025-12-18T10:15:55.890574"}
+{"run_id": "72c29231", "phase": "ingest", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:15:55.891205"}
+{"run_id": "72c29231", "phase": "ingest", "from_phase": "ingest", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:15:55.891626"}
+{"run_id": "72c29231", "agent": "program_ingest", "phase": "ingest", "event": "starting_ingest", "level": "info", "timestamp": "2025-12-18T10:15:55.891978"}
+{"run_id": "72c29231", "phase": "ingest", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:15:55.892684"}
+{"run_id": "72c29231", "phase": "plan", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:15:55.893086"}
+{"run_id": "72c29231", "phase": "plan", "from_phase": "plan", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:15:55.893458"}
+{"run_id": "72c29231", "agent": "planner", "phase": "plan", "event": "starting_planning", "level": "info", "timestamp": "2025-12-18T10:15:55.893783"}
+{"run_id": "72c29231", "phase": "plan", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:15:55.894226"}
+{"run_id": "72c29231", "phase": "recon", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:15:55.894577"}
+{"run_id": "72c29231", "phase": "recon", "from_phase": "recon", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:15:55.894949"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "starting_recon", "level": "info", "timestamp": "2025-12-18T10:15:55.895263"}
+{"run_id": "72c29231", "domains_count": 0, "contracts_count": 7, "agent": "recon", "phase": "recon", "event": "debug_scope", "level": "info", "timestamp": "2025-12-18T10:15:55.895570"}
+{"run_id": "72c29231", "name": "Proxy", "address": "0x85b78aCa6DeaE198fBf201c82dAf6cA21942ACc6", "agent": "recon", "phase": "recon", "event": "first_contract", "level": "info", "timestamp": "2025-12-18T10:15:55.896087"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Starting contract recon for 7 contracts", "level": "info", "timestamp": "2025-12-18T10:15:55.896767"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Compiling contract Proxy with profile contract_Proxy_85b7", "level": "info", "timestamp": "2025-12-18T10:15:55.923159"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Error compiling Proxy: 'ReconAgent' object has no attribute '_extract_contract_metadata'", "level": "info", "timestamp": "2025-12-18T10:16:05.794206"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Compiling contract ConvexEthMetaStrategyProxy with profile contract_ConvexEthMetaStrategyProxy_1827", "level": "info", "timestamp": "2025-12-18T10:16:05.794676"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Error compiling ConvexEthMetaStrategyProxy: 'ReconAgent' object has no attribute '_extract_contract_metadata'", "level": "info", "timestamp": "2025-12-18T10:16:29.335296"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Compiling contract VaultProxy with profile contract_VaultProxy_e75d", "level": "info", "timestamp": "2025-12-18T10:16:29.341710"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Error compiling VaultProxy: 'ReconAgent' object has no attribute '_extract_contract_metadata'", "level": "info", "timestamp": "2025-12-18T10:16:38.993090"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Compiling contract OETHCurveAMOProxy with profile contract_OETHCurveAMOProxy_af04", "level": "info", "timestamp": "2025-12-18T10:16:38.995467"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Error compiling OETHCurveAMOProxy: 'ReconAgent' object has no attribute '_extract_contract_metadata'", "level": "info", "timestamp": "2025-12-18T10:17:09.053526"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Compiling contract FixedRateRewardsSourceProxy with profile contract_FixedRateRewardsSourceProxy_7609", "level": "info", "timestamp": "2025-12-18T10:17:09.063021"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Error compiling FixedRateRewardsSourceProxy: 'ReconAgent' object has no attribute '_extract_contract_metadata'", "level": "info", "timestamp": "2025-12-18T10:17:28.772779"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Compiling contract ExponentialStakingProxy with profile contract_ExponentialStakingProxy_6389", "level": "info", "timestamp": "2025-12-18T10:17:28.773318"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Error compiling ExponentialStakingProxy: 'ReconAgent' object has no attribute '_extract_contract_metadata'", "level": "info", "timestamp": "2025-12-18T10:17:30.671330"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Compiling contract InitializeGovernedUpgradeabilityProxy with profile contract_InitializeGovernedUpgradeabilityProxy_5018", "level": "info", "timestamp": "2025-12-18T10:17:30.672258"}
+{"run_id": "72c29231", "agent": "recon", "phase": "recon", "event": "Error compiling InitializeGovernedUpgradeabilityProxy: 'ReconAgent' object has no attribute '_extract_contract_metadata'", "level": "info", "timestamp": "2025-12-18T10:17:31.786256"}
+{"run_id": "72c29231", "phase": "recon", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.788868"}
+{"run_id": "72c29231", "phase": "hypothesis", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.789793"}
+{"run_id": "72c29231", "phase": "hypothesis", "from_phase": "hypothesis", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:17:31.790162"}
+{"run_id": "72c29231", "agent": "vuln_hypothesis", "phase": "hypothesis", "event": "starting_hypothesis_generation", "level": "info", "timestamp": "2025-12-18T10:17:31.790410"}
+{"run_id": "72c29231", "phase": "hypothesis", "success": false, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.790658"}
+{"run_id": "72c29231", "errors": ["No assets available for hypothesis generation"], "agent": "supervisor", "phase": "orchestration", "event": "Phase hypothesis failed", "level": "error", "timestamp": "2025-12-18T10:17:31.790907"}
+{"run_id": "72c29231", "phase": "exploit", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.791225"}
+{"run_id": "72c29231", "phase": "exploit", "from_phase": "exploit", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:17:31.791468"}
+{"run_id": "72c29231", "agent": "exploit", "phase": "exploit", "event": "starting_exploitation", "level": "info", "timestamp": "2025-12-18T10:17:31.791710"}
+{"run_id": "72c29231", "phase": "exploit", "success": false, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.791972"}
+{"run_id": "72c29231", "errors": ["No hypotheses to test"], "agent": "supervisor", "phase": "orchestration", "event": "Phase exploit failed", "level": "error", "timestamp": "2025-12-18T10:17:31.792265"}
+{"run_id": "72c29231", "phase": "static", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.793038"}
+{"run_id": "72c29231", "phase": "static", "from_phase": "static", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:17:31.793454"}
+{"run_id": "72c29231", "agent": "static_analysis", "phase": "static", "event": "starting_static_analysis", "level": "info", "timestamp": "2025-12-18T10:17:31.794031"}
+{"run_id": "72c29231", "phase": "static", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.794725"}
+{"run_id": "72c29231", "phase": "triage", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.795946"}
+{"run_id": "72c29231", "phase": "triage", "from_phase": "triage", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:17:31.796750"}
+{"run_id": "72c29231", "agent": "triage", "phase": "triage", "event": "starting_triage", "level": "info", "timestamp": "2025-12-18T10:17:31.797356"}
+{"run_id": "72c29231", "phase": "triage", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.797873"}
+{"run_id": "72c29231", "phase": "report", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.798264"}
+{"run_id": "72c29231", "phase": "report", "from_phase": "report", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:17:31.798633"}
+{"run_id": "72c29231", "agent": "reporting", "phase": "report", "event": "starting_reporting", "level": "info", "timestamp": "2025-12-18T10:17:31.799954"}
+{"run_id": "72c29231", "phase": "report", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.800562"}
+{"run_id": "72c29231", "phase": "meta", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.801122"}
+{"run_id": "72c29231", "phase": "meta", "from_phase": "meta", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T10:17:31.801484"}
+{"run_id": "72c29231", "agent": "meta_learning", "phase": "meta", "event": "starting_meta_learning", "level": "info", "timestamp": "2025-12-18T10:17:31.801926"}
+{"run_id": "72c29231", "path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\targets\\originprotocol\\learnings\\72c29231.json", "agent": "meta_learning", "phase": "meta", "event": "learnings_stored", "level": "info", "timestamp": "2025-12-18T10:17:31.803501"}
+{"run_id": "72c29231", "phase": "meta", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T10:17:31.804140"}
+{"run_id": "72c29231", "success": true, "phases_completed": ["ingest", "plan", "recon", "static", "triage", "report", "meta"], "findings": 0, "duration": 95.914049, "event": "workflow_completed", "level": "info", "timestamp": "2025-12-18T10:17:31.804628"}

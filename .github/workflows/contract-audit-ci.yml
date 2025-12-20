@@ -1,0 +1,128 @@
+name: SecBrain Contract Audit CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'secbrain/**'
+      - 'tests/**'
+      - 'examples/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'secbrain/**'
+      - 'tests/**'
+      - 'examples/**'
+      - '.github/workflows/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: |
+          secbrain/pyproject.toml
+          secbrain/requirements.lock
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        cd secbrain
+        python -m pip install -r requirements.lock
+        python -m pip install -e ".[dev]"
+
+    - name: Lint (ruff)
+      run: |
+        cd secbrain
+        python -m ruff check .
+
+    - name: Type check (mypy)
+      run: |
+        cd secbrain
+        python -m mypy secbrain
+
+    - name: Run unit tests with coverage
+      run: |
+        cd secbrain
+        python -m pytest tests/ -v --tb=short --cov=secbrain --cov-report=term-missing --cov-fail-under=60
+
+    - name: Run contract recon dry-run test
+      run: |
+        cd secbrain
+        python -m secbrain.cli.secbrain_cli run \
+          --scope examples/enzyme_scope.yaml \
+          --program examples/enzyme_program.json \
+          --workspace test_workspace \
+          --dry-run \
+          --phases recon
+    
+    - name: Validate contract artifacts
+      run: |
+        cd secbrain
+        # Check that workspace contains expected artifacts
+        if [ ! -d "test_workspace/logs" ]; then
+          echo "ERROR: No logs directory created"
+          exit 1
+        fi
+
+        # Check for recon artifacts (in dry-run, storage may not persist)
+        echo "Recon dry-run completed successfully"
+
+    - name: Run contract fixture generation
+      run: |
+        cd secbrain
+        python secbrain/fixtures/contract_fixtures.py
+
+        # Verify fixtures were generated
+        if [ ! -f "examples/contract_fixtures.json" ]; then
+          echo "ERROR: Contract fixtures not generated"
+          exit 1
+        fi
+
+        echo "Contract fixtures generated successfully"
+
+    - name: Validate Enzyme configuration
+      run: |
+        cd secbrain
+        # Check that enzyme_scope.yaml exists and is valid
+        if [ ! -f "examples/enzyme_scope.yaml" ]; then
+          echo "ERROR: enzyme_scope.yaml not found"
+          exit 1
+        fi
+        
+        # Check that enzyme_program.json exists and is valid
+        if [ ! -f "examples/enzyme_program.json" ]; then
+          echo "ERROR: enzyme_program.json not found"
+          exit 1
+        fi
+        
+        # Validate JSON syntax
+        python -c "import json; json.load(open('examples/enzyme_program.json')); print('enzyme_program.json is valid JSON')"
+        python -c "import yaml; yaml.safe_load(open('examples/enzyme_scope.yaml')); print('enzyme_scope.yaml is valid YAML')"
+        
+        echo "Enzyme configuration files are valid"
+
+  # Future: Add integration test with actual Foundry installation
+  # integration:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - name: Install Foundry
+  #     uses: foundry-rs/foundry-toolchain@v1
+  #   - name: Run integration test with real Foundry
+  #     run: |
+  #       cd secbrain
+  #       python -m secbrain.cli.secbrain_cli run \
+  #         --scope examples/enzyme_scope.yaml \
+  #         --program examples/enzyme_program.json \
+  #         --workspace integration_workspace \
+  #         --phases recon

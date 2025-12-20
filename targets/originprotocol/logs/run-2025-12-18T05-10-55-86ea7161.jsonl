@@ -1,0 +1,45 @@
+{"run_id": "86ea7161", "phases": ["ingest", "plan", "recon", "hypothesis", "exploit", "static", "triage", "report", "meta"], "dry_run": false, "event": "workflow_started", "level": "info", "timestamp": "2025-12-18T05:10:55.454936"}
+{"run_id": "86ea7161", "phase": "ingest", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.455395"}
+{"run_id": "86ea7161", "phase": "ingest", "from_phase": "ingest", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.455766"}
+{"run_id": "86ea7161", "agent": "program_ingest", "phase": "ingest", "event": "starting_ingest", "level": "info", "timestamp": "2025-12-18T05:10:55.456082"}
+{"run_id": "86ea7161", "phase": "ingest", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.457232"}
+{"run_id": "86ea7161", "phase": "plan", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.457531"}
+{"run_id": "86ea7161", "phase": "plan", "from_phase": "plan", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.457961"}
+{"run_id": "86ea7161", "agent": "planner", "phase": "plan", "event": "starting_planning", "level": "info", "timestamp": "2025-12-18T05:10:55.458309"}
+{"run_id": "86ea7161", "phase": "plan", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.458724"}
+{"run_id": "86ea7161", "phase": "recon", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.459110"}
+{"run_id": "86ea7161", "phase": "recon", "from_phase": "recon", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.459450"}
+{"run_id": "86ea7161", "agent": "recon", "phase": "recon", "event": "starting_recon", "level": "info", "timestamp": "2025-12-18T05:10:55.459805"}
+{"run_id": "86ea7161", "domains_count": 0, "contracts_count": 7, "agent": "recon", "phase": "recon", "event": "debug_scope", "level": "info", "timestamp": "2025-12-18T05:10:55.460136"}
+{"run_id": "86ea7161", "name": "Proxy", "address": "0x85b78aCa6DeaE198fBf201c82dAf6cA21942ACc6", "agent": "recon", "phase": "recon", "event": "first_contract", "level": "info", "timestamp": "2025-12-18T05:10:55.460533"}
+{"run_id": "86ea7161", "agent": "recon", "phase": "recon", "event": "Starting contract recon for 7 contracts", "level": "info", "timestamp": "2025-12-18T05:10:55.461066"}
+{"run_id": "86ea7161", "phase": "recon", "success": false, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.467355"}
+{"run_id": "86ea7161", "errors": ["Foundry not installed or not in PATH"], "agent": "supervisor", "phase": "orchestration", "event": "Phase recon failed", "level": "error", "timestamp": "2025-12-18T05:10:55.467911"}
+{"run_id": "86ea7161", "phase": "hypothesis", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.468544"}
+{"run_id": "86ea7161", "phase": "hypothesis", "from_phase": "hypothesis", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.469116"}
+{"run_id": "86ea7161", "agent": "vuln_hypothesis", "phase": "hypothesis", "event": "starting_hypothesis_generation", "level": "info", "timestamp": "2025-12-18T05:10:55.469551"}
+{"run_id": "86ea7161", "phase": "hypothesis", "success": false, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.470090"}
+{"run_id": "86ea7161", "errors": ["No assets available for hypothesis generation"], "agent": "supervisor", "phase": "orchestration", "event": "Phase hypothesis failed", "level": "error", "timestamp": "2025-12-18T05:10:55.470625"}
+{"run_id": "86ea7161", "phase": "exploit", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.471137"}
+{"run_id": "86ea7161", "phase": "exploit", "from_phase": "exploit", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.471647"}
+{"run_id": "86ea7161", "agent": "exploit", "phase": "exploit", "event": "starting_exploitation", "level": "info", "timestamp": "2025-12-18T05:10:55.472388"}
+{"run_id": "86ea7161", "phase": "exploit", "success": false, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.472828"}
+{"run_id": "86ea7161", "errors": ["No hypotheses to test"], "agent": "supervisor", "phase": "orchestration", "event": "Phase exploit failed", "level": "error", "timestamp": "2025-12-18T05:10:55.473612"}
+{"run_id": "86ea7161", "phase": "static", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.474068"}
+{"run_id": "86ea7161", "phase": "static", "from_phase": "static", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.474424"}
+{"run_id": "86ea7161", "agent": "static_analysis", "phase": "static", "event": "starting_static_analysis", "level": "info", "timestamp": "2025-12-18T05:10:55.474891"}
+{"run_id": "86ea7161", "phase": "static", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.475319"}
+{"run_id": "86ea7161", "phase": "triage", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.475816"}
+{"run_id": "86ea7161", "phase": "triage", "from_phase": "triage", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.476253"}
+{"run_id": "86ea7161", "agent": "triage", "phase": "triage", "event": "starting_triage", "level": "info", "timestamp": "2025-12-18T05:10:55.476881"}
+{"run_id": "86ea7161", "phase": "triage", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.477355"}
+{"run_id": "86ea7161", "phase": "report", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.477893"}
+{"run_id": "86ea7161", "phase": "report", "from_phase": "report", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.478563"}
+{"run_id": "86ea7161", "agent": "reporting", "phase": "report", "event": "starting_reporting", "level": "info", "timestamp": "2025-12-18T05:10:55.479639"}
+{"run_id": "86ea7161", "phase": "report", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.480237"}
+{"run_id": "86ea7161", "phase": "meta", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.480715"}
+{"run_id": "86ea7161", "phase": "meta", "from_phase": "meta", "event": "phase_transition", "level": "info", "timestamp": "2025-12-18T05:10:55.481116"}
+{"run_id": "86ea7161", "agent": "meta_learning", "phase": "meta", "event": "starting_meta_learning", "level": "info", "timestamp": "2025-12-18T05:10:55.481511"}
+{"run_id": "86ea7161", "path": "C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\targets\\originprotocol\\learnings\\86ea7161.json", "agent": "meta_learning", "phase": "meta", "event": "learnings_stored", "level": "info", "timestamp": "2025-12-18T05:10:55.483281"}
+{"run_id": "86ea7161", "phase": "meta", "success": true, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-18T05:10:55.484163"}
+{"run_id": "86ea7161", "success": true, "phases_completed": ["ingest", "plan", "static", "triage", "report", "meta"], "findings": 0, "duration": 0.030012, "event": "workflow_completed", "level": "info", "timestamp": "2025-12-18T05:10:55.484958"}

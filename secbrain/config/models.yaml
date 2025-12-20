@@ -1,0 +1,43 @@
+# SecBrain Model Configuration
+
+worker:
+  provider: openai_compatible
+  model: qwen/qwen-2.5-72b-instruct
+  base_url: https://api.together.xyz/v1
+  max_tokens: 4096
+  temperature: 0.7
+
+advisor:
+  provider: gemini
+  model: gemini-pro
+  max_tokens: 8192
+  temperature: 0.3
+
+research:
+  provider: perplexity
+  model: sonar-medium-online
+  max_calls_per_run: 20
+  max_calls_per_phase: 5
+
+# Alternative configurations for different environments
+
+local:
+  worker:
+    provider: ollama
+    model: llama3.1:70b
+    base_url: http://localhost:11434
+
+cheap:
+  worker:
+    provider: openai_compatible
+    model: meta-llama/Llama-3.1-8B-Instruct-Turbo
+    base_url: https://api.together.xyz/v1
+
+premium:
+  worker:
+    provider: openai_compatible
+    model: deepseek-ai/DeepSeek-V3
+    base_url: https://api.together.xyz/v1
+  advisor:
+    provider: gemini
+    model: gemini-1.5-pro

@@ -1,0 +1,12 @@
+{"event": "test_started", "run_id": "68de9c14", "message": "Dry-run test initiated"}
+{"event": "workflow_started", "run_id": "68de9c14", "phases": ["ingest", "plan"], "dry_run": true}
+{"event": "pre_phase_check", "run_id": "68de9c14", "phase": "ingest", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "68de9c14", "phase": "ingest", "from_phase": "ingest"}
+{"event": "starting_ingest", "run_id": "68de9c14", "agent": "program_ingest", "phase": "ingest"}
+{"event": "post_phase_check", "run_id": "68de9c14", "phase": "ingest", "success": true, "agent": "supervisor"}
+{"event": "pre_phase_check", "run_id": "68de9c14", "phase": "plan", "agent": "supervisor"}
+{"event": "phase_transition", "run_id": "68de9c14", "phase": "plan", "from_phase": "plan"}
+{"event": "starting_planning", "run_id": "68de9c14", "agent": "planner", "phase": "plan"}
+{"event": "post_phase_check", "run_id": "68de9c14", "phase": "plan", "success": true, "agent": "supervisor"}
+{"event": "workflow_completed", "run_id": "68de9c14", "success": true, "phases_completed": ["ingest", "plan"], "findings": 0, "duration": 0.010655}
+{"event": "test_completed", "run_id": "68de9c14", "success": true}

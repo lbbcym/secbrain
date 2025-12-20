@@ -1,0 +1,43 @@
+name: Solidity Minimal CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'foundry.toml'
+      - '.github/workflows/solidity-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'foundry.toml'
+      - '.github/workflows/solidity-ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Format check (forge fmt)
+        run: |
+          forge fmt --check
+
+      - name: Build sample profiles
+        env:
+          FOUNDRY_PROFILE: contract_AaveV3Adapter_9cfb
+        run: |
+          forge build
+          FOUNDRY_PROFILE=contract_AavePriceFeed_e9cf forge build
+
+      - name: Slither (best-effort)
+        continue-on-error: true
+        uses: crytic/slither-action@v0.3.0
+        with:
+          target: .
