@@ -68,7 +68,7 @@ jobs:
           if [ "$DURATION_MS" -gt "$THRESHOLD_MS" ]; then
             echo "## ⏰ Performance Alert" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "This workflow took longer than expected ($((DURATION_MS / 1000))s vs ${THRESHOLD_MS}s threshold)." >> $GITHUB_STEP_SUMMARY
+            echo "This workflow took longer than expected ($((DURATION_MS / 1000))s vs $((THRESHOLD_MS / 1000))s threshold)." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Optimization Suggestions:**" >> $GITHUB_STEP_SUMMARY
             echo "- Use \`@workspace /task analyze-execution-time\` for detailed analysis" >> $GITHUB_STEP_SUMMARY

@@ -55,7 +55,7 @@ jobs:
         python -m pytest tests/ -v --tb=short --cov=secbrain --cov-report=term-missing --cov-report=xml --cov-fail-under=60
     
     - name: Upload coverage reports
-      if: always()
+      if: always() && hashFiles('secbrain/coverage.xml') != ''
       uses: actions/upload-artifact@v4
       with:
         name: coverage-reports
