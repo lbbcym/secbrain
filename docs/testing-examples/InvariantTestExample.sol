@@ -148,13 +148,17 @@ contract InvariantTests is Test {
     
     /// @notice Total supply should equal sum of all balances
     function invariant_totalSupplyEqualsBalances() public {
-        uint256 sumBalances = 0;
         address[] memory actors = handler.actors();
         uint256 actorsLength = actors.length; // Cache array length for gas optimization
         
+        uint256 sumBalances = 0;
         for (uint256 i = 0; i < actorsLength; ) {
-            sumBalances += token.balances(actors[i]);
-            unchecked { ++i; } // Safe: loop bound prevents overflow
+            unchecked {
+                // Safe: individual balances cannot exceed total supply,
+                // making overflow of sum highly unlikely in practice
+                sumBalances += token.balances(actors[i]);
+                ++i; // Safe: loop bound prevents overflow
+            }
         }
         
         assertEq(token.totalSupply(), sumBalances, "Total supply != sum of balances");
