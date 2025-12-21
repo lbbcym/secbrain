@@ -13,6 +13,10 @@ targets/**/instascope/lib/
 pwsh.profile.ps1
 claude-review.*
 
+# Test and validation workspaces (generated during test runs)
+secbrain/test_workspace/
+secbrain/validation_workspace/
+
 # Automated agent suite artifacts
 *.json.bak
 *-results.json
