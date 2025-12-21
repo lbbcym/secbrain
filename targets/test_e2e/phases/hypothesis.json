@@ -1,0 +1,20 @@
+{
+  "run_id": "a2add57e",
+  "phase": "hypothesis",
+  "success": true,
+  "duration_seconds": 0.000163,
+  "errors": [],
+  "data": {
+    "hypotheses": [],
+    "top_hypotheses": [],
+    "review": {
+      "reviewed": false
+    },
+    "by_vuln_type": {},
+    "missing_targets": {
+      "missing_contract_or_function": 0,
+      "total_hypotheses": 0
+    }
+  },
+  "timestamp": "2025-12-21T11:21:20.181900"
+}
