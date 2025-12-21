@@ -6,6 +6,7 @@ import json
 from typing import Any
 
 from secbrain.agents.base import AgentResult, BaseAgent
+from secbrain.core.profit_calculator import ProfitCalculator, TokenSpec
 
 
 class TriageAgent(BaseAgent):

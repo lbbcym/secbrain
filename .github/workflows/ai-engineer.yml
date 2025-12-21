@@ -58,7 +58,7 @@ jobs:
           cat analysis.md
 
       - name: Generate AI suggestions
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             // AI-powered suggestions based on latest research and best practices
