@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from io import StringIO
 from pathlib import Path
 
@@ -37,7 +37,7 @@ class InsightsReporter:
         """
         lines = []
         lines.append(f"# {title}\n")
-        lines.append(f"*Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}*\n")
+        lines.append(f"*Generated: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')}*\n")
 
         # Executive Summary
         lines.append("## Executive Summary\n")
@@ -245,7 +245,7 @@ class InsightsReporter:
 <body>
     <div class="container">
         <h1>{title}</h1>
-        <div class="timestamp">Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}</div>
+        <div class="timestamp">Generated: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S')}</div>
         
         <div class="summary">
             <h2>Executive Summary</h2>
@@ -344,7 +344,7 @@ class InsightsReporter:
             JSON formatted report
         """
         data = {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "summary": results.summary,
             "metrics": results.metrics,
             "insights": [
@@ -408,9 +408,18 @@ class InsightsReporter:
 
         Returns:
             Path to saved file
+
+        Raises:
+            ValueError: If unsupported format is provided
         """
+        # Validate format first
+        valid_formats = {"markdown", "html", "json", "csv"}
+        if format not in valid_formats:
+            msg = f"Unsupported format: {format}. Must be one of {valid_formats}"
+            raise ValueError(msg)
+
         if filename is None:
-            timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
             ext = {"markdown": "md", "html": "html", "json": "json", "csv": "csv"}[format]
             filename = f"insights_report_{timestamp}.{ext}"
 
@@ -425,6 +434,7 @@ class InsightsReporter:
         elif format == "csv":
             content = self.generate_csv(results)
         else:
+            # This should never be reached due to validation above
             msg = f"Unsupported format: {format}"
             raise ValueError(msg)
 
@@ -442,12 +452,24 @@ class InsightsReporter:
         Returns:
             Dictionary mapping format to filepath
         """
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         base = f"{base_filename}_{timestamp}"
 
-        return {
-            "markdown": self.save_report(results, "markdown", f"{base}.md"),
-            "html": self.save_report(results, "html", f"{base}.html"),
-            "json": self.save_report(results, "json", f"{base}.json"),
-            "csv": self.save_report(results, "csv", f"{base}.csv"),
+        # Pre-generate all content once for efficiency
+        content_by_format = {
+            "markdown": self.generate_markdown(results),
+            "html": self.generate_html(results),
+            "json": self.generate_json(results),
+            "csv": self.generate_csv(results),
         }
+
+        # Write each format to file
+        files = {}
+        for fmt, content in content_by_format.items():
+            ext = {"markdown": "md", "html": "html", "json": "json", "csv": "csv"}[fmt]
+            filename = f"{base}.{ext}"
+            filepath = self.output_dir / filename
+            filepath.write_text(content)
+            files[fmt] = filepath
+
+        return files

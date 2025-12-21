@@ -112,10 +112,12 @@ class InsightsAggregator:
         # Load logs (sample recent entries)
         logs_dir = self.workspace_path / "logs"
         if logs_dir.exists():
-            log_files = sorted(logs_dir.glob("*.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True)
-            # Load most recent log file
-            if log_files:
-                with log_files[0].open() as f:
+            # Get all log files and find the most recent one
+            log_files_with_mtime = [(p, p.stat().st_mtime) for p in logs_dir.glob("*.jsonl")]
+            if log_files_with_mtime:
+                # Sort by modification time and get the most recent
+                most_recent_log = max(log_files_with_mtime, key=lambda x: x[1])[0]
+                with most_recent_log.open() as f:
                     for line in f:
                         if line.strip():
                             data.logs.append(json.loads(line))
