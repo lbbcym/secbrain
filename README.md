@@ -5,6 +5,8 @@
 [![Security Scan](https://github.com/blairmichaelg/secbrain/actions/workflows/security-scan.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/security-scan.yml)
 [![Solidity Security](https://github.com/blairmichaelg/secbrain/actions/workflows/solidity-security.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/solidity-security.yml)
 [![Code Quality](https://github.com/blairmichaelg/secbrain/actions/workflows/code-quality.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/code-quality.yml)
+[![Python Testing](https://github.com/blairmichaelg/secbrain/actions/workflows/python-testing.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/python-testing.yml)
+[![Foundry Fuzzing](https://github.com/blairmichaelg/secbrain/actions/workflows/foundry-fuzzing.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/foundry-fuzzing.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ## Overview
@@ -138,6 +140,8 @@ python -m ruff check . --fix
 
 ### Running Tests
 
+SecBrain uses a comprehensive, multi-layered testing strategy:
+
 ```bash
 cd secbrain
 
@@ -145,10 +149,13 @@ cd secbrain
 python -m pytest tests/ -v
 
 # Property-based tests with Hypothesis
-python -m pytest tests/test_property_based.py -v
+python -m pytest tests/test_property_based.py -v --hypothesis-show-statistics
 
 # Run with coverage
 python -m pytest tests/ --cov=secbrain --cov-report=term-missing
+
+# Mutation testing (verifies test quality)
+mutmut run --paths-to-mutate=secbrain/utils/
 ```
 
 For smart contract testing:
@@ -162,7 +169,19 @@ forge test
 
 # CI fuzzing (10,000 runs)
 FOUNDRY_PROFILE=ci forge test
+
+# Invariant tests only
+forge test --match-contract Invariant -vvv
+
+# Echidna fuzzing (if installed)
+echidna . --contract EchidnaTestExample --config echidna.yaml
 ```
+
+**Advanced Testing Features:**
+- 🧪 **Property-Based Testing**: Hypothesis generates thousands of random inputs
+- 🔬 **Fuzzing**: Foundry/Echidna for comprehensive smart contract testing
+- 🧬 **Mutation Testing**: Mutmut verifies test suite quality
+- 📊 **Invariant Testing**: Handler-based state machine testing
 
 See [Testing Strategies](docs/TESTING-STRATEGIES.md) for more details.
 

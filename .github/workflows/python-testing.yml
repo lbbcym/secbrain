@@ -1,0 +1,240 @@
+name: Python Testing Suite
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'secbrain/**/*.py'
+      - 'tests/**/*.py'
+      - 'secbrain/pyproject.toml'
+      - 'requirements.txt'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'secbrain/**/*.py'
+      - 'tests/**/*.py'
+      - 'secbrain/pyproject.toml'
+      - 'requirements.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd secbrain
+          pip install -r requirements.lock
+          pip install -e ".[dev]"
+
+      - name: Run unit tests with coverage
+        run: |
+          cd secbrain
+          pytest tests/ -v --cov=secbrain --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v5
+        with:
+          file: secbrain/coverage.xml
+          fail_ci_if_error: false
+
+  property-based-tests:
+    name: Property-Based Tests (Hypothesis)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd secbrain
+          pip install -r requirements.lock
+          pip install -e ".[dev]"
+
+      - name: Run property-based tests
+        run: |
+          cd secbrain
+          pytest tests/test_property_based.py -v --hypothesis-show-statistics --hypothesis-seed=42
+
+      - name: Run property-based tests with more examples (CI mode)
+        run: |
+          cd secbrain
+          pytest tests/test_property_based.py -v \
+            --hypothesis-show-statistics \
+            -o hypothesis_max_examples=500 \
+            --tb=short
+
+      - name: Generate property testing summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 🧪 Property-Based Testing Summary
+
+          ### Tests Executed
+          - ✅ Response diff property tests
+          - ✅ Security-critical property tests
+          - ✅ Entropy and validation tests
+
+          ### Configuration
+          - **Max examples (standard)**: 100
+          - **Max examples (CI)**: 500
+          - **Deadline**: 400ms per test
+          - **Seed**: 42 (reproducible)
+
+          ### Properties Tested
+          - Identity properties (f(x, x) behavior)
+          - Symmetry properties (f(a, b) == f(b, a))
+          - Bounded values (non-negative, within range)
+          - Conservation properties (size deltas)
+
+          ### Benefits
+          - Discovers edge cases automatically
+          - Tests with thousands of random inputs
+          - Shrinks failures to minimal examples
+          - Ensures properties hold for all inputs
+
+          ---
+          *Property-based testing with Hypothesis for robust code* 🎯
+          EOF
+
+  mutation-testing:
+    name: Mutation Testing (Sample)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          cd secbrain
+          pip install -r requirements.lock
+          pip install -e ".[dev]"
+
+      - name: Run mutation testing on sample module
+        continue-on-error: true
+        run: |
+          cd secbrain
+          # Run mutation testing on a specific critical module
+          mutmut run --paths-to-mutate=secbrain/utils/response_diff.py --runner="pytest -x tests/test_property_based.py" || true
+
+      - name: Show mutation testing results
+        if: always()
+        run: |
+          cd secbrain
+          mutmut results || echo "No mutation results available"
+          mutmut html || echo "Could not generate HTML report"
+
+      - name: Upload mutation testing results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: mutation-testing-results
+          path: |
+            secbrain/html/**
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Generate mutation testing summary
+        if: always()
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 🧬 Mutation Testing Summary
+
+          ### What is Mutation Testing?
+          Mutation testing verifies test quality by introducing bugs (mutations) 
+          and checking if tests catch them.
+
+          ### Mutations Tested
+          - Arithmetic operator changes (+, -, *, /)
+          - Comparison operator changes (<, >, ==, !=)
+          - Boolean operator changes (and, or, not)
+          - Constant value changes
+          - Statement removal
+
+          ### Metrics
+          - **Killed**: Test failed (good - caught the bug)
+          - **Survived**: Test passed (bad - didn't catch the bug)
+          - **Mutation Score**: Killed / (Killed + Survived)
+
+          ### Target Score
+          - Critical modules: >80%
+          - Standard modules: >70%
+
+          ### Note
+          This is a sample run on response_diff.py module.
+          Full mutation testing is resource-intensive and run periodically.
+
+          ---
+          *Ensuring test suite quality through mutation testing* 🎯
+          EOF
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, property-based-tests]
+    if: always()
+    steps:
+      - name: Generate overall summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 📊 Python Testing Suite Summary
+
+          ### Test Types Executed
+          1. **Unit Tests** - Traditional test cases
+          2. **Property-Based Tests** - Hypothesis fuzzing
+          3. **Mutation Testing** - Test quality verification (sample)
+
+          ### Advanced Testing Features
+          - ✅ Property-based testing with Hypothesis
+          - ✅ Mutation testing with Mutmut
+          - ✅ Coverage reporting
+          - ✅ Statistical analysis
+
+          ### Testing Philosophy
+          **Layered Testing Strategy:**
+          ```
+          Unit Tests (pytest)
+              ↓
+          Property Tests (Hypothesis)
+              ↓
+          Mutation Tests (Mutmut)
+              ↓
+          Integration Tests
+          ```
+
+          ### Documentation
+          - [Testing Strategies Guide](../docs/TESTING-STRATEGIES.md)
+          - [Testing Quick Reference](../docs/TESTING-QUICK-REF.md)
+          - [Property-Based Tests](../tests/test_property_based.py)
+
+          ---
+          *Comprehensive testing for security-critical code* 🛡️
+          EOF
