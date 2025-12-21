@@ -134,10 +134,32 @@ class TriageAgent(BaseAgent):
         # Review top findings for accurate severity
         top_findings = findings[:10]
 
+        # Use research_severity_context for real-world severity data
+        research_context = ""
+        if self.research_client and top_findings:
+            # Get unique vulnerability types from findings
+            vuln_types = {f.get("vuln_type", "") for f in top_findings if f.get("vuln_type")}
+            if vuln_types:
+                # Select vulnerability type deterministically (most frequent, then alphabetically)
+                from collections import Counter
+                vuln_type_counts = Counter(f.get("vuln_type", "") for f in top_findings if f.get("vuln_type"))
+                # Get most common, break ties alphabetically
+                primary_vuln = max(vuln_type_counts.items(), key=lambda x: (x[1], -ord(x[0][0]) if x[0] else 0))[0]
+                try:
+                    research_result = await self.research_client.research_severity_context(
+                        vuln_type=primary_vuln,
+                        run_context=self.run_context,
+                        details=f"Found in {len(findings)} total findings across {len(vuln_types)} vulnerability types",
+                    )
+                    if not research_result.get("error") and not research_result.get("limited"):
+                        research_context = f"\n\nReal-world severity context for {primary_vuln}:\n{research_result.get('answer', '')[:500]}"
+                except Exception as e:
+                    self._log_error("research_severity_failed", error=str(e))
+
         prompt = f"""Review these security findings and validate severity classifications.
 
 Findings:
-{json.dumps(top_findings, indent=2)}
+{json.dumps(top_findings, indent=2)}{research_context}
 
 For each finding, assess:
 1. Is the severity classification accurate?

@@ -336,6 +336,22 @@ class VulnHypothesisAgent(BaseAgent):
         has_withdraw = any("withdraw" in fn for fn in lower_functions)
         has_share = any("share" in fn for fn in lower_functions)
 
+        # Use research_attack_vectors for real-world attack pattern data
+        research_context = ""
+        if self.research_client and pattern_hint:
+            # Research attack vectors for the primary vulnerability pattern
+            primary_pattern = profile.patterns[0] if profile.patterns else protocol_type
+            try:
+                research_result = await self.research_client.research_attack_vectors(
+                    vuln_type=primary_pattern,
+                    run_context=self.run_context,
+                    contract_pattern=f"{protocol_type} with functions: {', '.join(functions_preview[:5])}",
+                )
+                if not research_result.get("error") and not research_result.get("limited"):
+                    research_context = f"\n\nReal-world attack vectors for {primary_pattern}:\n{research_result.get('answer', '')[:600]}\n"
+            except Exception as e:
+                self._log_error("research_attack_vectors_failed", error=str(e))
+
         prompt = f"""Analyze this on-chain contract target and generate exploit-focused vulnerability hypotheses.
 
 Contract name: {name}
@@ -344,7 +360,7 @@ Chain ID: {chain_id}
 Known function signatures (partial): {functions_preview}
 ABI (may be truncated): {abi_preview_str[:2000]}
 Protocol type: {protocol_type}
-Targeted exploit patterns to prioritize: {pattern_hint}
+Targeted exploit patterns to prioritize: {pattern_hint}{research_context}
 
 For each hypothesis, provide:
 1. vuln_type (e.g., reentrancy, access_control, oracle, price_manipulation, signature_replay, accounting)
