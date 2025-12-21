@@ -1,6 +1,6 @@
 # Core dependencies for SecBrain
-# This file is used by pip-compile to generate requirements.txt with hashes
-# Run: pip-compile --generate-hashes --output-file=requirements.txt requirements.in
+# This file is used by pip-compile to generate requirements-hashed.txt with hashes
+# Run: pip-compile --generate-hashes --output-file=requirements-hashed.txt requirements.in
 
 # CLI and UI
 typer>=0.9.0
