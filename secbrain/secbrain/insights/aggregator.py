@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,22 +19,22 @@ class WorkspaceData:
     phases: dict[str, Any] = field(default_factory=dict)
     exploit_attempts: list[dict[str, Any]] = field(default_factory=list)
     logs: list[dict[str, Any]] = field(default_factory=list)
-    
+
     @property
     def total_runs(self) -> int:
         """Total number of runs."""
         return len(self.run_summaries)
-    
+
     @property
     def successful_runs(self) -> int:
         """Number of successful runs."""
         return sum(1 for r in self.run_summaries if r.get("success"))
-    
+
     @property
     def total_hypotheses(self) -> int:
         """Total hypotheses generated across all runs."""
         return sum(m.get("hypotheses_count", 0) for m in self.meta_metrics)
-    
+
     @property
     def total_attempts(self) -> int:
         """Total exploit attempts across all runs."""
@@ -69,20 +68,20 @@ class InsightsAggregator:
         # Load run summary
         run_summary_path = self.workspace_path / "run_summary.json"
         if run_summary_path.exists():
-            with open(run_summary_path) as f:
+            with run_summary_path.open() as f:
                 data.run_summaries.append(json.load(f))
 
         # Load learnings
         learnings_dir = self.workspace_path / "learnings"
         if learnings_dir.exists():
             for learning_file in learnings_dir.glob("*.json"):
-                with open(learning_file) as f:
+                with learning_file.open() as f:
                     data.learnings.append(json.load(f))
 
         # Load meta metrics
         meta_metrics_path = self.workspace_path / "meta_metrics.jsonl"
         if meta_metrics_path.exists():
-            with open(meta_metrics_path) as f:
+            with meta_metrics_path.open() as f:
                 for line in f:
                     if line.strip():
                         data.meta_metrics.append(json.loads(line))
@@ -91,7 +90,7 @@ class InsightsAggregator:
         phases_dir = self.workspace_path / "phases"
         if phases_dir.exists():
             for phase_file in phases_dir.glob("*.json"):
-                with open(phase_file) as f:
+                with phase_file.open() as f:
                     phase_name = phase_file.stem
                     data.phases[phase_name] = json.load(f)
 
@@ -104,7 +103,7 @@ class InsightsAggregator:
                         if attempt_dir.is_dir():
                             result_file = attempt_dir / "result.json"
                             if result_file.exists():
-                                with open(result_file) as f:
+                                with result_file.open() as f:
                                     attempt_data = json.load(f)
                                     attempt_data["hypothesis_id"] = hyp_dir.name
                                     attempt_data["attempt_dir"] = str(attempt_dir)
@@ -116,7 +115,7 @@ class InsightsAggregator:
             log_files = sorted(logs_dir.glob("*.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True)
             # Load most recent log file
             if log_files:
-                with open(log_files[0]) as f:
+                with log_files[0].open() as f:
                     for line in f:
                         if line.strip():
                             data.logs.append(json.loads(line))

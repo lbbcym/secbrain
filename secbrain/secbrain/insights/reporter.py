@@ -6,9 +6,8 @@ import csv
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
-from secbrain.insights.analyzer import AnalysisResults, ActionableInsight
+from secbrain.insights.analyzer import AnalysisResults
 
 
 class InsightsReporter:
@@ -37,7 +36,7 @@ class InsightsReporter:
         """
         lines = []
         lines.append(f"# {title}\n")
-        lines.append(f"*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n")
+        lines.append(f"*Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}*\n")
 
         # Executive Summary
         lines.append("## Executive Summary\n")
@@ -75,7 +74,7 @@ class InsightsReporter:
 
         # Insights by Category
         lines.append("\n## Insights by Category\n")
-        categories = set(i.category for i in results.insights)
+        categories = {i.category for i in results.insights}
         for category in sorted(categories):
             cat_insights = results.get_by_category(category)
             if cat_insights:
@@ -114,7 +113,7 @@ class InsightsReporter:
         """
         critical = results.get_critical_insights()
         high = results.get_high_priority_insights()
-        
+
         status_color = {
             "requires_attention": "#dc3545",
             "review_recommended": "#ffc107",
@@ -245,7 +244,7 @@ class InsightsReporter:
 <body>
     <div class="container">
         <h1>{title}</h1>
-        <div class="timestamp">Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
+        <div class="timestamp">Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}</div>
         
         <div class="summary">
             <h2>Executive Summary</h2>
@@ -268,7 +267,7 @@ class InsightsReporter:
         <h2>Key Metrics</h2>
         <div class="metrics">
 """
-        
+
         for key, value in results.metrics.items():
             formatted_key = key.replace('_', ' ').title()
             formatted_value = f"{value:.2f}" if isinstance(value, float) else str(value)
@@ -278,7 +277,7 @@ class InsightsReporter:
                 <div class="metric-label">{formatted_key}</div>
             </div>
 """
-        
+
         html += """
         </div>
 """
@@ -317,7 +316,7 @@ class InsightsReporter:
 """
             for rec in results.recommendations:
                 html += f"                <li>{rec}</li>\n"
-            
+
             html += """
             </ol>
         </div>
@@ -344,7 +343,7 @@ class InsightsReporter:
             JSON formatted report
         """
         data = {
-            "generated_at": datetime.now().isoformat(),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "summary": results.summary,
             "metrics": results.metrics,
             "insights": [
@@ -373,14 +372,12 @@ class InsightsReporter:
         Returns:
             CSV formatted report
         """
-        from io import StringIO
-        
         output = StringIO()
         writer = csv.writer(output)
-        
+
         # Header
         writer.writerow(["Category", "Priority", "Title", "Description", "Action", "Timestamp"])
-        
+
         # Data
         for insight in results.insights:
             writer.writerow([
@@ -391,7 +388,7 @@ class InsightsReporter:
                 insight.action,
                 insight.timestamp,
             ])
-        
+
         return output.getvalue()
 
     def save_report(
@@ -412,7 +409,7 @@ class InsightsReporter:
             Path to saved file
         """
         if filename is None:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
             ext = {"markdown": "md", "html": "html", "json": "json", "csv": "csv"}[format]
             filename = f"insights_report_{timestamp}.{ext}"
 
@@ -444,9 +441,9 @@ class InsightsReporter:
         Returns:
             Dictionary mapping format to filepath
         """
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         base = f"{base_filename}_{timestamp}"
-        
+
         return {
             "markdown": self.save_report(results, "markdown", f"{base}.md"),
             "html": self.save_report(results, "html", f"{base}.html"),
