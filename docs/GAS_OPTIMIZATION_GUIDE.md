@@ -6,6 +6,18 @@ This comprehensive guide documents gas optimization patterns implemented in the 
 
 Based on the latest Solidity 0.8.x optimizations and EIPs, we have implemented several gas-saving patterns that provide significant cost reductions in smart contract execution. This guide serves as both documentation of implemented optimizations and a reference for future development.
 
+### 📚 Reference Template
+
+For a complete, production-ready example of all optimization patterns, see:
+**`docs/testing-examples/GasOptimizationTemplate.sol`**
+
+This template includes:
+- ✅ All 5 optimization patterns implemented
+- ✅ Side-by-side comparison with unoptimized code
+- ✅ Detailed gas savings breakdown
+- ✅ Real-world usage examples
+- ✅ Security considerations and best practices
+
 ## Quick Summary
 
 - **90+ custom error implementations** across 30 exploit contracts
@@ -16,9 +28,13 @@ Based on the latest Solidity 0.8.x optimizations and EIPs, we have implemented s
 
 ## Files Modified
 
-### Documentation Examples (2 files)
+### Reference Template (NEW) ⭐
+- `docs/testing-examples/GasOptimizationTemplate.sol` - Comprehensive template demonstrating all 5 optimization patterns with before/after comparisons
+
+### Documentation Examples (3 files)
 - `docs/testing-examples/EchidnaTestExample.sol`
 - `docs/testing-examples/InvariantTestExample.sol`
+- `docs/testing-examples/GasOptimizationTemplate.sol` (NEW)
 
 ### Instascope Test Contracts (15 files)
 All files in `targets/originprotocol/instascope/test/secbrain/`:
@@ -378,6 +394,28 @@ When adding new Solidity contracts:
 4. Use `constant` for compile-time values, `immutable` for constructor-set values
 5. Pack storage variables when possible
 6. Document why unchecked blocks are safe
+
+### Using the Gas Optimization Template
+
+**New contracts should use `docs/testing-examples/GasOptimizationTemplate.sol` as a reference:**
+
+```bash
+# Copy the template as a starting point
+cp docs/testing-examples/GasOptimizationTemplate.sol src/YourNewContract.sol
+
+# Customize for your use case
+# - Keep the optimization patterns
+# - Replace business logic
+# - Maintain custom errors and unchecked blocks
+# - Document safety assumptions
+```
+
+The template demonstrates:
+- ✅ All 5 gas optimization patterns in one contract
+- ✅ Before/after comparison (GasOptimizedVault vs UnoptimizedVault)
+- ✅ Comprehensive inline documentation
+- ✅ Real-world examples of each pattern
+- ✅ Gas savings calculations
 
 ## Security Note
 
