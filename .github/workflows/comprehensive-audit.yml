@@ -50,7 +50,8 @@ jobs:
 
           # Solidity tools
           npm install -g solhint prettier prettier-plugin-solidity
-          pip install slither-analyzer mythril aderyn-py
+          pip install slither-analyzer mythril
+          # Note: aderyn is a Rust tool, install separately if needed via cargo
 
       - name: Run Python security audit
         continue-on-error: true
