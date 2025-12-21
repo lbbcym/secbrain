@@ -72,3 +72,6 @@ build/
 *.swo
 *~
 
+# Insights reports generated in workspaces
+targets/**/insights/
+**/insights-dashboard.json
