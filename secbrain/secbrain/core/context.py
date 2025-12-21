@@ -7,10 +7,10 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypedDict
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from secbrain.core.approval import ApprovalManager
 
@@ -20,8 +20,32 @@ if TYPE_CHECKING:
     from secbrain.models.base import ModelClient
 
 
+class SessionErrorDict(TypedDict, total=False):
+    """Structure for session error records."""
+    
+    phase: str
+    error: str
+    timestamp: str
+    agent: str
+
+
+class SessionFindingDict(TypedDict, total=False):
+    """Structure for session finding records."""
+    
+    id: str
+    title: str
+    severity: str
+    phase: str
+    discovered_by: str
+
+
 class ContractConfig(BaseModel):
-    """Configuration for a smart contract target."""
+    """Configuration for a smart contract target.
+    
+    Uses Pydantic V2 strict mode for enhanced type safety.
+    """
+
+    model_config = ConfigDict(strict=True)
 
     address: str = Field(description="Contract address")
     chain_id: int = Field(default=1, description="Chain ID (1=Mainnet, etc.)")
@@ -32,7 +56,12 @@ class ContractConfig(BaseModel):
 
 
 class ScopeConfig(BaseModel):
-    """Target scope configuration."""
+    """Target scope configuration.
+    
+    Uses Pydantic V2 strict mode for enhanced type safety.
+    """
+
+    model_config = ConfigDict(strict=True)
 
     domains: list[str] = Field(default_factory=list)
     ips: list[str] = Field(default_factory=list)
@@ -60,7 +89,12 @@ class ScopeConfig(BaseModel):
 
 
 class ProgramConfig(BaseModel):
-    """Bug bounty program configuration."""
+    """Bug bounty program configuration.
+    
+    Uses Pydantic V2 strict mode for enhanced type safety.
+    """
+
+    model_config = ConfigDict(strict=True)
 
     name: str
     platform: str = ""
@@ -76,7 +110,12 @@ class ProgramConfig(BaseModel):
 
 
 class ToolACL(BaseModel):
-    """Access control for a tool."""
+    """Access control for a tool.
+    
+    Uses Pydantic V2 strict mode for enhanced type safety.
+    """
+
+    model_config = ConfigDict(strict=True)
 
     allowed: bool = True
     allowed_phases: list[str] = Field(default_factory=list)
@@ -86,7 +125,12 @@ class ToolACL(BaseModel):
 
 
 class RateLimitConfig(BaseModel):
-    """Rate limiting configuration."""
+    """Rate limiting configuration.
+    
+    Uses Pydantic V2 strict mode for enhanced type safety.
+    """
+
+    model_config = ConfigDict(strict=True)
 
     requests_per_minute: int = 60
     burst: int = 10
@@ -95,7 +139,12 @@ class RateLimitConfig(BaseModel):
 
 
 class ToolsConfig(BaseModel):
-    """Tools configuration with ACLs and rate limits."""
+    """Tools configuration with ACLs and rate limits.
+    
+    Uses Pydantic V2 strict mode for enhanced type safety.
+    """
+
+    model_config = ConfigDict(strict=True)
 
     acls: dict[str, ToolACL] = Field(default_factory=dict)
     rate_limits: dict[str, RateLimitConfig] = Field(default_factory=dict)
@@ -129,7 +178,12 @@ class RateLimiter:
 
 
 class Session(BaseModel):
-    """Session state for a run."""
+    """Session state for a run.
+    
+    Uses Pydantic V2 strict mode for enhanced type safety.
+    """
+
+    model_config = ConfigDict(strict=True, arbitrary_types_allowed=True)
 
     run_id: str = Field(default_factory=lambda: str(uuid.uuid4())[:8])
     start_time: datetime = Field(default_factory=datetime.now)
@@ -138,10 +192,8 @@ class Session(BaseModel):
     tool_call_counts: dict[str, int] = Field(default_factory=dict)
     research_cache: dict[str, Any] = Field(default_factory=dict)
     llm_cache: dict[str, Any] = Field(default_factory=dict)
-    findings: list[dict[str, Any]] = Field(default_factory=list)
-    errors: list[dict[str, Any]] = Field(default_factory=list)
-
-    model_config = {"arbitrary_types_allowed": True}
+    findings: list[SessionFindingDict] = Field(default_factory=list)
+    errors: list[SessionErrorDict] = Field(default_factory=list)
 
 
 class RunContext:
