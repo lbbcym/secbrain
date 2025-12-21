@@ -9,9 +9,7 @@ This script verifies:
 """
 
 import asyncio
-import os
 import time
-from datetime import datetime
 
 # Add secbrain to path
 import sys
@@ -26,10 +24,12 @@ async def test_rate_limiting():
     """Test rate limiting enforcement (10 req/min)."""
     print("\n=== Testing Rate Limiting ===")
     
-    # Create a mock run context
+    # Create a mock run context with minimal required parameters
+    workspace_path = Path("/tmp/test_workspace")
+    workspace_path.mkdir(parents=True, exist_ok=True)
+    
     run_context = RunContext(
-        run_id="test-rate-limit",
-        target_name="test",
+        workspace_path=workspace_path,
         dry_run=True,  # Use dry-run to avoid API calls
     )
     
@@ -59,9 +59,11 @@ async def test_ttl_caching():
     """Test TTL-based cache validation."""
     print("\n=== Testing TTL Caching ===")
     
+    workspace_path = Path("/tmp/test_workspace")
+    workspace_path.mkdir(parents=True, exist_ok=True)
+    
     run_context = RunContext(
-        run_id="test-ttl",
-        target_name="test",
+        workspace_path=workspace_path,
         dry_run=True,
     )
     
@@ -94,9 +96,11 @@ async def test_specialized_methods():
     """Test specialized research methods."""
     print("\n=== Testing Specialized Research Methods ===")
     
+    workspace_path = Path("/tmp/test_workspace")
+    workspace_path.mkdir(parents=True, exist_ok=True)
+    
     run_context = RunContext(
-        run_id="test-specialized",
-        target_name="test",
+        workspace_path=workspace_path,
         dry_run=True,
     )
     
@@ -133,9 +137,11 @@ async def test_backward_compatibility():
     """Test backward compatibility with existing methods."""
     print("\n=== Testing Backward Compatibility ===")
     
+    workspace_path = Path("/tmp/test_workspace")
+    workspace_path.mkdir(parents=True, exist_ok=True)
+    
     run_context = RunContext(
-        run_id="test-compat",
-        target_name="test",
+        workspace_path=workspace_path,
         dry_run=True,
     )
     
@@ -178,9 +184,11 @@ async def test_call_limits():
     """Test max calls per run limit."""
     print("\n=== Testing Call Limits ===")
     
+    workspace_path = Path("/tmp/test_workspace")
+    workspace_path.mkdir(parents=True, exist_ok=True)
+    
     run_context = RunContext(
-        run_id="test-limits",
-        target_name="test",
+        workspace_path=workspace_path,
         dry_run=False,  # Not dry-run to test limit
     )
     

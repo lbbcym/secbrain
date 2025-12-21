@@ -79,28 +79,39 @@ class PerplexityResearch:
     async def _enforce_rate_limit(self) -> None:
         """Enforce 10 requests per minute rate limit with proper concurrency control."""
         async with self._rate_limit_lock:
-            now = time.time()
-            
-            # Remove requests older than 60 seconds
-            self._request_times = [
-                t for t in self._request_times
-                if now - t < 60
-            ]
-            
-            # If at limit, wait for oldest request to age out
-            if len(self._request_times) >= self._rate_limit_per_minute:
+            while True:
+                now = time.time()
+                
+                # Remove requests older than 60 seconds
+                self._request_times = [
+                    t for t in self._request_times
+                    if now - t < 60
+                ]
+                
+                # If under the limit, record this request and exit
+                if len(self._request_times) < self._rate_limit_per_minute:
+                    self._request_times.append(now)
+                    break
+                
+                # At limit: wait for the oldest request to age out, then re-check
                 wait_time = 60 - (now - self._request_times[0])
                 if wait_time > 0:
                     await asyncio.sleep(wait_time)
-                    # Recurse to clean up and check again
-                    return await self._enforce_rate_limit()
-            
-            # Record this request
-            self._request_times.append(now)
 
-    def _is_cache_valid(self, cache_key: str, ttl_hours: int) -> bool:
-        """Check if cached data is still valid based on TTL."""
+    def _is_cache_valid(self, cache_key: str, ttl_hours: int, run_context: RunContext) -> bool:
+        """Check if cached data is still valid based on TTL.
+        
+        Validates both the TTL timestamp exists AND the cached data exists
+        to prevent stale timestamp issues.
+        """
         if cache_key not in self._cache_ttl:
+            return False
+        
+        # Check that cached data actually exists in run_context
+        cached_data = run_context.get_cached_research(cache_key)
+        if not cached_data:
+            # TTL exists but data is missing - clean up stale timestamp
+            del self._cache_ttl[cache_key]
             return False
         
         cached_time = self._cache_ttl[cache_key]
@@ -136,7 +147,7 @@ class PerplexityResearch:
         
         # Check cache with TTL
         cached = run_context.get_cached_research(cache_key)
-        if cached and self._is_cache_valid(cache_key, ttl_hours):
+        if cached and self._is_cache_valid(cache_key, ttl_hours, run_context):
             cache_age = (datetime.now() - self._cache_ttl[cache_key]).total_seconds() / 3600
             return {
                 **cached,
@@ -174,7 +185,7 @@ Question: {question}
 
 Provide a focused, technical answer relevant to security research and bug bounty hunting. 
 Include specific techniques, tools, CVE references, exploit dates, and profit amounts when applicable.
-Prioritize data from 2024-2025."""
+Prioritize data from within the last 6 months (from {datetime.now().strftime('%B %Y')})."""
 
             payload = {
                 "model": self.model,
@@ -237,12 +248,18 @@ Prioritize data from 2024-2025."""
 
         Cache: 72 hours (severity standards change slowly)
         """
+        from datetime import datetime, timedelta
+        
+        # Calculate date range for recent data (last 6 months)
+        current_date = datetime.now()
+        six_months_ago = current_date - timedelta(days=180)
+        
         question = f"""
-Current severity assessment for {vuln_type} vulnerabilities in smart contracts (2025 data):
+Current severity assessment for {vuln_type} vulnerabilities in smart contracts (as of {current_date.strftime('%B %Y')}):
 
 Required information:
 1. Security researcher consensus on severity level (Critical/High/Medium/Low)
-2. Recent exploit examples from 2024-2025 with:
+2. Recent exploit examples from the last 6 months (since {six_months_ago.strftime('%B %Y')}) with:
    - Specific dates
    - Contract names
    - Financial impact in USD
@@ -280,12 +297,18 @@ Provide concrete, data-driven assessment with specific examples and amounts.
 
         Cache: 48 hours (attack patterns evolve moderately fast)
         """
+        from datetime import datetime, timedelta
+        
+        # Calculate date range for recent data (last 6 months)
+        current_date = datetime.now()
+        six_months_ago = current_date - timedelta(days=180)
+        
         question = f"""
 Successful attack vectors and exploitation techniques for {vuln_type} vulnerabilities in EVM smart contracts:
 
 For each attack pattern, provide:
 1. Step-by-step attack technique
-2. Real exploit examples from 2024-2025 with:
+2. Real exploit examples from the last 6 months (since {six_months_ago.strftime('%B %Y')}) with:
    - Exact dates
    - Contract names and addresses
    - Transaction hashes (if public)
@@ -326,19 +349,19 @@ Prioritize recent, successful exploits with verified outcomes.
         Cache: 1 hour (market conditions change rapidly)
         """
         question = f"""
-Current market conditions analysis for executing {exploit_type} exploit on {target_protocol}:
+Bug bounty analysis for {exploit_type} vulnerability in {target_protocol}:
 
-Required information:
+For bug bounty hunters evaluating if this is worth pursuing:
 1. Current TVL and liquidity depth
-2. Recent similar exploit attempts (last 30 days) with outcomes
+2. Recent similar vulnerability reports (last 30 days) with outcomes and bounty amounts
 3. Current gas prices and network congestion
-4. Active monitoring and response time of protocol team
-5. MEV bot competition level for this exploit type
-6. Recommended execution timing and conditions
-7. Risk factors and detection likelihood
-8. Expected profitability range given current market state
+4. Protocol's bug bounty program details (if any) and typical payout ranges
+5. Competition level from other security researchers
+6. Estimated time investment required
+7. Risk factors and likelihood of discovery by others
+8. Expected bounty profitability range given current market state
 
-Provide actionable intelligence for go/no-go decision.
+Provide actionable intelligence for deciding whether to pursue this bug bounty opportunity.
 """
         
         return await self.ask_research(

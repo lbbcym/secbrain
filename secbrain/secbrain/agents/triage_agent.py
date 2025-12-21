@@ -140,8 +140,11 @@ class TriageAgent(BaseAgent):
             # Get unique vulnerability types from findings
             vuln_types = {f.get("vuln_type", "") for f in top_findings if f.get("vuln_type")}
             if vuln_types:
-                # Research the most common vulnerability type
-                primary_vuln = list(vuln_types)[0]
+                # Select vulnerability type deterministically (most frequent, then alphabetically)
+                from collections import Counter
+                vuln_type_counts = Counter(f.get("vuln_type", "") for f in top_findings if f.get("vuln_type"))
+                # Get most common, break ties alphabetically
+                primary_vuln = max(vuln_type_counts.items(), key=lambda x: (x[1], -ord(x[0][0]) if x[0] else 0))[0]
                 try:
                     research_result = await self.research_client.research_severity_context(
                         vuln_type=primary_vuln,
