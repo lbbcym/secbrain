@@ -370,5 +370,96 @@ def validate(
     console.print("[green]Configuration valid.[/]")
 
 
+@app.command()
+def insights(
+    workspace: Path = typer.Option(
+        ...,
+        "--workspace",
+        "-w",
+        help="Path to workspace directory to analyze",
+        exists=True,
+        readable=True,
+    ),
+    output_dir: Path = typer.Option(
+        ".",
+        "--output",
+        "-o",
+        help="Directory for output reports (default: current directory)",
+    ),
+    format: str = typer.Option(
+        "markdown",
+        "--format",
+        "-f",
+        help="Output format: markdown, html, json, csv, or all",
+    ),
+    open_report: bool = typer.Option(
+        False,
+        "--open",
+        help="Open the HTML report in browser after generation",
+    ),
+) -> None:
+    """Generate actionable insights report from workspace data."""
+    from secbrain.insights import InsightsAggregator, InsightsAnalyzer, InsightsReporter
+
+    console.print("[bold blue]SecBrain Insights[/] Analyzing workspace...")
+    console.print(f"Workspace: {workspace}")
+
+    try:
+        # Aggregate data
+        aggregator = InsightsAggregator(workspace)
+        data = aggregator.aggregate()
+        console.print(f"  ✓ Loaded {data.total_runs} runs, {data.total_hypotheses} hypotheses, {data.total_attempts} attempts")
+
+        # Analyze
+        analyzer = InsightsAnalyzer()
+        results = analyzer.analyze(data)
+        console.print(f"  ✓ Generated {len(results.insights)} insights")
+
+        # Display summary
+        console.print()
+        console.print("[bold]Executive Summary[/]")
+        console.print(f"  Status: [{'red' if results.summary['status'] == 'requires_attention' else 'yellow' if results.summary['status'] == 'review_recommended' else 'green'}]{results.summary['status'].replace('_', ' ').title()}[/]")
+        console.print(f"  Critical Issues: {results.summary['critical_count']}")
+        console.print(f"  High Priority: {results.summary['high_count']}")
+        console.print(f"  Next Action: {results.summary['next_action']}")
+
+        # Display critical insights
+        critical = results.get_critical_insights()
+        if critical:
+            console.print()
+            console.print("[bold red]🔴 Critical Issues:[/]")
+            for insight in critical:
+                console.print(f"  • {insight.title}")
+                console.print(f"    {insight.action}")
+
+        # Generate reports
+        reporter = InsightsReporter(output_dir)
+        console.print()
+        console.print("[bold]Generating reports...[/]")
+
+        if format.lower() == "all":
+            files = reporter.save_all_formats(results)
+            for fmt, filepath in files.items():
+                console.print(f"  ✓ {fmt.capitalize()}: {filepath}")
+            html_file = files.get("html")
+        else:
+            filepath = reporter.save_report(results, format.lower())
+            console.print(f"  ✓ {format.capitalize()}: {filepath}")
+            html_file = filepath if format.lower() == "html" else None
+
+        # Open in browser if requested
+        if open_report and html_file:
+            import webbrowser
+            webbrowser.open(f"file://{html_file.absolute()}")
+            console.print(f"  ✓ Opened {html_file} in browser")
+
+        console.print()
+        console.print("[green]✓ Insights generation complete![/]")
+
+    except Exception as e:
+        console.print(f"[bold red]Error:[/] {e}")
+        raise typer.Exit(code=1)
+
+
 if __name__ == "__main__":
     app()

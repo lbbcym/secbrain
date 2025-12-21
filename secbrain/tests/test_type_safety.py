@@ -202,6 +202,60 @@ class TestPydanticStrictMode:
         )
         assert result.success is True
 
+    def test_contract_config_strict_mode(self) -> None:
+        """ContractConfig enforces strict mode type validation."""
+        from secbrain.core.context import ContractConfig
+        
+        # Valid construction
+        config = ContractConfig(
+            address="0x742d35Cc6634C0532925a3b844Bc9e7595f8E",
+            chain_id=1,
+        )
+        assert config.chain_id == 1
+        
+        # Invalid: string for chain_id should fail
+        with pytest.raises(ValidationError):
+            ContractConfig(
+                address="0x742d35Cc6634C0532925a3b844Bc9e7595f8E",
+                chain_id="1",  # type: ignore[arg-type] # Should be int
+            )
+
+    def test_scope_config_strict_mode(self) -> None:
+        """ScopeConfig enforces strict mode type validation."""
+        from secbrain.core.context import ScopeConfig
+        
+        # Valid construction
+        config = ScopeConfig(
+            domains=["example.com"],
+            max_depth=3,
+        )
+        assert config.max_depth == 3
+        
+        # Invalid: string for max_depth should fail
+        with pytest.raises(ValidationError):
+            ScopeConfig(
+                domains=["example.com"],
+                max_depth="3",  # type: ignore[arg-type] # Should be int
+            )
+
+    def test_rate_limit_config_strict_mode(self) -> None:
+        """RateLimitConfig enforces strict mode type validation."""
+        from secbrain.core.context import RateLimitConfig
+        
+        # Valid construction
+        config = RateLimitConfig(
+            requests_per_minute=60,
+            burst=10,
+        )
+        assert config.burst == 10
+        
+        # Invalid: string for burst should fail
+        with pytest.raises(ValidationError):
+            RateLimitConfig(
+                requests_per_minute=60,
+                burst="10",  # type: ignore[arg-type] # Should be int
+            )
+
 
 class TestSelfTypeMethods:
     """Tests for Self type method returns."""
