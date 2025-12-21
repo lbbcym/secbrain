@@ -71,6 +71,23 @@ class TokenSpec:
             price_usd=float(data.get("price_usd", 0.0)),
         )
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> TokenSpec:
+        """Create TokenSpec from dictionary.
+
+        Args:
+            data: Dictionary containing token spec fields
+
+        Returns:
+            TokenSpec instance
+        """
+        return cls(
+            symbol=data["symbol"],
+            address=data["address"],
+            decimals=data["decimals"],
+            price_usd=data.get("price_usd", 0.0),
+        )
+
 
 @dataclass
 class ProfitBreakdown:
@@ -105,17 +122,17 @@ class ProfitCalculator:
 
     def __init__(
         self,
-        token_specs: list[TokenSpec],
+        token_specs: list[TokenSpec] | None = None,
         eth_price_usd: float = ETH_PRICE_DEFAULT,
     ) -> None:
         """Initialize the profit calculator.
 
         Args:
-            token_specs: List of token specifications for known tokens
+            token_specs: List of token specifications for known tokens (default: empty list)
             eth_price_usd: Current ETH price in USD (default: 3000.0)
         """
         self.tokens: dict[str, TokenSpec] = {}
-        for spec in token_specs:
+        for spec in (token_specs or []):
             key = spec.symbol.lower()
             self.tokens[key] = spec
 

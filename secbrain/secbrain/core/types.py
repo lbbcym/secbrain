@@ -18,11 +18,11 @@ from typing import (
     NewType,
     Protocol,
     Self,
-    TypedDict,
     runtime_checkable,
 )
 
 from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import TypedDict
 
 
 class Phase(str, Enum):

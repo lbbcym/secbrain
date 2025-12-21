@@ -1,0 +1,17 @@
+{
+  "run_id": "a2add57e",
+  "phase": "triage",
+  "success": true,
+  "duration_seconds": 8.4e-05,
+  "errors": [],
+  "data": {
+    "findings": [],
+    "triaged": 0,
+    "economic": {
+      "decision": "SKIP",
+      "reason": "no_attempts",
+      "max_profit_eth": 0.0
+    }
+  },
+  "timestamp": "2025-12-21T11:21:20.182197"
+}
