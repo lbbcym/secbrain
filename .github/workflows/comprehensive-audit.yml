@@ -43,7 +43,10 @@ jobs:
           cd secbrain
           pip install -r requirements.lock
           pip install -e ".[dev]"
-          pip install bandit[toml] safety pip-audit semgrep black pylint radon vulture
+          pip install bandit[toml] safety pip-audit black pylint radon vulture
+          
+          # Install semgrep (use --pre to get latest compatible version for Python 3.12+)
+          pip install semgrep --pre
 
           # Solidity tools
           npm install -g solhint prettier prettier-plugin-solidity
