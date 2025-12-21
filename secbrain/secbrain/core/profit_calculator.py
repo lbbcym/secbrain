@@ -2,7 +2,6 @@
 
 This module provides a single source of truth for calculating profit values
 across all agents (exploit, triage, reporting, meta).
-"""Unified profit calculation module for all agents.
 
 This module provides a single source of truth for profit calculations,
 preventing inconsistent prioritization and duplicated code across agents.
