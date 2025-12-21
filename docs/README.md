@@ -18,6 +18,7 @@ This docs directory contains contributor-focused guides. For core project docume
 | **Security patterns** | [SOLIDITY_SECURITY_PATTERNS.md](SOLIDITY_SECURITY_PATTERNS.md) |
 | **SBOM & supply chain** | [SBOM-SECURITY.md](SBOM-SECURITY.md) |
 | **Gas optimizations** | [GAS_OPTIMIZATION_GUIDE.md](GAS_OPTIMIZATION_GUIDE.md) |
+| **Gas optimization how-to** ⭐ | [GAS_OPTIMIZATION_IMPLEMENTATION.md](GAS_OPTIMIZATION_IMPLEMENTATION.md) |
 | **Implementation status** | [IMPLEMENTATION-STATUS.md](IMPLEMENTATION-STATUS.md) |
 
 ## 📖 Documentation Categories
@@ -33,6 +34,7 @@ This docs directory contains contributor-focused guides. For core project docume
 - **[SOLIDITY_SECURITY_PATTERNS.md](SOLIDITY_SECURITY_PATTERNS.md)** - Advanced security patterns for smart contracts
 - **[SBOM-SECURITY.md](SBOM-SECURITY.md)** - Software Bill of Materials and supply chain security
 - **[GAS_OPTIMIZATION_GUIDE.md](GAS_OPTIMIZATION_GUIDE.md)** - Comprehensive gas optimization patterns with examples
+- **[GAS_OPTIMIZATION_IMPLEMENTATION.md](GAS_OPTIMIZATION_IMPLEMENTATION.md)** ⭐ - Step-by-step implementation guide for gas optimizations
 
 ### 🤝 Contributing
 
