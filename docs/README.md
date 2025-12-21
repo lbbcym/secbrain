@@ -11,6 +11,7 @@ This docs directory contains contributor-focused guides. For core project docume
 | Topic | Guide |
 |-------|-------|
 | **New to Git?** | [GIT_QUICK_START.md](GIT_QUICK_START.md) |
+| **Git concepts explained** | [SUMMARY.md](SUMMARY.md) |
 | **Contributing workflow** | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 | **CI/CD status** | [CI_STATUS.md](CI_STATUS.md) |
 | **Testing strategies** | [TESTING-STRATEGIES.md](TESTING-STRATEGIES.md) |
