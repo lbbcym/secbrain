@@ -48,6 +48,7 @@ dev = [
     "mypy>=1.7.0",
     "hypothesis>=6.0.0",
     "mutmut>=2.4.0",
+    "types-PyYAML>=6.0.0",
 ]
 
 [project.scripts]

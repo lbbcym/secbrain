@@ -135,7 +135,8 @@ Output ONLY valid JSON, no other text."""
             if content.startswith("```"):
                 lines = content.split("\n")
                 content = "\n".join(lines[1:-1])
-            return json.loads(content)
+            result: dict[str, Any] = json.loads(content)
+            return result
         except json.JSONDecodeError:
             return {}
 
@@ -225,7 +226,8 @@ Output ONLY valid JSON."""
             if content.startswith("```"):
                 lines = content.split("\n")
                 content = "\n".join(lines[1:-1])
-            return json.loads(content)
+            result: dict[str, Any] = json.loads(content)
+            return result
         except json.JSONDecodeError:
             return {}
 
