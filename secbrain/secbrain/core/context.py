@@ -7,7 +7,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypedDict
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
@@ -18,6 +18,25 @@ from .identity import IdentityRegistry
 
 if TYPE_CHECKING:
     from secbrain.models.base import ModelClient
+
+
+class SessionErrorDict(TypedDict, total=False):
+    """Structure for session error records."""
+    
+    phase: str
+    error: str
+    timestamp: str
+    agent: str
+
+
+class SessionFindingDict(TypedDict, total=False):
+    """Structure for session finding records."""
+    
+    id: str
+    title: str
+    severity: str
+    phase: str
+    discovered_by: str
 
 
 class ContractConfig(BaseModel):
@@ -173,8 +192,8 @@ class Session(BaseModel):
     tool_call_counts: dict[str, int] = Field(default_factory=dict)
     research_cache: dict[str, Any] = Field(default_factory=dict)
     llm_cache: dict[str, Any] = Field(default_factory=dict)
-    findings: list[dict[str, Any]] = Field(default_factory=list)
-    errors: list[dict[str, Any]] = Field(default_factory=list)
+    findings: list[SessionFindingDict] = Field(default_factory=list)
+    errors: list[SessionErrorDict] = Field(default_factory=list)
 
 
 class RunContext:
