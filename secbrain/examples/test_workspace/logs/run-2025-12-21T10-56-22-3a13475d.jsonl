@@ -1,0 +1,12 @@
+{"run_id": "3a13475d", "message": "Dry-run test initiated", "event": "test_started", "level": "info", "timestamp": "2025-12-21T10:56:22.968486"}
+{"run_id": "3a13475d", "phases": ["ingest", "plan"], "dry_run": true, "event": "workflow_started", "level": "info", "timestamp": "2025-12-21T10:56:22.968754"}
+{"run_id": "3a13475d", "phase": "ingest", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-21T10:56:22.968848"}
+{"run_id": "3a13475d", "phase": "ingest", "from_phase": "ingest", "event": "phase_transition", "level": "info", "timestamp": "2025-12-21T10:56:22.969012"}
+{"run_id": "3a13475d", "agent": "program_ingest", "phase": "ingest", "event": "starting_ingest", "level": "info", "timestamp": "2025-12-21T10:56:22.969097"}
+{"run_id": "3a13475d", "phase": "ingest", "success": false, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-21T10:56:22.969225"}
+{"run_id": "3a13475d", "phase": "plan", "agent": "supervisor", "event": "pre_phase_check", "level": "info", "timestamp": "2025-12-21T10:56:22.969304"}
+{"run_id": "3a13475d", "phase": "plan", "from_phase": "plan", "event": "phase_transition", "level": "info", "timestamp": "2025-12-21T10:56:22.969404"}
+{"run_id": "3a13475d", "agent": "planner", "phase": "plan", "event": "starting_planning", "level": "info", "timestamp": "2025-12-21T10:56:22.969491"}
+{"run_id": "3a13475d", "phase": "plan", "success": false, "agent": "supervisor", "event": "post_phase_check", "level": "info", "timestamp": "2025-12-21T10:56:22.969625"}
+{"run_id": "3a13475d", "success": true, "phases_completed": ["ingest", "plan"], "findings": 0, "duration": 0.000973, "event": "workflow_completed", "level": "info", "timestamp": "2025-12-21T10:56:22.969732"}
+{"run_id": "3a13475d", "success": true, "event": "test_completed", "level": "info", "timestamp": "2025-12-21T10:56:22.970565"}

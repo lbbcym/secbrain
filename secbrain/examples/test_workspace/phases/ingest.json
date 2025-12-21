@@ -1,0 +1,51 @@
+{
+  "run_id": "3a13475d",
+  "phase": "ingest",
+  "success": true,
+  "duration_seconds": 0.000195,
+  "errors": [],
+  "data": {
+    "program_name": "Test Program",
+    "platform": "test",
+    "domains": [
+      "*.example.com",
+      "api.example.com"
+    ],
+    "urls": [
+      "https://example.com",
+      "https://api.example.com"
+    ],
+    "focus_areas": [
+      "API Security",
+      "Authentication"
+    ],
+    "rules": [
+      "No automated scanning",
+      "Report within 24h"
+    ],
+    "research": {},
+    "normalized": {
+      "domains": [
+        "*.example.com",
+        "api.example.com"
+      ],
+      "urls": [
+        "https://example.com",
+        "https://api.example.com"
+      ],
+      "target_types": [
+        "web",
+        "api"
+      ],
+      "excluded_paths": [
+        "/admin/*",
+        "/internal/*"
+      ],
+      "allowed_methods": [
+        "GET",
+        "POST"
+      ]
+    }
+  },
+  "timestamp": "2025-12-21T10:56:22.970067"
+}
