@@ -36,8 +36,8 @@ class GeminiAdvisorClient(ModelClient):
             try:
                 import google.generativeai as genai
 
-                genai.configure(api_key=self.api_key)
-                self._client = genai.GenerativeModel(self.model)
+                genai.configure(api_key=self.api_key)  # type: ignore[attr-defined]
+                self._client = genai.GenerativeModel(self.model)  # type: ignore[attr-defined, assignment]
             except ImportError:
                 raise ImportError(
                     "google-generativeai is required for Gemini. "
@@ -137,7 +137,8 @@ Rules:
                 lines = content.split("\n")
                 # Remove first and last lines (```json and ```)
                 content = "\n".join(lines[1:-1])
-            return json.loads(content)
+            result: dict[str, Any] = json.loads(content)
+            return result
         except json.JSONDecodeError:
             return {}
 

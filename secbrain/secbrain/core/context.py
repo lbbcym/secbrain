@@ -268,7 +268,7 @@ class RunContext:
     def _load_scope(self, path: Path) -> ScopeConfig:
         """Load scope configuration from YAML."""
         if not path.exists():
-            return ScopeConfig()
+            return ScopeConfig(foundry_root=None)
         with open(path) as f:
             data = yaml.safe_load(f) or {}
         return ScopeConfig(**data)
@@ -464,15 +464,24 @@ class RunContext:
 
     def add_finding(self, finding: dict[str, Any]) -> None:
         """Add a finding to the session."""
-        finding["timestamp"] = datetime.now().isoformat()
-        finding["run_id"] = self.run_id
-        self.session.findings.append(finding)
+        finding_dict: SessionFindingDict = {
+            "id": finding.get("id", ""),
+            "title": finding.get("title", ""),
+            "severity": finding.get("severity", ""),
+            "phase": finding.get("phase", ""),
+            "discovered_by": finding.get("discovered_by", ""),
+        }
+        self.session.findings.append(finding_dict)
 
     def add_error(self, error: dict[str, Any]) -> None:
         """Record an error."""
-        error["timestamp"] = datetime.now().isoformat()
-        error["run_id"] = self.run_id
-        self.session.errors.append(error)
+        error_dict: SessionErrorDict = {
+            "phase": error.get("phase", ""),
+            "error": error.get("error", ""),
+            "timestamp": datetime.now().isoformat(),
+            "agent": error.get("agent", ""),
+        }
+        self.session.errors.append(error_dict)
 
     def set_phase(self, phase: str) -> None:
         """Set the current phase."""

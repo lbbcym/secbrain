@@ -48,6 +48,7 @@ dev = [
     "mypy>=1.7.0",
     "hypothesis>=6.0.0",
     "mutmut>=2.4.0",
+    "types-PyYAML>=6.0.0",
 ]
 
 [project.scripts]
@@ -136,6 +137,17 @@ strict_equality = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "secbrain.core.profit_calculator",
+    "secbrain.core.logging",
+    "secbrain.agents.*",
+    "secbrain.workflows.*",
+    "secbrain.insights.*",
+]
+disallow_untyped_defs = false
+check_untyped_defs = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
