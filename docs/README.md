@@ -2,7 +2,7 @@
 
 Welcome! This directory contains comprehensive guides for contributing to SecBrain and understanding its various components.
 
-## 🗂️ Documentation Overview
+## 📖 Documentation Overview
 
 This docs directory contains contributor-focused guides. For core project documentation (architecture, workflows, operations), see [secbrain/docs/](../secbrain/docs/).
 
@@ -10,14 +10,14 @@ This docs directory contains contributor-focused guides. For core project docume
 
 | Topic | Guide |
 |-------|-------|
-| **New to Git?** | [SUMMARY.md](SUMMARY.md) |
-| **Quick Git reference** | [GIT_QUICK_START.md](GIT_QUICK_START.md) |
+| **New to Git?** | [GIT_QUICK_START.md](GIT_QUICK_START.md) |
 | **Contributing workflow** | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 | **CI/CD status** | [CI_STATUS.md](CI_STATUS.md) |
 | **Testing strategies** | [TESTING-STRATEGIES.md](TESTING-STRATEGIES.md) |
 | **Security patterns** | [SOLIDITY_SECURITY_PATTERNS.md](SOLIDITY_SECURITY_PATTERNS.md) |
 | **SBOM & supply chain** | [SBOM-SECURITY.md](SBOM-SECURITY.md) |
-| **Gas optimizations** | [GAS_OPTIMIZATIONS.md](GAS_OPTIMIZATIONS.md) |
+| **Gas optimizations** | [GAS_OPTIMIZATION_GUIDE.md](GAS_OPTIMIZATION_GUIDE.md) |
+| **Implementation status** | [IMPLEMENTATION-STATUS.md](IMPLEMENTATION-STATUS.md) |
 
 ## 📖 Documentation Categories
 
@@ -31,7 +31,7 @@ This docs directory contains contributor-focused guides. For core project docume
 
 - **[SOLIDITY_SECURITY_PATTERNS.md](SOLIDITY_SECURITY_PATTERNS.md)** - Advanced security patterns for smart contracts
 - **[SBOM-SECURITY.md](SBOM-SECURITY.md)** - Software Bill of Materials and supply chain security
-- **[GAS_OPTIMIZATIONS.md](GAS_OPTIMIZATIONS.md)** - Gas optimization patterns implemented in the project
+- **[GAS_OPTIMIZATION_GUIDE.md](GAS_OPTIMIZATION_GUIDE.md)** - Comprehensive gas optimization patterns with examples
 
 ### 🤝 Contributing
 
@@ -39,6 +39,7 @@ This docs directory contains contributor-focused guides. For core project docume
 - **[GIT_QUICK_START.md](GIT_QUICK_START.md)** - Daily Git reference for contributors
 - **[CI_STATUS.md](CI_STATUS.md)** - Current CI pipeline state and known issues
 - **[../CONTRIBUTING.md](../CONTRIBUTING.md)** - Complete contribution workflow guide
+- **[IMPLEMENTATION-STATUS.md](IMPLEMENTATION-STATUS.md)** - Summary of major implementations
 
 ---
 
@@ -212,7 +213,7 @@ For core project documentation, see the [secbrain/docs/](../secbrain/docs/) dire
 
 ## 🔗 Related Documentation
 
-- **[Main README](../secbrain/README.md)** - Project overview and quick start
+- **[Main README](../README.md)** - Project overview and quick start
 - **[AUTOMATION-QUICK-REF.md](../AUTOMATION-QUICK-REF.md)** - Quick reference for automated agents
-- **[IMPLEMENTATION-SUMMARY.md](../IMPLEMENTATION-SUMMARY.md)** - Summary of implemented features
+- **[IMPLEMENTATION-STATUS.md](IMPLEMENTATION-STATUS.md)** - Summary of major implementations
 - **[BADGES.md](../BADGES.md)** - Status badges for the project
