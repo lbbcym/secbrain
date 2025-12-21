@@ -11,6 +11,11 @@ pragma solidity ^0.8.23;
  * 2. Run: echidna . --contract EchidnaTestExample --config echidna.yaml
  */
 
+// Custom errors for gas optimization
+error ZeroDeposit();
+error InsufficientBalance();
+error TransferFailed();
+
 /// @notice Simple vault contract for testing
 contract Vault {
     mapping(address => uint256) public balances;
@@ -20,19 +25,28 @@ contract Vault {
     event Withdraw(address indexed user, uint256 amount);
     
     function deposit() external payable {
-        require(msg.value > 0, "Must deposit non-zero amount");
-        balances[msg.sender] += msg.value;
-        totalDeposits += msg.value;
+        if (msg.value == 0) revert ZeroDeposit();
+        
+        unchecked {
+            // Safe: totalDeposits tracks contract balance, cannot overflow in practice
+            balances[msg.sender] += msg.value;
+            totalDeposits += msg.value;
+        }
+        
         emit Deposit(msg.sender, msg.value);
     }
     
     function withdraw(uint256 amount) external {
-        require(balances[msg.sender] >= amount, "Insufficient balance");
-        balances[msg.sender] -= amount;
-        totalDeposits -= amount;
+        if (balances[msg.sender] < amount) revert InsufficientBalance();
+        
+        unchecked {
+            // Safe: checked above that balance >= amount
+            balances[msg.sender] -= amount;
+            totalDeposits -= amount;
+        }
         
         (bool success, ) = msg.sender.call{value: amount}("");
-        require(success, "Transfer failed");
+        if (!success) revert TransferFailed();
         
         emit Withdraw(msg.sender, amount);
     }
@@ -164,7 +178,10 @@ contract EchidnaAdvancedTest {
             amount = address(this).balance;
         }
         if (amount > 0) {
-            ghost_totalDeposited += amount;
+            unchecked {
+                // Safe: tracking actual deposits, overflow extremely unlikely
+                ghost_totalDeposited += amount;
+            }
             vault.deposit{value: amount}();
         }
     }
@@ -175,7 +192,10 @@ contract EchidnaAdvancedTest {
             amount = myBalance;
         }
         if (amount > 0) {
-            ghost_totalWithdrawn += amount;
+            unchecked {
+                // Safe: tracking actual withdrawals, amount <= myBalance
+                ghost_totalWithdrawn += amount;
+            }
             vault.withdraw(amount);
         }
     }

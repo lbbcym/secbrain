@@ -45,9 +45,14 @@ cd secbrain
 # Install with uv (recommended)
 uv sync
 
-# Or with pip
+# Or with pip (using hash-verified requirements for security)
+pip install -r requirements-hashed.txt
+
+# Or install in development mode
 pip install -e ".[dev]"
 ```
+
+For more details on dependency management and supply chain security, see [DEPENDENCY-MANAGEMENT.md](../DEPENDENCY-MANAGEMENT.md).
 
 ## Quick Start
 
@@ -84,6 +89,7 @@ secbrain run \
 | Command | Description |
 |---------|-------------|
 | `secbrain run` | Execute bounty workflow |
+| `secbrain insights` | Generate actionable insights report from workspace |
 | `secbrain validate` | Validate configuration files |
 | `secbrain version` | Show version |
 
@@ -103,12 +109,37 @@ secbrain run \
 | `--exploit-iterations` | Attempts per hypothesis (default 3) |
 | `--profit-threshold` | Stop iterating after profit (ETH) meets threshold (default 0.1) |
 
+### Insights Options
+
+After running SecBrain, generate actionable insights to guide your security research:
+
+```bash
+# Generate insights report
+secbrain insights --workspace ./targets/protocol1
+
+# Generate HTML report and open in browser
+secbrain insights --workspace ./targets/protocol1 --format html --open
+
+# Generate all formats (markdown, html, json, csv)
+secbrain insights --workspace ./targets/protocol1 --format all --output ./reports
+```
+
+**What you get:**
+- ✅ **Executive Summary**: Critical issues, status, next actions
+- 📊 **Key Metrics**: Success rates, hypothesis quality, exploit results
+- 🎯 **Actionable Insights**: Prioritized issues by category (Critical/High/Medium/Low)
+- 📝 **Recommendations**: Clear next steps based on your data
+
+See the [Insights Guide](docs/INSIGHTS-GUIDE.md) for detailed usage and examples.
+
 ## Documentation
 
 - [Architecture](docs/architecture-updated.md) - System design and components
 - [Workflows](docs/workflows.md) - Run modes and phases
 - [Threat Model](docs/threat_model.md) - Security considerations
 - [Operations](docs/ops.md) - Setup and usage guide
+- [Dependency Management](../DEPENDENCY-MANAGEMENT.md) - Hash-verified dependencies and SBOM
+- [Insights Guide](docs/INSIGHTS-GUIDE.md) - **NEW: Turn your data into actionable insights**
 
 ## Project Structure
 
@@ -118,6 +149,7 @@ secbrain/
 │   ├── agents/        # Agent implementations
 │   ├── cli/           # CLI interface
 │   ├── core/          # Context, logging, types
+│   ├── insights/      # Insights aggregation and reporting (NEW)
 │   ├── models/        # Model abstractions
 │   ├── tools/         # Tool wrappers
 │   └── workflows/     # Orchestration logic

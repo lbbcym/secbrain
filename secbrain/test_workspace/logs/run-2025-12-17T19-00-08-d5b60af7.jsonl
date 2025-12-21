@@ -1,7 +1,0 @@
-{"event": "workflow_started", "run_id": "d5b60af7", "phases": ["recon"], "dry_run": true}
-{"event": "pre_phase_check", "run_id": "d5b60af7", "phase": "recon", "agent": "supervisor"}
-{"event": "phase_transition", "run_id": "d5b60af7", "phase": "recon", "from_phase": "recon"}
-{"event": "starting_recon", "run_id": "d5b60af7", "agent": "recon", "phase": "recon"}
-{"event": "post_phase_check", "run_id": "d5b60af7", "phase": "recon", "success": false, "agent": "supervisor"}
-{"event": "Phase recon failed", "run_id": "d5b60af7", "errors": ["No domains or contracts in scope for recon"], "agent": "supervisor", "phase": "orchestration"}
-{"event": "workflow_completed", "run_id": "d5b60af7", "success": true, "phases_completed": [], "findings": 0, "duration": 0.006168}

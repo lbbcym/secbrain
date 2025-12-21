@@ -43,11 +43,19 @@ jobs:
           cd secbrain
           pip install -r requirements.lock
           pip install -e ".[dev]"
-          pip install bandit[toml] safety pip-audit semgrep black pylint radon vulture
+          
+          # Python security and quality tools
+          pip install bandit[toml] safety pip-audit black pylint radon vulture
+          
+          # Install semgrep (requires --pre for compatibility with newer pip versions)
+          pip install semgrep --pre
 
           # Solidity tools
           npm install -g solhint prettier prettier-plugin-solidity
-          pip install slither-analyzer mythril aderyn-py
+          pip install slither-analyzer mythril
+          # Note: Aderyn is a Rust-based static analyzer. To install:
+          # cargo install aderyn
+          # See: https://github.com/Cyfrin/aderyn
 
       - name: Run Python security audit
         continue-on-error: true

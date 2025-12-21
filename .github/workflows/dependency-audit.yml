@@ -11,6 +11,7 @@ on:
       - 'requirements.txt'
       - 'secbrain/pyproject.toml'
       - 'secbrain/requirements.lock'
+      - 'secbrain/requirements-hashed.txt'
       - 'package.json'
       - 'package-lock.json'
 
@@ -35,7 +36,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           cd secbrain
-          pip install -r requirements.lock
+          # Use hash-verified requirements for supply chain security
+          pip install -r requirements-hashed.txt
           pip install safety pip-audit
 
       - name: Run pip-audit
@@ -252,6 +254,7 @@ jobs:
           - ✅ **SBOM generated**: Software Bill of Materials
           - ✅ **License compliance**: License compatibility check
           - ✅ **Vendor risk**: Dependency health assessment
+          - ✅ **Hash verification**: SHA256 checksums for all dependencies
 
           ### Security Posture
           - All Python dependencies scanned against known CVE databases
@@ -259,31 +262,34 @@ jobs:
           - Vendor risk assessed for supply chain security
           - Results uploaded as artifacts for review
           - Issues created for CRITICAL/HIGH severity findings
+          - Hash-verified dependencies prevent supply chain attacks
 
-          ### Supply Chain Security
+          ### Supply Chain Security (SLSA Framework)
           - **SBOM**: Complete inventory of all dependencies
           - **License Compliance**: Ensure legal compatibility
           - **Vendor Risk**: Monitor for deprecated/unmaintained packages
-          - **Hash Verification**: Use pip-compile for integrity checks
+          - **Hash Verification**: SHA256 checksums for tamper detection (🔴 HIGH PRIORITY ✅)
+          - **Reproducible Builds**: Identical dependencies across environments
+          - **Audit Trail**: All changes tracked in version control
 
           ### Best Practices
-          - Keep dependencies up to date
-          - Review security advisories regularly
-          - Pin versions in production with hashes
-          - Use lock files (requirements.lock)
-          - Monitor for new vulnerabilities
-          - Verify license compatibility
+          - ✅ Keep dependencies up to date (Dependabot daily updates)
+          - ✅ Review security advisories regularly (automated scanning)
+          - ✅ Pin versions in production with hashes (requirements-hashed.txt)
+          - ✅ Use lock files (requirements-hashed.txt with SHA256 hashes)
+          - ✅ Monitor for new vulnerabilities (daily scans)
+          - ✅ Verify license compatibility (automated checks)
 
           ### Next Steps
           1. Review any created issues immediately
-          2. Update vulnerable dependencies
+          2. Update vulnerable dependencies using `pip-compile --upgrade`
           3. Test updates in development before deploying
           4. Review license compliance report
           5. Address vendor risk findings
-          6. Consider automated dependency updates via Dependabot
+          6. Monitor Dependabot PRs for automated updates
 
           ---
-          *Automated dependency security with SBOM for bug bounty focus* 🎯
+          *Automated dependency security with SBOM and hash verification for bug bounty focus* 🎯
           EOF
 
   npm-dependency-audit:
