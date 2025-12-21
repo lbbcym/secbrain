@@ -7,10 +7,11 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import TYPE_CHECKING, Any
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import TypedDict
 
 from secbrain.core.approval import ApprovalManager
 
