@@ -32,7 +32,7 @@ jobs:
         id: analyze
         run: |
           echo "Running deep codebase analysis..."
-          python scripts/ai_engineer_analysis.py > codebase_analysis.json
+          python scripts/ai_engineer_analysis.py 2>&1 | tee analysis.log | grep -v "^🔍\|^🚀" > codebase_analysis.json
           
           echo "Analysis complete. Summary:"
           python -c "
@@ -51,7 +51,7 @@ jobs:
         id: security_intel
         run: |
           echo "Gathering security intelligence..."
-          python scripts/security_intelligence.py > security_intel.json
+          python scripts/security_intelligence.py 2>&1 | tee intel.log | grep -v "^🔍\|^🚀" > security_intel.json
           
           echo "Intelligence gathered:"
           python -c "
@@ -175,43 +175,62 @@ jobs:
       - name: Generate summary
         if: always()
         run: |
+          # Show generated recommendations if available
+          if [ -f recommendations.json ]; then
+            echo "## 🤖 AI-Powered Engineering Agent Summary" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Parse and display recommendations
+            python -c "
+          import json
+          import sys
+          
+          try:
+              with open('recommendations.json') as f:
+                  data = json.load(f)
+              
+              print('### 📊 Analysis Results', file=sys.stderr)
+              print('', file=sys.stderr)
+              print(f'- **Recommendations Generated:** {data[\"recommendation_count\"]}', file=sys.stderr)
+              print('', file=sys.stderr)
+              
+              if 'recommendations' in data and data['recommendations']:
+                  print('### 🎯 Generated Recommendations', file=sys.stderr)
+                  print('', file=sys.stderr)
+                  for i, rec in enumerate(data['recommendations'], 1):
+                      priority_emoji = '🔴' if rec.get('priority') == 'critical' else '🟡' if rec.get('priority') == 'high' else '🟢'
+                      print(f'{i}. {priority_emoji} **{rec[\"title\"]}**', file=sys.stderr)
+                      print(f'   - Priority: {rec.get(\"priority\", \"medium\")}', file=sys.stderr)
+                      print(f'   - Category: {rec.get(\"category\", \"general\")}', file=sys.stderr)
+                      print(f'   - Effort: {rec.get(\"effort\", \"unknown\")}', file=sys.stderr)
+                      print('', file=sys.stderr)
+          except Exception as e:
+              print(f'Error displaying recommendations: {e}', file=sys.stderr)
+          " 2>> $GITHUB_STEP_SUMMARY
+          fi
+          
           cat >> $GITHUB_STEP_SUMMARY << 'EOF'
-          ## 🤖 AI-Powered Engineering Agent Summary
-
-          ### Analysis Completed
+          
+          ### ✅ Analysis Completed
           - ✅ Codebase structure analysis
           - ✅ Latest security research reviewed
           - ✅ Best practices evaluated
-          - ✅ Improvement suggestions generated
+          - ✅ Context-aware suggestions generated
 
-          ### Suggestion Categories
-          - 🚀 **Gas Optimization**: Solidity gas-saving patterns
-          - 🔒 **Type Safety**: Python 3.11+ advanced features
-          - 🛡️ **Security Patterns**: State-of-the-art contract security
-          - 🧪 **Testing**: Property-based testing and fuzzing
-          - 📦 **Supply Chain**: SBOM and dependency security
-
-          ### Research Sources
+          ### 🔬 Research Sources
           - Latest EIPs and PEPs
-          - Recent security audit reports
-          - DeFi Security Summit findings
-          - Trail of Bits publications
+          - Recent DeFi exploit patterns (2023-2024)
+          - Trail of Bits security research
           - Consensys best practices
-          - Academic papers on smart contract security
+          - Python 3.11+ security features
+          - Advanced testing methodologies
 
-          ### Generated Issues
-          Issues created with detailed implementation guidance and references to:
-          - Research papers and blog posts
-          - Audit reports
-          - Best practice guides
-          - Code examples
-
-          ### Next Steps
-          1. Review created issues
-          2. Prioritize based on security impact
-          3. Implement high-priority suggestions
-          4. Schedule follow-up for long-term improvements
+          ### 📋 Next Steps
+          1. Review created/updated issues with `ai-suggestion` label
+          2. Prioritize based on security impact and effort
+          3. Implement high-priority recommendations
+          4. Track effectiveness and iterate
 
           ---
-          *AI-powered continuous improvement for security research* 🎯
+          *Dynamic, context-aware security recommendations powered by codebase analysis* 🎯
           EOF
