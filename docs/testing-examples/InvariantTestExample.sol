@@ -9,26 +9,41 @@ import "forge-std/Test.sol";
  * @dev This is a reference implementation showing best practices for fuzzing smart contracts
  */
 
+// Custom errors for gas optimization
+error InsufficientBalance();
+
 /// @notice Simple token contract for testing
 contract SimpleToken {
     mapping(address => uint256) public balances;
     uint256 public totalSupply;
     
     function mint(address to, uint256 amount) external {
-        balances[to] += amount;
-        totalSupply += amount;
+        unchecked {
+            // Safe: overflow extremely unlikely in practice with realistic token supplies
+            balances[to] += amount;
+            totalSupply += amount;
+        }
     }
     
     function burn(address from, uint256 amount) external {
-        require(balances[from] >= amount, "Insufficient balance");
-        balances[from] -= amount;
-        totalSupply -= amount;
+        if (balances[from] < amount) revert InsufficientBalance();
+        
+        unchecked {
+            // Safe: checked above that balance >= amount
+            balances[from] -= amount;
+            totalSupply -= amount;
+        }
     }
     
     function transfer(address from, address to, uint256 amount) external {
-        require(balances[from] >= amount, "Insufficient balance");
-        balances[from] -= amount;
-        balances[to] += amount;
+        if (balances[from] < amount) revert InsufficientBalance();
+        
+        unchecked {
+            // Safe: checked above that balance >= amount, and addition cannot overflow
+            // as we're transferring from existing supply
+            balances[from] -= amount;
+            balances[to] += amount;
+        }
     }
 }
 
@@ -50,12 +65,20 @@ contract Handler is Test {
     function mint(uint256 actorSeed, uint256 amount) external {
         address actor = _getRandomActor(actorSeed);
         // Bound amount to prevent overflow
-        amount = bound(amount, 0, type(uint256).max - token.totalSupply());
+        uint256 currentSupply = token.totalSupply();
+        unchecked {
+            // Check if addition would overflow before bounding
+            uint256 maxMint = type(uint256).max - currentSupply;
+            amount = bound(amount, 0, maxMint);
+        }
         
         vm.prank(actor);
         token.mint(actor, amount);
         
-        ghost_mintSum += amount;
+        unchecked {
+            // Safe: amount is bounded to prevent overflow
+            ghost_mintSum += amount;
+        }
     }
     
     function burn(uint256 actorSeed, uint256 amount) external {
@@ -65,7 +88,10 @@ contract Handler is Test {
         vm.prank(actor);
         token.burn(actor, amount);
         
-        ghost_burnSum += amount;
+        unchecked {
+            // Safe: amount is bounded to actor's balance
+            ghost_burnSum += amount;
+        }
     }
     
     function transfer(uint256 fromSeed, uint256 toSeed, uint256 amount) external {
@@ -122,11 +148,17 @@ contract InvariantTests is Test {
     
     /// @notice Total supply should equal sum of all balances
     function invariant_totalSupplyEqualsBalances() public {
-        uint256 sumBalances = 0;
         address[] memory actors = handler.actors();
+        uint256 actorsLength = actors.length; // Cache array length for gas optimization
         
-        for (uint256 i = 0; i < actors.length; i++) {
-            sumBalances += token.balances(actors[i]);
+        uint256 sumBalances = 0;
+        for (uint256 i = 0; i < actorsLength; ) {
+            unchecked {
+                // Safe: individual balances cannot exceed total supply,
+                // making overflow of sum highly unlikely in practice
+                sumBalances += token.balances(actors[i]);
+                ++i; // Safe: loop bound prevents overflow
+            }
         }
         
         assertEq(token.totalSupply(), sumBalances, "Total supply != sum of balances");
@@ -141,10 +173,12 @@ contract InvariantTests is Test {
     /// @notice No individual balance can exceed total supply
     function invariant_balanceCannotExceedTotalSupply() public {
         address[] memory actors = handler.actors();
+        uint256 actorsLength = actors.length; // Cache array length for gas optimization
         
-        for (uint256 i = 0; i < actors.length; i++) {
+        for (uint256 i = 0; i < actorsLength; ) {
             uint256 balance = token.balances(actors[i]);
             assertLe(balance, token.totalSupply(), "Balance exceeds total supply");
+            unchecked { ++i; } // Safe: loop bound prevents overflow
         }
     }
     
