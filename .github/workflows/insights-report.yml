@@ -1,0 +1,165 @@
+name: SecBrain Insights Report
+
+on:
+  workflow_run:
+    workflows: ["SecBrain Contract Audit CI"]
+    types:
+      - completed
+
+jobs:
+  generate-insights:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion != 'cancelled'
+    
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install SecBrain
+        run: |
+          cd secbrain
+          pip install -e .
+      
+      - name: Find workspaces
+        id: workspaces
+        run: |
+          # Find all SecBrain workspaces
+          WORKSPACES=$(find targets -type f -name "run_summary.json" -exec dirname {} \; 2>/dev/null || echo "")
+          echo "Found workspaces: $WORKSPACES"
+          echo "workspaces<<EOF" >> $GITHUB_OUTPUT
+          echo "$WORKSPACES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Generate insights reports
+        if: steps.workspaces.outputs.workspaces != ''
+        run: |
+          mkdir -p insights-reports
+          
+          # Generate insights for each workspace
+          while IFS= read -r workspace; do
+            if [ -n "$workspace" ]; then
+              protocol=$(basename "$workspace")
+              echo "Generating insights for $protocol..."
+              
+              secbrain insights \
+                --workspace "$workspace" \
+                --format all \
+                --output "insights-reports/$protocol" || echo "Failed to generate insights for $workspace"
+            fi
+          done <<< "${{ steps.workspaces.outputs.workspaces }}"
+      
+      - name: Upload insights reports
+        if: steps.workspaces.outputs.workspaces != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: insights-reports
+          path: insights-reports/**/*.html
+          retention-days: 30
+      
+      - name: Generate summary
+        if: steps.workspaces.outputs.workspaces != ''
+        run: |
+          echo "# 📊 SecBrain Insights Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Generated:** $(date '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Read each workspace's JSON summary
+          for json_file in insights-reports/*/*.json; do
+            if [ -f "$json_file" ]; then
+              protocol=$(basename $(dirname "$json_file"))
+              echo "## 🎯 $protocol" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              
+              # Extract key info using jq if available, otherwise use grep/sed
+              if command -v jq &> /dev/null; then
+                status=$(jq -r '.summary.status // "unknown"' "$json_file")
+                critical=$(jq -r '.summary.critical_count // 0' "$json_file")
+                high=$(jq -r '.summary.high_count // 0' "$json_file")
+                next_action=$(jq -r '.summary.next_action // "N/A"' "$json_file")
+                
+                echo "- **Status:** $status" >> $GITHUB_STEP_SUMMARY
+                echo "- **Critical Issues:** $critical" >> $GITHUB_STEP_SUMMARY
+                echo "- **High Priority:** $high" >> $GITHUB_STEP_SUMMARY
+                echo "- **Next Action:** $next_action" >> $GITHUB_STEP_SUMMARY
+              fi
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "📥 Download detailed HTML reports from the artifacts." >> $GITHUB_STEP_SUMMARY
+      
+      - name: Comment on PR (if applicable)
+        if: github.event.workflow_run.event == 'pull_request' && steps.workspaces.outputs.workspaces != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Find all JSON insight files
+            const insightsDir = 'insights-reports';
+            let comment = '## 📊 SecBrain Insights Report\n\n';
+            
+            try {
+              const protocols = fs.readdirSync(insightsDir);
+              
+              for (const protocol of protocols) {
+                const jsonPath = path.join(insightsDir, protocol, 
+                  fs.readdirSync(path.join(insightsDir, protocol))
+                    .find(f => f.endsWith('.json')));
+                
+                if (fs.existsSync(jsonPath)) {
+                  const insights = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+                  const summary = insights.summary || {};
+                  
+                  comment += `### 🎯 ${protocol}\n\n`;
+                  comment += `- **Status:** ${summary.status || 'unknown'}\n`;
+                  comment += `- **Critical:** ${summary.critical_count || 0}\n`;
+                  comment += `- **High Priority:** ${summary.high_count || 0}\n`;
+                  comment += `- **Next Action:** ${summary.next_action || 'N/A'}\n\n`;
+                  
+                  // Add top recommendations
+                  if (insights.recommendations && insights.recommendations.length > 0) {
+                    comment += '**Top Recommendations:**\n';
+                    insights.recommendations.slice(0, 3).forEach((rec, i) => {
+                      comment += `${i + 1}. ${rec}\n`;
+                    });
+                    comment += '\n';
+                  }
+                }
+              }
+              
+              comment += '---\n';
+              comment += '📥 Download detailed reports from workflow artifacts.\n';
+              
+              // Post comment
+              const { data: pullRequests } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`,
+                state: 'open'
+              });
+              
+              if (pullRequests.length > 0) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pullRequests[0].number,
+                  body: comment
+                });
+              }
+            } catch (error) {
+              console.error('Error generating PR comment:', error);
+            }
