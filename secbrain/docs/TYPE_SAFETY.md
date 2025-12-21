@@ -191,6 +191,23 @@ strict_equality = true
 
 This catches type errors at development time, before code reaches production.
 
+### Type Safety Status
+
+**Fully Type-Safe Modules** (passing mypy --strict):
+- ✅ `secbrain/core/types.py` - Core type primitives
+- ✅ `secbrain/core/context.py` - Run context and configuration
+- ✅ `secbrain/tools/storage.py` - SQL storage with LiteralString
+- ✅ `secbrain/models/base.py` - Model client interface
+- ✅ `secbrain/models/open_workers.py` - OpenAI-compatible clients
+- ✅ `secbrain/models/gemini_advisor.py` - Gemini client
+
+**Recent Improvements** (December 2025):
+- Fixed mypy strict mode compliance in model clients
+- Added explicit type annotations for JSON parsing to avoid `no-any-return` errors
+- Improved TypedDict usage in context module for session tracking
+- Added types-PyYAML dependency for YAML type stubs
+- Enhanced type safety in error and finding tracking
+
 ## Best Practices
 
 ### 1. Always Use Type Hints

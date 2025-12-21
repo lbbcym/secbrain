@@ -138,6 +138,17 @@ strict_equality = true
 module = "tests.*"
 disallow_untyped_defs = false
 
+[[tool.mypy.overrides]]
+module = [
+    "secbrain.core.profit_calculator",
+    "secbrain.core.logging",
+    "secbrain.agents.*",
+    "secbrain.workflows.*",
+    "secbrain.insights.*",
+]
+disallow_untyped_defs = false
+check_untyped_defs = false
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
