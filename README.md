@@ -14,7 +14,7 @@
 SecBrain is a CLI-first Python project that automates bug bounty workflows using a coordinated team of AI agents. It combines:
 
 - **Multi-agent architecture**: Specialized agents for each phase (recon, hypothesis, exploit, triage, reporting)
-- **Research-first approach**: Perplexity integration for external knowledge and learning
+- **Research-first approach**: Enhanced Perplexity integration with TTL-based caching, rate limiting, and specialized research methods for severity assessment, attack vectors, and market conditions
 - **Advisor oversight**: Gemini model reviews critical decisions
 - **Guarded execution**: ACLs, rate limits, kill-switch, and human approval checkpoints
 
@@ -22,7 +22,12 @@ SecBrain is a CLI-first Python project that automates bug bounty workflows using
 
 - 🔍 **Automated recon** with subfinder, amass, httpx integration
 - 🧠 **Vulnerability hypothesis generation** using AI reasoning
-- 🔬 **Research-backed testing** with Perplexity for context
+- 🔬 **Research-backed testing** with enhanced Perplexity integration:
+  - Real-world severity context with exploit examples
+  - Attack vector discovery from recent exploits
+  - Market condition analysis for exploit validation
+  - TTL-based intelligent caching (1h-168h)
+  - Strict rate limiting (10 req/min)
 - ✅ **Advisor review** at critical checkpoints
 - 🛡️ **Safety controls**: Scope enforcement, rate limits, kill-switch
 - 📊 **Structured logging** in JSONL format
@@ -61,6 +66,19 @@ secbrain run \
   --workspace ./targets/test \
   --dry-run
 ```
+
+### Test enhanced research capabilities
+
+```bash
+# Run the research integration test script
+python test_research.py
+```
+
+This will verify:
+- TTL-based caching behavior
+- Rate limiting enforcement (10 req/min)
+- Specialized research methods (severity, attack vectors, market conditions)
+- Backward compatibility with existing methods
 
 ### Generate insights from results
 
