@@ -1,0 +1,34 @@
+{
+  "run_id": "a2add57e",
+  "phase": "recon",
+  "success": true,
+  "duration_seconds": 0.000722,
+  "errors": [],
+  "data": {
+    "assets": [
+      {
+        "id": "sub-2404cc60",
+        "type": "subdomain",
+        "value": "[DRY-RUN] Would run: subfinder -d localhost -silent",
+        "metadata": {
+          "source": "subfinder",
+          "parent_domain": "localhost"
+        }
+      },
+      {
+        "id": "sub-a9ba9a24",
+        "type": "subdomain",
+        "value": "[DRY-RUN] Would run: subfinder -d 127.0.0.1 -silent",
+        "metadata": {
+          "source": "subfinder",
+          "parent_domain": "127.0.0.1"
+        }
+      }
+    ],
+    "subdomains_count": 2,
+    "live_hosts_count": 0,
+    "technologies": [],
+    "tech_research": {}
+  },
+  "timestamp": "2025-12-21T11:21:20.181766"
+}

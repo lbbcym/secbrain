@@ -107,8 +107,8 @@ contract Secure is ReentrancyGuard {
                 "view function",
                 "external call in modifier",
                 "getters during state change",
-                "balanceOf",
-                "totalSupply",
+                "balanceof",
+                "totalsupply",
             ],
             mitigation_code='''
 // Protect view functions from read-only reentrancy
@@ -224,8 +224,8 @@ contract Secure {
                 "borrow",
                 "repay",
                 "block.number",
-                "flashLoan",
-                "onFlashLoan",
+                "flashloan",
+                "onflashloan",
             ],
             mitigation_code='''
 // Detect and prevent same-block borrow/repay attacks
@@ -268,7 +268,7 @@ contract Secure {
             severity="high",
             description="Multi-level role-based access control needed instead of simple Ownable",
             detection_heuristics=[
-                "onlyOwner",
+                "onlyowner",
                 "owner",
                 "admin",
                 "restricted function",
@@ -312,6 +312,7 @@ contract Secure is AccessControl {
             severity="medium",
             description="Commit-reveal scheme needed to prevent front-running",
             detection_heuristics=[
+                "commit",
                 "bid",
                 "auction",
                 "vote",
@@ -403,7 +404,7 @@ contract Secure is EIP712 {
             severity="high",
             description="Chainlink price feed staleness checks required",
             detection_heuristics=[
-                "latestRoundData",
+                "latestrounddata",
                 "chainlink",
                 "price feed",
                 "oracle",

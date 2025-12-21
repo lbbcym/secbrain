@@ -1,0 +1,50 @@
+{
+  "run_id": "a2add57e",
+  "phase": "ingest",
+  "success": true,
+  "duration_seconds": 0.000131,
+  "errors": [],
+  "data": {
+    "program_name": "dummy-localhost",
+    "platform": "solo-lab",
+    "domains": [
+      "localhost",
+      "127.0.0.1"
+    ],
+    "urls": [
+      "http://localhost",
+      "http://127.0.0.1"
+    ],
+    "focus_areas": [
+      "http",
+      "static"
+    ],
+    "rules": [
+      "Localhost-only testing",
+      "No real external network calls",
+      "Dry-run preferred"
+    ],
+    "research": {},
+    "normalized": {
+      "domains": [
+        "localhost",
+        "127.0.0.1"
+      ],
+      "urls": [
+        "http://localhost",
+        "http://127.0.0.1"
+      ],
+      "target_types": [
+        "web"
+      ],
+      "excluded_paths": [],
+      "allowed_methods": [
+        "GET",
+        "POST",
+        "HEAD",
+        "OPTIONS"
+      ]
+    }
+  },
+  "timestamp": "2025-12-21T11:21:20.181480"
+}
