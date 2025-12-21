@@ -1,8 +1,7 @@
 """Unified profit calculation module for SecBrain.
 
 This module provides a single source of truth for calculating profit values
-across all agents (exploit, triage, reporting, meta) and for profit calculations,
-preventing inconsistent prioritization and duplicated code across agents.
+across all agents (exploit, triage, reporting, meta).
 """
 
 from __future__ import annotations
@@ -150,29 +149,44 @@ class ProfitCalculator:
         token_amounts: dict[str, int | float],
         base_eth_profit: float = 0.0,
         price_cache: dict[str, float] | None = None,
-    ) -> float:
+    ) -> tuple[float, dict[str, float], float]:
         """Compute ETH-equivalent value from token amounts.
+
+        This method provides a backward-compatible interface for existing code
+        that expects the (eth_equiv, breakdown_usd, profit_usd) tuple format.
 
         Args:
             token_amounts: Mapping of token symbol to raw amount
-            base_eth_profit: Base ETH profit to add to the calculation
+            base_eth_profit: Direct ETH profit to add to the total
             price_cache: Optional cache of dynamic prices
 
         Returns:
-            Total ETH-equivalent value
+            Tuple of (eth_equivalent, breakdown_by_address, total_usd)
         """
         breakdown = self.compute_usd(token_amounts, price_cache)
-        return base_eth_profit + breakdown.eth_equivalent
+
+        # Convert breakdown to use addresses where available
+        breakdown_by_address: dict[str, float] = {}
+        for symbol, usd_value in breakdown.by_token.items():
+            spec = self.tokens.get(symbol.lower())
+            key = spec.address if spec and spec.address else symbol
+            breakdown_by_address[key] = usd_value
+
+        total_eth_equiv = breakdown.eth_equivalent + base_eth_profit
+
+        return (total_eth_equiv, breakdown_by_address, breakdown.total_usd)
 
     def update_eth_price(self, new_price: float) -> None:
         """Update the ETH price used for conversions.
 
         Args:
-            new_price: New ETH price in USD
+            new_price: New ETH price in USD (must be non-negative)
         """
-        self.eth_price_usd = max(new_price, 0.0)
+        if new_price < 0:
+            raise ValueError(f"Negative ETH price: {new_price}")
+        self.eth_price_usd = new_price
 
-    def add_token_spec(self, spec: TokenSpec) -> None:
+    def add_token(self, spec: TokenSpec) -> None:
         """Add or update a token specification.
 
         Args:
@@ -180,21 +194,23 @@ class ProfitCalculator:
         """
         self.tokens[spec.symbol.lower()] = spec
 
-    def normalize_amount(self, amount: int | float, decimals: int) -> float:
+    @staticmethod
+    def normalize_amount(raw_amount: int | float, decimals: int) -> float:
         """Normalize a raw token amount by its decimals.
 
         Args:
-            amount: Raw amount in smallest unit
-            decimals: Number of decimal places
+            raw_amount: Raw amount in smallest unit (e.g., wei)
+            decimals: Token decimals (0-77)
 
         Returns:
-            Normalized amount
+            Normalized amount as float
+
+        Raises:
+            ValueError: If decimals is out of range
         """
-        if amount <= 0:
-            return 0.0
-        if amount > MAX_RAW_AMOUNT:
-            return 0.0
-        return float(amount) / (10 ** decimals)
+        if not 0 <= decimals <= MAX_TOKEN_DECIMALS:
+            raise ValueError(f"Invalid decimals: {decimals}")
+        return float(raw_amount) / (10 ** decimals)
 
 
 def create_profit_calculator_from_chain(
