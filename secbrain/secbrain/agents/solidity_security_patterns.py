@@ -318,6 +318,8 @@ contract Secure is AccessControl {
                 "vote",
                 "random",
                 "lottery",
+                "commit",
+                "reveal",
             ],
             mitigation_code='''
 // Implement commit-reveal scheme

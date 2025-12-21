@@ -72,7 +72,7 @@ class TestSoliditySecurityPatterns:
         
         staleness = patterns["chainlink_staleness"]
         assert staleness.severity == "high"
-        assert "latestRoundData" in staleness.detection_heuristics
+        assert "latestrounddata" in staleness.detection_heuristics
         assert "answeredInRound" in staleness.mitigation_code
 
     def test_get_all_patterns(self):
