@@ -89,8 +89,8 @@ requests==2.32.5
 
 # With hash verification (secure)
 requests==2.32.5 \
-    --hash=sha256:0cfa2c5f5c3196cd9a8b1c4b7c9d6e4d2a1c5c3d6e4f1a2b3c4d5e6f7a8b9c0d \
-    --hash=sha256:1dfa3c6g6d3297de0b9c2d5d4e5d7f3e2d1c6d6e7f2b3d4e5f6a7b8c9d0e1f2
+    --hash=sha256:2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6 \
+    --hash=sha256:dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf
     # via -r requirements.in
 ```
 
