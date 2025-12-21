@@ -127,7 +127,7 @@ echidna . --contract EchidnaTest --test-limit 0
 **Status:** ✅ Installed and configured
 
 - **Installation:** Mutmut 3.4.0 installed as dev dependency
-- **Configuration:** `.mutmut-config.py` includes:
+- **Configuration:** `.mutmut-config.py` (TOML format despite .py extension):
   ```toml
   [mutmut]
   paths_to_mutate = secbrain/
