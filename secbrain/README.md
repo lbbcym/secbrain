@@ -45,9 +45,14 @@ cd secbrain
 # Install with uv (recommended)
 uv sync
 
-# Or with pip
+# Or with pip (using hash-verified requirements for security)
+pip install -r requirements-hashed.txt
+
+# Or install in development mode
 pip install -e ".[dev]"
 ```
+
+For more details on dependency management and supply chain security, see [DEPENDENCY-MANAGEMENT.md](../DEPENDENCY-MANAGEMENT.md).
 
 ## Quick Start
 
@@ -133,6 +138,7 @@ See the [Insights Guide](docs/INSIGHTS-GUIDE.md) for detailed usage and examples
 - [Workflows](docs/workflows.md) - Run modes and phases
 - [Threat Model](docs/threat_model.md) - Security considerations
 - [Operations](docs/ops.md) - Setup and usage guide
+- [Dependency Management](../DEPENDENCY-MANAGEMENT.md) - Hash-verified dependencies and SBOM
 - [Insights Guide](docs/INSIGHTS-GUIDE.md) - **NEW: Turn your data into actionable insights**
 
 ## Project Structure
