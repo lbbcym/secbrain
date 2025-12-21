@@ -2,6 +2,12 @@
 
 from secbrain.core.context import RunContext, Session
 from secbrain.core.logging import log_event, setup_logging
+from secbrain.core.profit_calculator import (
+    ProfitBreakdown,
+    ProfitCalculator,
+    TokenSpec,
+    create_profit_calculator_from_chain,
+)
 from secbrain.core.types import (
     # Constants
     ALLOWED_HTTP_METHODS,
@@ -55,6 +61,9 @@ __all__ = [
     "ModelClientProtocol",
     # Enums
     "Phase",
+    # Profit Calculator
+    "ProfitBreakdown",
+    "ProfitCalculator",
     "ProfitTokenDict",
     # Context and Logging
     "RunContext",
@@ -64,8 +73,10 @@ __all__ = [
     "Session",
     "Severity",
     "StorageProtocol",
+    "TokenSpec",
     "ToolCallDict",
     "TxHash",
+    "create_profit_calculator_from_chain",
     "log_event",
     "setup_logging",
 ]
