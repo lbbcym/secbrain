@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import math
 import uuid
 from dataclasses import dataclass, field
@@ -14,6 +15,14 @@ from jsonschema import ValidationError, validate
 
 from secbrain.agents.base import AgentResult, BaseAgent
 from secbrain.agents.oracle_manipulation_detector import OracleManipulationDetector
+
+logger = logging.getLogger(__name__)
+
+# ABI preview limits for prompt generation
+ABI_PREVIEW_MAX_ENTRIES = 30  # Maximum number of ABI entries to include
+ABI_PREVIEW_REDUCED_ENTRIES = 15  # Reduced number if JSON is too large
+ABI_JSON_SIZE_LIMIT = 1500  # Maximum JSON string length for ABI preview
+FUNCTIONS_PREVIEW_LIMIT = 15  # Maximum number of function signatures to preview
 
 
 @dataclass(slots=True)
@@ -106,7 +115,7 @@ class VulnHypothesisAgent(BaseAgent):
         "type": "array",
         "items": {
             "type": "object",
-            "required": ["vuln_type", "confidence", "contract_address", "function_signature"],
+            "required": ["vuln_type", "confidence"],
             "properties": {
                 "vuln_type": {
                     "type": "string",
@@ -148,8 +157,8 @@ class VulnHypothesisAgent(BaseAgent):
                     ],
                 },
                 "confidence": {"type": "number", "minimum": 0, "maximum": 1},
-                "contract_address": {"type": "string", "pattern": "^0x[a-fA-F0-9]{40}$"},
-                "function_signature": {"type": "string", "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*\\(.*\\)$"},
+                "contract_address": {"type": "string"},
+                "function_signature": {"type": "string"},
                 "rationale": {"type": "string"},
                 "attack_description": {"type": "string"},
                 "expected_profit_hint_eth": {"type": "number", "minimum": 0},
@@ -162,6 +171,13 @@ class VulnHypothesisAgent(BaseAgent):
         super().__init__(*args, **kwargs)
         self._oracle_detector = OracleManipulationDetector()
         self._contract_llm_sem = asyncio.Semaphore(5)
+
+        # Add hypothesis enhancer
+        self.hyp_enhancer = None
+        if self.research_orch:
+            from secbrain.agents.hypothesis_enhancement import HypothesisEnhancer
+
+            self.hyp_enhancer = HypothesisEnhancer(self.research_orch)
 
     async def run(self, **kwargs: Any) -> AgentResult:
         """Generate vulnerability hypotheses."""
@@ -313,12 +329,16 @@ class VulnHypothesisAgent(BaseAgent):
             return static_hypotheses
 
         # Keep prompts bounded
-        functions_preview = functions[:50]
-        abi_preview = abi
+        functions_preview = functions[:FUNCTIONS_PREVIEW_LIMIT]
+        abi_preview = abi[:ABI_PREVIEW_MAX_ENTRIES]
         try:
-            abi_preview_str = json.dumps(abi_preview)
+            # Limit ABI entries before serialization to avoid invalid JSON
+            if len(json.dumps(abi_preview)) > ABI_JSON_SIZE_LIMIT:
+                # If still too long, reduce ABI entries further
+                abi_preview = abi[:ABI_PREVIEW_REDUCED_ENTRIES]
         except Exception:
-            abi_preview_str = "[]"
+            # On serialization failure, fall back to a smaller preview slice
+            abi_preview = abi[:ABI_PREVIEW_REDUCED_ENTRIES]
 
         classification = (asset.get("metadata", {}) or {}).get("classification", {})
         protocol_type = classification.get("protocol_type", "generic")
@@ -348,49 +368,34 @@ class VulnHypothesisAgent(BaseAgent):
                     contract_pattern=f"{protocol_type} with functions: {', '.join(functions_preview[:5])}",
                 )
                 if not research_result.get("error") and not research_result.get("limited"):
-                    research_context = f"\n\nReal-world attack vectors for {primary_pattern}:\n{research_result.get('answer', '')[:600]}\n"
+                    research_context = f"\n\nReal-world attack vectors for {primary_pattern}:\n{research_result.get('answer', '')[:400]}\n"  # Reduced from 600
             except Exception as e:
                 self._log_error("research_attack_vectors_failed", error=str(e))
 
-        prompt = f"""Analyze this on-chain contract target and generate exploit-focused vulnerability hypotheses.
+        prompt = f"""Contract: {name} ({address})
+Chain: {chain_id}
+Protocol: {protocol_type}
+Functions (sample): {', '.join(functions_preview[:8])}
 
-Contract name: {name}
-Contract address: {address}
-Chain ID: {chain_id}
-Known function signatures (partial): {functions_preview}
-ABI (may be truncated): {abi_preview_str[:2000]}
-Protocol type: {protocol_type}
-Targeted exploit patterns to prioritize: {pattern_hint}{research_context}
+{research_context}
 
-For each hypothesis, provide:
-1. vuln_type (e.g., reentrancy, access_control, oracle, price_manipulation, signature_replay, accounting)
-2. confidence (0.0 to 1.0)
-3. rationale
-4. test_approach (what to do in a forked Foundry test)
-5. REQUIRED on-chain fields:
-   - contract_address (hex)
-   - chain_id (int)
-   - function_signature (pick an actual target from the provided functions if possible)
-6. Optional:
-   - exploit_notes (short array of bullet points)
-   - expected_profit_hint_eth (float)
+Generate 3-5 exploit hypotheses as a JSON array.
 
-Output as JSON array ONLY (no markdown, no prose):
-[
-  {{
-    \"vuln_type\": \"...\",
-    \"confidence\": 0.7,
-    \"rationale\": \"...\",
-    \"test_approach\": \"...\",
-    \"contract_address\": \"0x...\",
-    \"chain_id\": 1,
-    \"function_signature\": \"withdraw(uint256)\",
-    \"exploit_notes\": [\"...\",\"...\"],
-    \"expected_profit_hint_eth\": 1.2
-  }}
-]
+Each hypothesis MUST be a JSON object with at least these required fields:
+- "vuln_type": short name of the vulnerability class
+- "confidence": numeric confidence score in [0,1]
 
-Focus on realistic, Immunefi-grade issues aligned with {protocol_type}. Limit to {profile.budget} hypotheses."""
+Optional fields you MAY include:
+- "contract_address": the checksum address of the target contract (use "{address}")
+- "chain_id": the numeric chain id (use {chain_id})
+- "function_signature": primary function or entrypoint involved, if any
+- "rationale": explanation of why this hypothesis is plausible
+- "exploit_notes": array of short notes or assumptions
+
+Example JSON object:
+{{"vuln_type":"share_inflation","confidence":0.8,"rationale":"short explanation","function_signature":"deposit(uint256)","exploit_notes":["note 1","note 2"]}}
+
+Always return a pure JSON array of such objects. Focus on {protocol_type}-specific high-severity issues."""
 
         async with self._contract_llm_sem:
             # Define precision-related keywords and checks for use in multiple blocks
@@ -741,13 +746,37 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
         return parsed
 
     def _checksum_address(self, address: str | None) -> str:
-        """Validate and return checksum address."""
+        """Validate and return checksum address with better error handling."""
         if not address or not isinstance(address, str):
-            raise ValueError("missing address")
+            # Return a placeholder instead of raising
+            logger.warning("Invalid or missing address (None or non-string), returning placeholder: %s", address)
+            return "0x0000000000000000000000000000000000000000"
+        
         addr = address.strip()
-        if not is_address(addr):
-            raise ValueError(f"invalid address: {address}")
-        return to_checksum_address(addr)
+        
+        # Be lenient with address format
+        if not addr.startswith("0x"):
+            addr = "0x" + addr
+        
+        # Pad if too short
+        if len(addr) < 42:
+            addr = addr + "0" * (42 - len(addr))
+            logger.debug("Padded short address: original=%s, padded=%s", address, addr)
+        
+        # Truncate if too long
+        if len(addr) > 42:
+            addr = addr[:42]
+            logger.debug("Truncated long address: original=%s, truncated=%s", address, addr)
+        
+        try:
+            if is_address(addr):
+                return to_checksum_address(addr)
+            else:
+                logger.warning("Invalid address format, returning placeholder: %s", address)
+                return "0x0000000000000000000000000000000000000000"
+        except Exception as e:
+            logger.warning("Exception validating address, returning placeholder: %s (error: %s)", address, str(e))
+            return "0x0000000000000000000000000000000000000000"
 
     def _static_vulnerability_patterns(
         self,

@@ -9,6 +9,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+
+def _default_research_config() -> dict[str, Any]:
+    """Default research configuration factory."""
+    return {
+        "max_concurrent": 3,
+        "cache_results": True,
+        "priority_threshold": 5,
+        "max_queries_per_phase": {
+            "hypothesis": 10,
+            "exploit": 5,
+            "triage": 3,
+        },
+    }
+
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import TypedDict
@@ -86,6 +100,10 @@ class ScopeConfig(BaseModel):
     max_parallel_exploits: int = Field(
         default=2,
         description="Maximum concurrent Foundry exploit attempts to run",
+    )
+    research_config: dict[str, Any] = Field(
+        default_factory=_default_research_config,
+        description="Research orchestrator configuration",
     )
 
 

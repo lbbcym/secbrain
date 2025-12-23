@@ -63,6 +63,16 @@ class BaseAgent(ABC):
         self.logger = logger
         self._reasoning_chain: list[dict[str, Any]] = []
 
+        # Initialize research orchestrator
+        self.research_orch: ResearchOrchestrator | None = None
+        if self.research_client:
+            from secbrain.agents.research_orchestrator import ResearchOrchestrator
+
+            self.research_orch = ResearchOrchestrator(
+                run_context=self.run_context,
+                research_client=self.research_client,
+            )
+
     def _check_kill_switch(self) -> bool:
         """Check if kill-switch is activated."""
         return self.run_context.is_killed()
