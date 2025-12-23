@@ -91,6 +91,36 @@ class FoundryRunner:
         self._compile_cache_dir = Path(run_context.workspace_path) / ".secbrain_cache" / "compile"
         self._compile_cache_dir.mkdir(parents=True, exist_ok=True)
 
+    async def _compile_with_cache(self, profile: str | None) -> None:
+        """Precompile contracts per profile to reduce test latency."""
+        if not self.project_root:
+            return
+
+        cache_key = profile or "default"
+        cache_marker = self._compile_cache_dir / f"{cache_key}.compiled"
+        if cache_marker.exists():
+            return
+
+        try:
+            args = ["forge", "build"]
+            env = os.environ.copy() if profile else None
+            if profile and env is not None:
+                env["FOUNDRY_PROFILE"] = profile
+
+            proc = await asyncio.create_subprocess_exec(
+                *args,
+                cwd=self.project_root,
+                env=env,
+                stdout=asyncio.subprocess.DEVNULL,
+                stderr=asyncio.subprocess.DEVNULL,
+            )
+            await asyncio.wait_for(proc.communicate(), timeout=120)
+            if proc.returncode == 0:
+                cache_marker.touch()
+        except Exception:
+            # If compilation fails here, forge test will attempt compilation again.
+            pass
+
     async def run_exploit_attempt(
         self,
         hypothesis: dict[str, Any],
@@ -153,7 +183,7 @@ class FoundryRunner:
                 gas_used=None,
                 execution_trace=None,
                 revert_reason="missing_foundry_root",
-                logs=["No scope.foundry_root configured; cannot run forge tests"],
+                logs=["Nd; cannot run forge tests"],
                 attempt_index=attempt_index,
             )
         if not self.project_root.exists():

@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import shutil
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -262,32 +264,32 @@ class ReconToolRunner:
         timeout: int = 300,
     ) -> ToolResult:
         """Run httpx for HTTP probing."""
-        # Create a temp file with targets
-        import tempfile
+        targets_file: str | None = None
+        try:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+                f.write("\n".join(targets))
+                targets_file = f.name
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
-            f.write("\n".join(targets))
-            targets_file = f.name
+            args = ["-l", targets_file, "-silent", "-json"]
 
-        args = ["-l", targets_file, "-silent", "-json"]
+            result = await self._run_command("httpx", args, timeout)
 
-        result = await self._run_command("httpx", args, timeout)
+            # Parse JSON output
+            if result.success and result.output:
+                parsed = []
+                for line in result.output.strip().split("\n"):
+                    if line.strip():
+                        try:
+                            parsed.append(json.loads(line))
+                        except json.JSONDecodeError:
+                            pass
+                result.parsed_data = parsed
 
-        # Parse JSON output
-        if result.success and result.output:
-            parsed = []
-            for line in result.output.strip().split("\n"):
-                if line.strip():
-                    try:
-                        parsed.append(json.loads(line))
-                    except json.JSONDecodeError:
-                        pass
-            result.parsed_data = parsed
-
-        # Cleanup
-        Path(targets_file).unlink(missing_ok=True)
-
-        return result
+            return result
+        finally:
+            if targets_file:
+                with contextlib.suppress(OSError):
+                    Path(targets_file).unlink()
 
     async def run_ffuf(
         self,
