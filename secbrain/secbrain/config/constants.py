@@ -1,4 +1,4 @@
-"""Centralized configuration constants for SecBrain (packaged)."""
+"""Centralized configuration constants for SecBrain."""
 
 from dataclasses import dataclass
 from typing import ClassVar

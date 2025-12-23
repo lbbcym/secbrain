@@ -344,7 +344,7 @@ class RunContext:
 
     def _load_tools_config(self) -> ToolsConfig:
         """Load tools configuration from config directory."""
-        config_path = Path(__file__).parent.parent.parent / "config" / "tools.yaml"
+        config_path = Path(__file__).parent.parent / "config" / "tools.yaml"
         if config_path.exists():
             with open(config_path) as f:
                 data = yaml.safe_load(f) or {}
