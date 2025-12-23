@@ -8,6 +8,7 @@ import json
 import shutil
 import tempfile
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -124,8 +125,6 @@ class ReconToolRunner:
             )
 
         if self.run_context.requires_approval(tool_name) and not self.run_context.auto_approve:
-            from datetime import datetime
-
             from secbrain.core.approval import ApprovalRequest, new_request_id
 
             approval = await self.run_context.approval_manager.request_approval(
@@ -134,7 +133,7 @@ class ReconToolRunner:
                     tool_name=tool_name,
                     operation=f"{tool_name} {' '.join(args)}",
                     risk_level="high",
-                    timestamp=datetime.now(),
+                    timestamp=datetime.now(timezone.utc),
                 )
             )
             if not approval.approved:

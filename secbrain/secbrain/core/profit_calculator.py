@@ -12,6 +12,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from secbrain.config.constants import PricingConfig
+
 # Maximum reasonable decimals for token (uint256 max is ~77 digits)
 MAX_TOKEN_DECIMALS = 77
 
@@ -19,13 +21,13 @@ MAX_TOKEN_DECIMALS = 77
 MAX_RAW_AMOUNT = 10**80
 
 # Default ETH price when no dynamic pricing is available
-ETH_PRICE_DEFAULT = 3000.0
+ETH_PRICE_DEFAULT = PricingConfig.ETH_PRICE_DEFAULT
 
 # Maximum gas cost as fraction of profit before warning (50%)
-MAX_GAS_COST_RATIO = 0.5
+MAX_GAS_COST_RATIO = PricingConfig.GAS_RATIO_THRESHOLD
 
 # Default gas price in wei (50 gwei)
-DEFAULT_GAS_PRICE_WEI = 50e9
+DEFAULT_GAS_PRICE_WEI = PricingConfig.DEFAULT_GAS_PRICE_GWEI * 1e9
 
 
 @dataclass(frozen=True)
