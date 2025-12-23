@@ -1,185 +1,37 @@
-# SecBrain Tools Configuration
-
 acls:
   http_client:
     allowed: true
-    allowed_phases: []  # Empty means all phases
     require_approval: false
-    max_calls_per_phase: 50
-    max_calls_per_run: 200
-
-  oob_client:
-    allowed: true
-    allowed_phases: [exploit]
-    require_approval: true
-    max_calls_per_phase: 5
-    max_calls_per_run: 10
-
-  playwright:
-    allowed: true
-    allowed_phases: [recon, exploit, triage]
-    require_approval: true
-    max_calls_per_phase: 3
-    max_calls_per_run: 6
-
-  subfinder:
-    allowed: true
-    allowed_phases: [recon]
-    require_approval: false
-    max_calls_per_phase: 5
-    max_calls_per_run: 10
-
-  amass:
-    allowed: true
-    allowed_phases: [recon]
-    require_approval: false
-    max_calls_per_phase: 3
-    max_calls_per_run: 5
-
-  httpx:
-    allowed: true
-    allowed_phases: [recon]
-    require_approval: false
-    max_calls_per_phase: 5
-    max_calls_per_run: 10
-
-  ffuf:
-    allowed: true
-    allowed_phases: [recon, exploit]
-    require_approval: true
-    max_calls_per_phase: 2
-    max_calls_per_run: 4
-
-  nmap:
-    allowed: true
-    allowed_phases: [recon]
-    require_approval: false
-    max_calls_per_phase: 2
-    max_calls_per_run: 4
-
-  nuclei:
-    allowed: true
-    allowed_phases: [exploit, triage]
-    require_approval: true
-    max_calls_per_phase: 2
-    max_calls_per_run: 4
+    max_calls_per_run: 5000
+    allowed_phases: ["recon", "hypothesis", "exploit", "triage"]
 
   forge_test_exploit:
     allowed: true
-    allowed_phases: [exploit]
     require_approval: true
-    max_calls_per_phase: 10
-    max_calls_per_run: 30
+    max_calls_per_run: 100
+    allowed_phases: ["exploit"]
 
-  hardhat_test_exploit:
+  subfinder:
     allowed: true
-    allowed_phases: [exploit]
-    require_approval: true
-    max_calls_per_phase: 10
-    max_calls_per_run: 30
-
-  semgrep:
-    allowed: true
-    allowed_phases: [static]
     require_approval: false
-    max_calls_per_phase: 4
-    max_calls_per_run: 8
+    max_calls_per_run: 50
+    allowed_phases: ["recon"]
 
 rate_limits:
   http_client:
-    requests_per_minute: 20
-    burst: 5
+    requests_per_minute: 120
+    burst: 20
     backoff_factor: 2.0
     max_backoff: 60.0
 
-  subfinder:
-    requests_per_minute: 1
-    burst: 1
-    backoff_factor: 2.0
-    max_backoff: 120.0
-
-  amass:
-    requests_per_minute: 0.5
-    burst: 1
-    backoff_factor: 2.0
+  forge_test_exploit:
+    requests_per_minute: 10
+    burst: 2
+    backoff_factor: 3.0
     max_backoff: 300.0
 
-  oob_client:
-    requests_per_minute: 2
-    burst: 1
-    backoff_factor: 2.0
-    max_backoff: 60.0
-
-  playwright:
-    requests_per_minute: 2
-    burst: 1
-    backoff_factor: 2.0
-    max_backoff: 120.0
-
-  nuclei:
-    requests_per_minute: 1
-    burst: 1
-    backoff_factor: 2.0
-    max_backoff: 120.0
-
-  forge_test_exploit:
-    requests_per_minute: 4
-    burst: 2
-    backoff_factor: 2.0
-    max_backoff: 60.0
-
-  hardhat_test_exploit:
-    requests_per_minute: 4
-    burst: 2
-    backoff_factor: 2.0
-    max_backoff: 60.0
-
 global_rate_limit:
-  requests_per_minute: 30
-  burst: 8
+  requests_per_minute: 60
+  burst: 10
   backoff_factor: 2.0
   max_backoff: 60.0
-
-# Tool-specific settings
-tools:
-  http_client:
-    timeout: 30
-    max_redirects: 5
-    verify_ssl: true
-
-  oob_client:
-    endpoint: "https://interact.sh"  # interactsh-style endpoint
-
-  playwright:
-    headless: true
-    navigation_timeout: 15000
-    max_pages: 3
-
-  subfinder:
-    timeout: 300
-
-  amass:
-    timeout: 600
-    passive_only: true
-
-  httpx:
-    timeout: 300
-    concurrency: 50
-
-  nuclei:
-    templates_path: ~/nuclei-templates
-    allowed_severities: [critical, high, medium]
-    blocked_tags: [dos, intrusive, fuzz]
-    rate_limit: 100
-
-  semgrep:
-    config: auto
-    timeout: 600
-
-  forge_test_exploit:
-    command: "forge test --match-test testExploit -vvvvv --json"
-    timeout: 900
-
-  hardhat_test_exploit:
-    command: "npx hardhat test --grep exploit --reporter json"
-    timeout: 900
