@@ -263,6 +263,9 @@ class ReconToolRunner:
         timeout: int = 300,
     ) -> ToolResult:
         """Run httpx for HTTP probing."""
+        # Create a temp file with targets
+        import tempfile
+
         targets_file: str | None = None
         try:
             with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
@@ -287,8 +290,7 @@ class ReconToolRunner:
             return result
         finally:
             if targets_file:
-                with contextlib.suppress(OSError):
-                    Path(targets_file).unlink()
+                Path(targets_file).unlink(missing_ok=True)
 
     async def run_ffuf(
         self,
