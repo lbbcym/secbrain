@@ -1,6 +1,13 @@
 # SecBrain Model Configuration
 #
 # This file configures AI model providers for different SecBrain components.
+# 
+# TROUBLESHOOTING PROVIDER SPEND LIMITS:
+# If you encounter spend limit errors (e.g., "spend_limit_reached"), you can:
+#   1. Switch to alternative providers by uncommenting one of the configurations below
+#   2. Increase your API provider's spend limit
+#   3. Use cached responses (SecBrain automatically caches to reduce API calls)
+#   4. Switch to local models (see 'local' configuration)
 #
 # REQUIRED API KEYS (set as environment variables):
 #   - TOGETHER_API_KEY: For Together AI (default provider)
