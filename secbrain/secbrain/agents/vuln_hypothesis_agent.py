@@ -690,11 +690,45 @@ Additional note: The contract contains functions that may be vulnerable to preci
 
         parsed: list[dict[str, Any]] = []
 
+        allowed_vuln_types = set(
+            self.HYPOTHESIS_SCHEMA["items"]["properties"]["vuln_type"]["enum"]
+        )
+
+        def _normalize_item(item: dict[str, Any]) -> dict[str, Any]:
+            """Coerce common LLM variations into the expected schema."""
+            out = dict(item)
+            # Map alternate keys
+            if "vuln_type" not in out and "vulnerability" in out:
+                out["vuln_type"] = str(out.get("vulnerability") or "").strip().lower()
+            if "function_signature" not in out and "function" in out:
+                out["function_signature"] = out.get("function")
+            # Default confidence if missing
+            if "confidence" not in out or out.get("confidence") is None:
+                out["confidence"] = 0.5
+            # Normalize vuln_type to allowed set
+            vt = str(out.get("vuln_type") or "").strip().lower()
+            if not vt:
+                vt = "generic_contract"
+            # Common alias mapping
+            aliases = {
+                "owner_privilege_escalation": "access_control",
+                "privilege_escalation": "access_control",
+                "admin_takeover": "access_control",
+                "governance_hijack": "flash_loan_governance_attack",
+                "price_oracle": "oracle_manipulation",
+            }
+            vt = aliases.get(vt, vt)
+            if vt not in allowed_vuln_types:
+                vt = "generic_contract"
+            out["vuln_type"] = vt
+            return out
+
         for attempt in range(max_retries):
             try:
                 raw = _extract_json_array(response)
-                validate(instance=raw, schema=self.HYPOTHESIS_SCHEMA)
-                parsed = raw
+                normalized = [_normalize_item(i) for i in raw]
+                validate(instance=normalized, schema=self.HYPOTHESIS_SCHEMA)
+                parsed = normalized
                 self._log(
                     "hypothesis_validation_success",
                     contract=contract_name,
