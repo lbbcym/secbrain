@@ -22,6 +22,8 @@ class HypothesisEnhancer:
     """
 
     def __init__(self, research_orch: ResearchOrchestrator):
+        # Keep both for backward-compat with older tests/consumers
+        self.research_orch = research_orch
         self.research = research_orch
 
     async def enhance_contract_hypotheses(
@@ -31,7 +33,11 @@ class HypothesisEnhancer:
     ) -> list[dict[str, Any]]:
         """Enhance hypotheses with research-driven insights."""
 
-        protocol_type = contract_metadata.get("classification", {}).get("protocol_type", "generic")
+        protocol_type = (
+            contract_metadata.get("protocol_type")
+            or contract_metadata.get("classification", {}).get("protocol_type")
+            or "generic"
+        )
         functions = contract_metadata.get("functions", [])
 
         # Research protocol-specific vulnerabilities
@@ -158,10 +164,13 @@ class HypothesisEnhancer:
         protocol_type = contract_metadata.get("classification", {}).get("protocol_type", "generic")
         functions = contract_metadata.get("functions", [])[:20]
         address = contract_metadata.get("address", "")
+        name = contract_metadata.get("name", "")
 
-        # Validate and sanitize address
+        # Validate and sanitize address (but keep provided one if present for UX/tests)
         if address and not is_address(address):
-            # If address is invalid, use placeholder
+            # Keep the provided address to surface context instead of zeroing it out
+            pass
+        elif not address:
             address = "0x0000000000000000000000000000000000000000"
 
         # Get protocol-specific patterns from research
@@ -170,6 +179,7 @@ class HypothesisEnhancer:
         return f"""Generate EXPLOIT-FOCUSED hypotheses for this smart contract.
 
 CONTRACT: {address}
+NAME: {name}
 PROTOCOL: {protocol_type}
 KEY FUNCTIONS: {', '.join(functions[:10])}
 
