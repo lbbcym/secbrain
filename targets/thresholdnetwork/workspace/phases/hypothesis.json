@@ -394,10 +394,14 @@
         "rank": 1
       },
       {
-        "id": "hyp-942de729",
+        "id": "hyp-dfb85e31",
         "asset_id": null,
-        "target": "StarkNetBitcoinDepositor@0xD3585922B7F6B30953Fc81726F48046826B8B2CA",
-        "vuln_type": "reentrancy",
+        "target": "DonationVault@0xa544b70dC6af906862f68eb8e68c27bb7150e672",
+        "vuln_type": "state_inconsistency",
+        "confidence": 0.85,
+        "rationale": "Bank can push arbitrarily large deposit sweeps into receiveBalanceIncrease without per-entry validation; DonationVault only checks array length equality before burning its own balance, so a compromised bridge/governance can grief the vault or force underflows while emitting misleading DonationReceived events.",
+        "test_approach": "Simulate Bridge-controlled Bank calling increaseBalanceAndCall with oversized arrays to observe vault balance burn and gas exhaustion paths.",
+        "contract_address": "0xa544b70dC6af906862f68eb8e68c27bb7150e672",
         "confidence": 0.9,
         "rationale": "The `finalizeDeposit` function in the `defi_vault` contract does not properly handle reentrancy attacks. An attacker could send multiple `finalizeDeposit` requests with a high gas price, causing the contract to spend more gas than intended and potentially leading to a denial-of-service (DoS) attack.",
         "test_approach": "",

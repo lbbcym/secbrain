@@ -36,7 +36,7 @@ def validate_config():
             if "focus_areas" in program and len(program["focus_areas"]) < 5:
                 warnings.append("program.json has fewer than 5 focus areas")
 
-            print(f"✓ program.json is valid ({len(program.get('in_scope', []))} in-scope items)")
+            print(f"[OK] program.json is valid ({len(program.get('in_scope', []))} in-scope items)")
         except json.JSONDecodeError as e:
             errors.append(f"Invalid JSON in program.json: {e}")
 
@@ -54,7 +54,7 @@ def validate_config():
                 errors.append("scope.yaml missing 'contracts' section")
             else:
                 contracts = scope["contracts"]
-                print(f"✓ scope.yaml is valid ({len(contracts)} contracts configured)")
+                print(f"[OK] scope.yaml is valid ({len(contracts)} contracts configured)")
 
                 # Check each contract has required fields
                 for i, contract in enumerate(contracts):
@@ -69,19 +69,19 @@ def validate_config():
                 if not foundry_root.exists():
                     warnings.append(f"Foundry root directory not found: {foundry_root}")
                 else:
-                    print(f"✓ Foundry root exists: {foundry_root}")
+                    print(f"[OK] Foundry root exists: {foundry_root}")
 
             # Check RPC URLs
             if "rpc_urls" not in scope or len(scope.get("rpc_urls", [])) == 0:
                 errors.append("scope.yaml missing RPC URLs")
             else:
-                print(f"✓ RPC URLs configured ({len(scope['rpc_urls'])} endpoints)")
+                print(f"[OK] RPC URLs configured ({len(scope['rpc_urls'])} endpoints)")
 
             # Check profit tokens
             if "profit_tokens" not in scope or len(scope.get("profit_tokens", [])) == 0:
                 warnings.append("scope.yaml missing profit_tokens configuration")
             else:
-                print(f"✓ Profit tokens configured ({len(scope['profit_tokens'])} tokens)")
+                print(f"[OK] Profit tokens configured ({len(scope['profit_tokens'])} tokens)")
 
         except yaml.YAMLError as e:
             errors.append(f"Invalid YAML in scope.yaml: {e}")
@@ -96,14 +96,14 @@ def validate_config():
         if not foundry_toml.exists():
             errors.append(f"Missing foundry.toml in instascope directory")
         else:
-            print(f"✓ foundry.toml exists")
+            print(f"[OK] foundry.toml exists")
 
         # Check for build.sh
         build_sh = instascope_path / "build.sh"
         if not build_sh.exists():
             warnings.append(f"Missing build.sh script")
         else:
-            print(f"✓ build.sh exists")
+            print(f"[OK] build.sh exists")
 
         # Check src directory
         src_path = instascope_path / "src"
@@ -112,14 +112,14 @@ def validate_config():
         else:
             # Count contract directories
             contract_dirs = [d for d in src_path.iterdir() if d.is_dir()]
-            print(f"✓ Found {len(contract_dirs)} contract source directories")
+            print(f"[OK] Found {len(contract_dirs)} contract source directories")
 
     # Check for README
     readme_path = base / "README.md"
     if not readme_path.exists():
         warnings.append(f"Missing README.md")
     else:
-        print(f"✓ README.md exists")
+        print(f"[OK] README.md exists")
 
     # Print results
     print("\n" + "="*60)
@@ -129,14 +129,14 @@ def validate_config():
             print(f"  - {error}")
 
     if warnings:
-        print(f"\n⚠️  WARNINGS ({len(warnings)}):")
+        print(f"\n[WARN] WARNINGS ({len(warnings)}):")
         for warning in warnings:
             print(f"  - {warning}")
 
     if not errors and not warnings:
-        print("\n✅ All checks passed! Configuration is ready.")
+        print("\n[OK] All checks passed! Configuration is ready.")
     elif not errors:
-        print("\n✅ No errors found. Configuration is usable.")
+        print("\n[OK] No errors found. Configuration is usable.")
     else:
         print("\n❌ Configuration has errors. Please fix before running.")
         return 1
