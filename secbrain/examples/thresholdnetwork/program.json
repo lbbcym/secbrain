@@ -1,0 +1,17 @@
+{
+  "name": "Threshold Network",
+  "platform": "immunefi",
+  "program_url": "https://immunefi.com/bug-bounty/thresholdnetwork/",
+  "focus_areas": [
+    "Smart contracts",
+    "Cross-chain bridges",
+    "Governance"
+  ],
+  "rules": [
+    "PoC required for all severities",
+    "Use forked mainnet testing only; no live txs",
+    "Respect Immunefi safe-harbor and Threshold Network rules",
+    "Coordinate disclosure via Immunefi"
+  ],
+  "notes": "Contracts and profiles sourced from Instascope export under targets/thresholdnetwork/instascope."
+}

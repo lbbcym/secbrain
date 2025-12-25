@@ -1,0 +1,83 @@
+contracts:
+  - name: Bank
+    address: "0x65Fbae61ad2C8836fFbFB502A0dA41b0789D9Fc6"
+    chain_id: 1
+    foundry_profile: "contract_Bank_65fb"
+    verified: true
+  - name: WalletRegistry
+    address: "0xfbae130e06bbc8ca198861beecae6e2b830398fb"
+    chain_id: 1
+    foundry_profile: "contract_WalletRegistry_fbae"
+    verified: true
+  - name: LightRelay
+    address: "0x836cdFE63fe2d63f8Bdb69b96f6097F36635896E"
+    chain_id: 1
+    foundry_profile: "contract_LightRelay_836c"
+    verified: true
+  - name: TokenholderGovernor
+    address: "0xd101f2b25bcbf992bdf55db67c104fe7646f5447"
+    chain_id: 1
+    foundry_profile: "contract_TokenholderGovernor_d101"
+    verified: true
+  - name: Bridge
+    address: "0x8d014903bf7867260584d714e11809fea5293234"
+    chain_id: 1
+    foundry_profile: "contract_Bridge_8d01"
+    verified: true
+  - name: TBTC
+    address: "0x18084fbA666a33d37592fA2633fD49a74DD93a88"
+    chain_id: 1
+    foundry_profile: "contract_TBTC_1808"
+    verified: true
+  - name: TToken
+    address: "0xCdF7028ceAB81fA0C6971208e83fa7872994beE5"
+    chain_id: 1
+    foundry_profile: "contract_T_cdf7"
+    verified: true
+  - name: TokenStaking
+    address: "0xf5a2ccfea213cb3ff0799e0c33ea2fa3da7cbb65"
+    chain_id: 1
+    foundry_profile: "contract_TokenStaking_f5a2"
+    verified: true
+  - name: StarknetTokenBridge
+    address: "0xf39d314c5ad7dc88958116dfa7d5ac095d563aff"
+    chain_id: 1
+    foundry_profile: "contract_StarknetTokenBridge_f39d"
+    verified: true
+  - name: WalletRegistryGovernance
+    address: "0x6aed6cC30D1b2770771052555d257Da86eD47fe8"
+    chain_id: 1
+    foundry_profile: "contract_WalletRegistryGovernance_6aed"
+    verified: true
+
+domains: []
+ips: []
+urls: []
+excluded_paths: []
+allowed_methods: [GET, POST, PUT, HEAD, OPTIONS]
+notes: "Threshold Network (Immunefi) contract-focused run using the Instascope export. Target Ethereum mainnet via fork – do not send live txs."
+foundry_root: C:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\targets\\thresholdnetwork\\instascope
+max_requests_per_second: 10
+respect_robots_txt: true
+max_parallel_exploits: 2
+
+rpc_urls:
+  - "https://eth-mainnet.g.alchemy.com/v2/0qXCrEmq6j7uj1z8GqbJR"
+  - "https://eth.drpc.org"
+
+profit_tokens:
+  - symbol: "T"
+    address: "0xCdF7028ceAB81fA0C6971208e83fa7872994beE5"
+    decimals: 18
+  - symbol: "TBTC"
+    address: "0x18084fbA666a33d37592fA2633fD49a74DD93a88"
+    decimals: 18
+  - symbol: "WBTC"
+    address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
+    decimals: 8
+  - symbol: "WETH"
+    address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+    decimals: 18
+  - symbol: "USDC"
+    address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    decimals: 6
