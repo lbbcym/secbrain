@@ -25,26 +25,6 @@ class ForgeOutputParser:
         match = cls._PROFIT_EQUIV_RE.search(text) or cls._PROFIT_ETH_RE.search(text)
         if not match:
             return None
-
-    @staticmethod
-    def _detect_compile_error(stdout: str) -> str | None:
-        """Detect forge compile errors from stdout."""
-        if not stdout:
-            return None
-        lowered = stdout.lower()
-        markers = (
-            "compiler run failed",
-            "compilation failed",
-            "error (2314):",
-            "error (6933):",
-        )
-        for marker in markers:
-            if marker in lowered:
-                for line in stdout.splitlines():
-                    if marker.strip() in line.lower():
-                        return line.strip() or "compiler_error"
-                return "compiler_error"
-        return None
         return cls._normalize_large_value(match.group(1))
 
     @classmethod
@@ -91,6 +71,11 @@ class ForgeOutputParser:
                 profit_breakdown.update(tokens_from_json)
             if state_changes_json:
                 state_changes.update(state_changes_json)
+
+        if compile_error:
+            status = "failed"
+            if not revert_reason:
+                revert_reason = compile_error
 
         if status == "success" and profit_eth is None:
             profit_eth = 0.0
