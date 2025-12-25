@@ -10,6 +10,7 @@ import signal
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import typer
 import yaml
@@ -36,6 +37,40 @@ def _signal_handler(signum: int, frame: object) -> None:
     global _kill_requested
     _kill_requested = True
     console.print("\n[bold red]Kill-switch activated![/] Stopping run...")
+
+
+def _validate_run_options(
+    rpc_url: str | None,
+    block_number: int | None,
+    chain_id: int | None,
+    exploit_iterations: int | None,
+    profit_threshold: float | None,
+) -> None:
+    """Validate CLI options that materially impact workflow execution."""
+    errors: list[str] = []
+
+    if block_number is not None and block_number < 0:
+        errors.append("--block-number must be >= 0")
+
+    if chain_id is not None and chain_id <= 0:
+        errors.append("--chain-id must be a positive integer")
+
+    if exploit_iterations is not None and exploit_iterations <= 0:
+        errors.append("--exploit-iterations must be >= 1")
+
+    if profit_threshold is not None and profit_threshold <= 0:
+        errors.append("--profit-threshold must be greater than 0")
+
+    if (block_number is not None or chain_id is not None) and not rpc_url:
+        errors.append("--rpc-url is required when specifying block number or chain id")
+
+    if rpc_url:
+        parsed = urlparse(rpc_url)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+            errors.append("--rpc-url must be an absolute HTTP(S) URL")
+
+    if errors:
+        raise typer.BadParameter("\n".join(errors))
 
 
 @app.command()
@@ -138,6 +173,14 @@ def run(
         phase_list = [p.strip() for p in phases.split(",")]
 
     workspace.mkdir(parents=True, exist_ok=True)
+
+    _validate_run_options(
+        rpc_url=rpc_url,
+        block_number=block_number,
+        chain_id=chain_id,
+        exploit_iterations=exploit_iterations,
+        profit_threshold=profit_threshold,
+    )
 
     console.print("[bold blue]SecBrain[/] Starting bounty run...")
     console.print(f"  Scope: {scope}")
@@ -264,13 +307,29 @@ async def _run_workflow(
         # Tool checker not available, skip check
         if logger:
             logger.warning("tool_checker_unavailable", reason="import_error", error=str(e))
+        console.print(
+            "[yellow]Warning:[/] Tool availability check could not run; "
+            "ensure Foundry/Nuclei/etc. are installed."
+        )
 
     # Load model clients (worker/advisor)
     worker_model, advisor_model = _initialize_models(dry_run=dry_run)
+
+    missing_clients: list[str] = []
     if worker_model:
         run_context.worker_model = worker_model
+    else:
+        missing_clients.append("worker")
     if advisor_model:
         run_context.advisor_model = advisor_model
+    else:
+        missing_clients.append("advisor")
+
+    if missing_clients and not dry_run:
+        console.print(
+            f"[yellow]Warning:[/] Missing model client(s): {', '.join(missing_clients)}. "
+            "LLM-powered agents may be degraded."
+        )
 
     # Run workflow
     try:
@@ -286,8 +345,10 @@ async def _run_workflow(
             profit_threshold=profit_threshold,
         )
     finally:
-        await _shutdown_model_client(worker_model)
-        await _shutdown_model_client(advisor_model)
+        if worker_model:
+            await _shutdown_model_client(worker_model)
+        if advisor_model:
+            await _shutdown_model_client(advisor_model)
 
     return {
         "run_id": result.run_id,

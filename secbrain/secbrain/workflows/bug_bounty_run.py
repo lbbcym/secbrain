@@ -83,6 +83,18 @@ PHASE_GRAPH: dict[Phase, list[Phase]] = {
     Phase.META: [],  # Terminal phase
 }
 
+# Immediate prerequisites required before entering a phase
+PHASE_PREREQS: dict[Phase, list[Phase]] = {
+    Phase.PLAN: [Phase.INGEST],
+    Phase.RECON: [Phase.PLAN],
+    Phase.HYPOTHESIS: [Phase.RECON],
+    Phase.EXPLOIT: [Phase.HYPOTHESIS],
+    Phase.STATIC: [Phase.EXPLOIT],
+    Phase.TRIAGE: [Phase.EXPLOIT],
+    Phase.REPORT: [Phase.TRIAGE],
+    Phase.META: [Phase.REPORT],
+}
+
 
 class BugBountyWorkflow:
     """
@@ -109,13 +121,13 @@ class BugBountyWorkflow:
         # Initialize optimization features
         self.enable_checkpoints = enable_checkpoints
         self.enable_quality_filter = enable_quality_filter
-        
+
         # Initialize checkpoint manager
         self.checkpoint_manager = CheckpointManager(run_context.workspace_path) if enable_checkpoints else None
-        
+
         # Initialize performance metrics collector
         self.metrics_collector = PerformanceMetricsCollector(run_context.run_id)
-        
+
         # Initialize hypothesis quality filter
         self.quality_filter = HypothesisQualityFilter(
             min_confidence=0.45,
@@ -182,6 +194,7 @@ class BugBountyWorkflow:
 
         # Check for existing checkpoint
         checkpoint_loaded = False
+        checkpoint = None
         if self.checkpoint_manager and self.checkpoint_manager.has_checkpoint(self.run_context.run_id):
             checkpoint = self.checkpoint_manager.load_checkpoint(self.run_context.run_id)
             if checkpoint:
@@ -199,10 +212,18 @@ class BugBountyWorkflow:
 
         # Determine phases to run
         phases_to_run = self._determine_phases(phases)
-        
+
         # Skip completed phases if resuming from checkpoint
         if checkpoint_loaded and checkpoint:
             phases_to_run = [p for p in phases_to_run if p not in checkpoint.completed_phases]
+
+        try:
+            completed_phase_names = {p.value for p in result.phases_completed}
+            self._validate_phase_sequence(phases_to_run, completed_phase_names)
+        except ValueError as err:
+            result.success = False
+            result.errors.append(str(err))
+            return result
 
         log_event(
             self.logger,
@@ -220,7 +241,7 @@ class BugBountyWorkflow:
             while current_phase:
                 # Start phase metrics tracking
                 self.metrics_collector.start_phase(current_phase)
-                
+
                 if self.run_context.is_killed():
                     log_event(self.logger, "workflow_killed", phase=current_phase)
                     result.errors.append(f"Kill-switch activated during {current_phase}")
@@ -238,6 +259,18 @@ class BugBountyWorkflow:
                     result.phases_failed.append(Phase(current_phase))
                     result.errors.extend(pre_check.errors)
                     self.metrics_collector.complete_phase(success=False)
+                    if self.checkpoint_manager:
+                        self.checkpoint_manager.save_checkpoint(
+                            run_id=self.run_context.run_id,
+                            current_phase=current_phase,
+                            completed_phases=[p.value for p in result.phases_completed],
+                            phase_data=self.phase_data,
+                            metadata={
+                                "reason": "pre_check_failed",
+                                "phase": current_phase,
+                                "errors": pre_check.errors,
+                            },
+                        )
                     break
 
                 # Execute phase
@@ -257,7 +290,7 @@ class BugBountyWorkflow:
                     result.phases_completed.append(Phase(current_phase))
                     self.phase_data[current_phase] = phase_result.data
                     self.metrics_collector.complete_phase(success=True, metadata=phase_result.data)
-                    
+
                     # Save checkpoint after successful phase
                     if self.checkpoint_manager:
                         self.checkpoint_manager.save_checkpoint(
@@ -318,7 +351,7 @@ class BugBountyWorkflow:
         hypotheses_with_concrete_target = len(
             [h for h in hypotheses if h.get("contract_address") and h.get("function_signature")]
         )
-        
+
         # Add hypothesis quality metrics if filtering was enabled
         quality_metrics = {}
         if self.quality_filter and hypotheses:
@@ -329,7 +362,7 @@ class BugBountyWorkflow:
                 "low_quality_hypotheses": len(low_quality),
                 "quality_filter_enabled": True,
             }
-        
+
         meta_metrics.update({
             "hypotheses_count": len(hypotheses),
             "hypotheses_with_concrete_target": hypotheses_with_concrete_target,
@@ -408,6 +441,35 @@ class BugBountyWorkflow:
 
         return result
 
+    def _validate_phase_sequence(self, pending_phases: list[str], completed: set[str]) -> None:
+        """
+        Ensure pending phases respect dependency ordering when resuming or running subsets.
+
+        Args:
+            pending_phases: Ordered list of phase names that will be executed.
+            completed: Set of phase names already completed.
+
+        Raises:
+            ValueError: If a pending phase is missing required prerequisites.
+        """
+        seen = set(completed)
+        for phase_name in pending_phases:
+            try:
+                phase = Phase(phase_name)
+            except ValueError as exc:
+                raise ValueError(f"Unknown phase '{phase_name}' in execution list") from exc
+
+            missing = [
+                prereq.value
+                for prereq in PHASE_PREREQS.get(phase, [])
+                if prereq.value not in seen
+            ]
+            if missing:
+                raise ValueError(
+                    f"Cannot execute phase '{phase_name}' before required phase(s): {', '.join(missing)}"
+                )
+            seen.add(phase_name)
+
     def _determine_phases(self, phases: list[str] | None) -> list[str]:
         """Determine which phases to run."""
         all_phases = [p.value for p in Phase]
@@ -484,7 +546,7 @@ class BugBountyWorkflow:
                 if hypotheses:
                     # Apply quality filtering
                     high_quality, low_quality = self.quality_filter.filter_hypotheses(hypotheses)
-                    
+
                     # Log filtering results
                     log_event(
                         self.logger,
@@ -494,7 +556,7 @@ class BugBountyWorkflow:
                         low_quality=len(low_quality),
                         filter_rate=len(low_quality) / len(hypotheses) if hypotheses else 0,
                     )
-                    
+
                     # Update agent result with filtered hypotheses
                     # Keep all hypotheses but mark quality for downstream use
                     agent_result.data["hypotheses_all"] = hypotheses
