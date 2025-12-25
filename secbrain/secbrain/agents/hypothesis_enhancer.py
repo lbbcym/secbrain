@@ -161,7 +161,7 @@ class HypothesisEnhancer:
                     **original_hypothesis,
                     "id": f"refined-{original_hypothesis['id']}",
                     "vuln_type": "access_control_bypass",
-                    "confidence": 0.7,
+                    "confidence": max(original_hypothesis.get("confidence", 0.5) * 0.7, 0.05),
                     "refinement": "Identify access control bypass (delegatecall, signature replay, frontrun).",
                     "exploit_notes": [
                         "Try delegate call path",

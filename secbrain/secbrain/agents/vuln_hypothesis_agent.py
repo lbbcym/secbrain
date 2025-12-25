@@ -794,20 +794,20 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
     def _checksum_address(self, address: str | None) -> str:
         """Validate and return checksummed Ethereum address."""
         if not address:
-            raise ValueError("Address cannot be None or empty")
+            raise ValueError("cannot be None or empty")
         if not isinstance(address, str):
             raise ValueError(f"Address must be string, got {type(address).__name__}")
 
         addr = address.strip()
         if not addr.startswith("0x"):
-            raise ValueError(f"Address must start with '0x': {address}")
+            raise ValueError("start with '0x'")
         if len(addr) != 42:
-            raise ValueError(f"Address must be 42 characters, got {len(addr)}: {address}")
+            raise ValueError("42 characters")
 
         try:
             int(addr, 16)
         except ValueError as exc:
-            raise ValueError(f"Address contains invalid hex characters: {address}") from exc
+            raise ValueError("invalid hex") from exc
 
         if not is_address(addr):
             raise ValueError(f"Invalid Ethereum address format: {address}")
@@ -830,7 +830,7 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
                 addr = addr[:42]
 
             if is_address(addr):
-                return to_checksum_address(addr)
+                return to_checksum_address(addr).upper()
         except Exception as exc:
             logger.debug("Failed to normalize address '%s': %s", address, exc)
 
