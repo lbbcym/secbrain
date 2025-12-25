@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import hashlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
@@ -139,10 +140,8 @@ class BaseAgent(ABC):
         content = response.content
 
         if cache_key:
-            try:
+            with contextlib.suppress(Exception):
                 self.run_context.cache_llm(cache_key, content)
-            except Exception:
-                pass
 
         return content
 
@@ -190,10 +189,8 @@ class BaseAgent(ABC):
             context=context,
             run_context=self.run_context,
         )
-        try:
+        with contextlib.suppress(Exception):
             self.run_context.cache_research(cache_key, result)
-        except Exception:
-            pass
         result.setdefault("cached", False)
         return result
 
@@ -312,7 +309,7 @@ class BaseAgent(ABC):
         return BaseAgent.HealthCheck(
             component=self.name,
             status=overall,
-            timestamp=datetime.now(),
+            timestamp=datetime.now(UTC),
             message="; ".join(f"{comp}: {msg}" for comp, _, msg in checks if msg),
             metrics={
                 "checks": len(checks),

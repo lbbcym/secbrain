@@ -9,7 +9,7 @@ import json
 import subprocess
 import sys
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -331,11 +331,11 @@ def main() -> None:
     """Main analysis function."""
     repo_path = Path(__file__).parent.parent
     
-    print(f"🚀 Starting AI Engineer codebase analysis...\n", file=sys.stderr)
+    print("🚀 Starting AI Engineer codebase analysis...\n", file=sys.stderr)
     
     # Perform all analyses
     analysis = {
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "repository": "secbrain",
         "commits": analyze_recent_commits(repo_path),
         "code_patterns": analyze_code_patterns(repo_path),
