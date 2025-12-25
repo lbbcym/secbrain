@@ -1,5 +1,5 @@
 {
-  "run_id": "0b6aca0d",
+  "run_id": "8e0cee57",
   "success": true,
   "phases_completed": [
     "ingest",
@@ -15,7 +15,7 @@
   "phases_failed": [],
   "findings_count": 0,
   "reports_generated": 0,
-  "duration_seconds": 376.188504,
+  "duration_seconds": 210.849887,
   "errors": [],
   "economic": {
     "decision": "SKIP",
@@ -28,17 +28,17 @@
     "threshold_usd": 300.0,
     "gas_price_gwei": 50.0
   },
-  "attempts_count": 12,
+  "attempts_count": 8,
   "meta_metrics": {
-    "hypotheses_count": 82,
-    "hypotheses_with_concrete_target": 82,
+    "hypotheses_count": 81,
+    "hypotheses_with_concrete_target": 80,
     "missing_targets": {
-      "missing_contract_or_function": 0,
-      "total_hypotheses": 82
+      "missing_contract_or_function": 1,
+      "total_hypotheses": 81
     },
-    "attempts_count": 12,
+    "attempts_count": 8,
     "attempts_with_profit": 0,
     "economic_decision": "SKIP",
-    "total_duration_seconds": 376.188504
+    "total_duration_seconds": 210.849887
   }
 }

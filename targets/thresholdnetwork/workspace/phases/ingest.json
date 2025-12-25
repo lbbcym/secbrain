@@ -1,8 +1,8 @@
 {
-  "run_id": "0b6aca0d",
+  "run_id": "8e0cee57",
   "phase": "ingest",
   "success": true,
-  "duration_seconds": 0.007106,
+  "duration_seconds": 0.000665,
   "errors": [],
   "data": {
     "program_name": "Threshold Network",
@@ -50,5 +50,5 @@
       ]
     }
   },
-  "timestamp": "2025-12-25T01:36:55.284699"
+  "timestamp": "2025-12-25T02:37:08.263773"
 }

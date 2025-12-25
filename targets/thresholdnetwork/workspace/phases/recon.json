@@ -1,8 +1,8 @@
 {
-  "run_id": "0b6aca0d",
+  "run_id": "8e0cee57",
   "phase": "recon",
   "success": true,
-  "duration_seconds": 43.436045,
+  "duration_seconds": 66.329913,
   "errors": [],
   "data": {
     "assets": [
@@ -32594,5 +32594,5 @@
     "failed_count": 0,
     "foundry_root": "c:\\Users\\Michael\\CascadeProjects\\windsurf-project-2\\targets\\thresholdnetwork\\instascope"
   },
-  "timestamp": "2025-12-25T01:36:55.285960"
+  "timestamp": "2025-12-25T02:37:08.265471"
 }
