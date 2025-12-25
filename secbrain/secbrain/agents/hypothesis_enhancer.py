@@ -6,7 +6,9 @@ from typing import Any
 
 from eth_utils import is_address  # type: ignore[attr-defined]
 
+from secbrain.agents.immunefi_intelligence import ImmunefiIntelligence
 from secbrain.agents.research_orchestrator import ResearchOrchestrator, ResearchQuery
+from secbrain.agents.threshold_network_patterns import ThresholdNetworkPatterns
 
 # Confidence threshold for high-confidence hypotheses
 HIGH_CONFIDENCE_THRESHOLD = 0.7
@@ -19,6 +21,8 @@ class HypothesisEnhancer:
     - Historical exploit data
     - Protocol-specific knowledge
     - Failure feedback loops
+    - Immunefi intelligence
+    - Threshold Network specific patterns
     """
 
     def __init__(self, research_orch: ResearchOrchestrator):
@@ -39,6 +43,22 @@ class HypothesisEnhancer:
             or "generic"
         )
         functions = contract_metadata.get("functions", [])
+        contract_name = contract_metadata.get("name", "")
+        contract_address = contract_metadata.get("address", "")
+
+        # Add Threshold Network specific enhancements
+        if protocol_type in ["threshold_network", "bridge"] or any(
+            name.lower() in contract_name.lower()
+            for name in ["tbtc", "bridge", "wallet", "threshold", "staking"]
+        ):
+            static_hypotheses = await self._enhance_threshold_network_hypotheses(
+                contract_name, contract_address, functions, static_hypotheses
+            )
+
+        # Add Immunefi intelligence enhancements
+        static_hypotheses = self._enhance_with_immunefi_intelligence(
+            protocol_type, contract_name, functions, static_hypotheses
+        )
 
         # Research protocol-specific vulnerabilities
         protocol_research = await self.research.research_protocol_type(
@@ -75,6 +95,102 @@ class HypothesisEnhancer:
                     hyp["research_sources"] = pattern_research.sources[:3]
 
         return static_hypotheses
+
+    async def _enhance_threshold_network_hypotheses(
+        self,
+        contract_name: str,
+        contract_address: str,
+        functions: list[str],
+        hypotheses: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Add Threshold Network specific hypothesis enhancements."""
+        # Research Threshold Network specific patterns
+        threshold_research = await self.research.research_threshold_network_patterns(
+            contract_name=contract_name,
+            functions=functions,
+            priority=9,
+        )
+
+        # Get Threshold Network patterns for this contract
+        threshold_patterns = ThresholdNetworkPatterns.get_patterns_for_contract(contract_name)
+
+        # Build a lookup from vulnerability type to Threshold pattern for efficient matching
+        pattern_by_type = {
+            pattern.pattern_type.value: pattern for pattern in threshold_patterns
+        }
+
+        # Boost confidence for Threshold Network specific vulnerabilities
+        for hyp in hypotheses:
+            vuln_type = hyp.get("vuln_type", "")
+
+            # Check if this vulnerability type matches a Threshold pattern via O(1) lookup
+            pattern = pattern_by_type.get(vuln_type)
+            if pattern is not None:
+                # Boost confidence significantly for known high-value patterns
+                hyp["confidence"] = min(hyp.get("confidence", 0.5) * 1.5, 0.98)
+                hyp["threshold_network_pattern"] = True
+                hyp["max_bounty_usd"] = pattern.max_bounty_usd
+                hyp["immunefi_severity"] = pattern.severity.value
+                hyp["detection_heuristics"] = pattern.detection_heuristics
+                hyp["exploitation_steps"] = pattern.exploitation_steps
+
+        # Add research context if available
+        if threshold_research:
+            for hyp in hypotheses:
+                if hyp.get("threshold_network_pattern"):
+                    hyp["threshold_research"] = threshold_research.answer[:400]
+
+        return hypotheses
+
+    def _enhance_with_immunefi_intelligence(
+        self,
+        protocol_type: str,
+        contract_name: str,
+        functions: list[str],
+        hypotheses: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Enhance hypotheses with Immunefi intelligence."""
+        # Get relevant vulnerability patterns for this protocol type
+        immunefi_patterns = ImmunefiIntelligence.get_vulnerability_patterns_for_protocol(protocol_type)
+
+        # Build a lookup from normalized common pattern to Immunefi patterns for O(1) matching
+        pattern_lookup: dict[str, Any] = {}
+        for pattern in immunefi_patterns:
+            for common_pattern in pattern.common_patterns:
+                key = str(common_pattern).lower()
+                if key not in pattern_lookup:
+                    pattern_lookup[key] = pattern
+
+        for hyp in hypotheses:
+            vuln_type = hyp.get("vuln_type", "")
+            function_name = hyp.get("function_signature", "").split("(")[0]
+
+            # Track if we found a pattern match
+            pattern_matched = False
+
+            # Check if vulnerability matches known Immunefi patterns using exact (case-insensitive) match
+            matched_pattern = None
+            vuln_type_key = str(vuln_type).lower()
+            matched_pattern = pattern_lookup.get(vuln_type_key)
+
+            if matched_pattern is not None:
+                hyp["immunefi_pattern"] = matched_pattern.name
+                hyp["typical_bounty_range"] = matched_pattern.typical_bounty_range
+                hyp["detection_techniques"] = matched_pattern.detection_techniques
+                hyp["recent_examples"] = matched_pattern.recent_examples[:2]
+                # Boost confidence for well-known patterns
+                hyp["confidence"] = min(hyp.get("confidence", 0.5) * 1.2, 0.95)
+                pattern_matched = True
+
+            # Add detection priority based on contract and function
+            priority = ImmunefiIntelligence.get_detection_priority(contract_name, function_name)
+            hyp["detection_priority"] = priority
+            # Only boost confidence for high-priority targets if we also have a pattern match
+            if priority >= 8 and pattern_matched:
+                # Additional boost for high-priority targets with known patterns
+                hyp["confidence"] = min(hyp.get("confidence", 0.5) * 1.15, 0.95)
+
+        return hypotheses
 
     async def refine_from_failures(
         self,
