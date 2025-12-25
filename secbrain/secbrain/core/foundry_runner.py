@@ -25,6 +25,26 @@ class ForgeOutputParser:
         match = cls._PROFIT_EQUIV_RE.search(text) or cls._PROFIT_ETH_RE.search(text)
         if not match:
             return None
+
+    @staticmethod
+    def _detect_compile_error(stdout: str) -> str | None:
+        """Detect forge compile errors from stdout."""
+        if not stdout:
+            return None
+        lowered = stdout.lower()
+        markers = (
+            "compiler run failed",
+            "compilation failed",
+            "error (2314):",
+            "error (6933):",
+        )
+        for marker in markers:
+            if marker in lowered:
+                for line in stdout.splitlines():
+                    if marker.strip() in line.lower():
+                        return line.strip() or "compiler_error"
+                return "compiler_error"
+        return None
         return cls._normalize_large_value(match.group(1))
 
     @classmethod
@@ -54,6 +74,10 @@ class ForgeOutputParser:
         revert_reason = cls._extract_revert(stdout)
         gas_used = cls._extract_gas(stdout)
         state_changes: dict[str, Any] = {}
+        compile_error = cls._detect_compile_error(stdout)
+        if compile_error:
+            status = "failed"
+            revert_reason = compile_error
 
         json_obj = cls._load_json(stdout, json_path)
         if json_obj is not None:
@@ -80,6 +104,7 @@ class ForgeOutputParser:
             "revert_reason": revert_reason,
             "logs": stdout.splitlines()[-50:],
             "state_changes": state_changes,
+            "compile_error": compile_error,
         }
 
     @staticmethod
