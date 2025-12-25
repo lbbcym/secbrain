@@ -133,6 +133,26 @@ class ForgeOutputParser:
         except Exception:
             return None
 
+    @staticmethod
+    def _detect_compile_error(stdout: str) -> str | None:
+        """Detect forge compile errors from stdout."""
+        if not stdout:
+            return None
+        lowered = stdout.lower()
+        markers = (
+            "compiler run failed",
+            "compilation failed",
+            "error (2314):",
+            "error (6933):",
+        )
+        for marker in markers:
+            if marker in lowered:
+                for line in stdout.splitlines():
+                    if marker.strip() in line.lower():
+                        return line.strip() or "compiler_error"
+                return "compiler_error"
+        return None
+
     @classmethod
     def _parse_json(
         cls, json_obj: Any

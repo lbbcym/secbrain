@@ -1,0 +1,50 @@
+{
+  "generated_at": "2025-12-25T09:38:07.861651+00:00",
+  "entries": [
+    {
+      "hypothesis_id": "hyp-0067c785",
+      "contract_address": "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+      "function_signature": "approve(address,uint256)",
+      "categories": {
+        "unknown_failure": 1
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x1)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-8bd1bc21",
+      "contract_address": "0x3fFeE7D7bE970201a33d17E318E2421a06Ad69f8",
+      "function_signature": "finalizeDeposit(uint256)",
+      "categories": {
+        "unknown_failure": 2
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x2)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-6462dab4",
+      "contract_address": "0xE490c802f8455EA1f0dF96a7B5043536a41E2535",
+      "function_signature": "applyForRebate(address,uint64)",
+      "categories": {
+        "unknown_failure": 3
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x3)"
+      ]
+    }
+  ],
+  "aggregate": {
+    "unknown_failure": 6
+  }
+}

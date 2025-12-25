@@ -17,6 +17,36 @@ from typing import Any
 from secbrain.core.foundry_runner import ForgeOutputParser
 
 
+def _install_compile_error_shim() -> None:
+    """Ensure ForgeOutputParser exposes _detect_compile_error (older builds lacked it)."""
+
+    if hasattr(ForgeOutputParser, "_detect_compile_error"):
+        return
+
+    def _detect_compile_error(stdout: str) -> str | None:
+        if not stdout:
+            return None
+        lowered = stdout.lower()
+        markers = (
+            "compiler run failed",
+            "compilation failed",
+            "error (2314):",
+            "error (6933):",
+        )
+        for marker in markers:
+            if marker in lowered:
+                for line in stdout.splitlines():
+                    if marker.strip() in line.lower():
+                        return line.strip() or "compiler_error"
+                return "compiler_error"
+        return None
+
+    ForgeOutputParser._detect_compile_error = staticmethod(_detect_compile_error)  # type: ignore[attr-defined]
+
+
+_install_compile_error_shim()
+
+
 @dataclass
 class FoundryRunResult:
     status: str
@@ -27,6 +57,7 @@ class FoundryRunResult:
     execution_trace: str | None = None
     state_changes: dict[str, Any] | None = None
     revert_reason: str | None = None
+    compile_error: str | None = None
     logs: list[Any] | None = None
     attempt_index: int | None = None
     rpc_url: str | None = None

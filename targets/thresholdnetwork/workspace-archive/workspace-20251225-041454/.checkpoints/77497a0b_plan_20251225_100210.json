@@ -1,0 +1,211 @@
+{
+  "run_id": "77497a0b",
+  "current_phase": "plan",
+  "completed_phases": [
+    "ingest",
+    "plan"
+  ],
+  "phase_data": {
+    "ingest": {
+      "program_name": "Threshold Network",
+      "platform": "Immunefi",
+      "domains": [],
+      "urls": [],
+      "focus_areas": [
+        "Smart contract vulnerabilities",
+        "Loss of user funds",
+        "Bitcoin bridge security (tBTC)",
+        "Threshold cryptography implementation",
+        "Token staking mechanisms",
+        "Governance vulnerabilities",
+        "Cross-chain bridge security",
+        "Proxy pattern implementations",
+        "Access control vulnerabilities",
+        "Reentrancy attacks",
+        "Flash loan attacks",
+        "Oracle manipulation",
+        "Front-running vulnerabilities"
+      ],
+      "rules": [
+        "All testing must be done on local-forks of either public testnet or mainnet",
+        "Proof of Concept is required for all severities",
+        "No KYC required for payouts under $100,000",
+        "KYC required for payouts above $100,000",
+        "Rewards distributed according to Immunefi Vulnerability Severity Classification System V2.3",
+        "Critical smart contract vulnerabilities capped at 10% of funds at risk",
+        "Payouts are denominated in USD and made in USDC, USDT, ETH, or T tokens",
+        "All payouts are handled by the Threshold Network team",
+        "Duplicates and private known issues are not eligible for rewards"
+      ],
+      "research": {},
+      "normalized": {
+        "domains": [],
+        "urls": [],
+        "target_types": [],
+        "excluded_paths": [],
+        "allowed_methods": [
+          "GET",
+          "POST",
+          "PUT",
+          "HEAD",
+          "OPTIONS"
+        ]
+      }
+    },
+    "plan": {
+      "plan": {
+        "phases": [
+          {
+            "phase": "recon",
+            "objectives": [
+              "Map and identify publicly accessible smart contracts and applications",
+              "Discover and document API endpoints and interfaces",
+              "Identify potential entry points and vulnerabilities",
+              "Compile a comprehensive list of potential targets for testing"
+            ],
+            "tools": [
+              "Browser extensions (e.g., Burp Suite, Fiddler)",
+              "API analysis tools (e.g., API Map, API Scanner)",
+              "Network scanning tools (e.g., Nmap, ZAP)",
+              "Web crawling tools (e.g., Scrapy, Selenium)"
+            ],
+            "time_estimate": "2 weeks",
+            "success_criteria": [
+              "Comprehensive list of potential targets identified",
+              "All public-facing APIs and interfaces documented",
+              "Potential entry points and vulnerabilities identified"
+            ]
+          },
+          {
+            "phase": "hypothesis",
+            "objectives": [
+              "Analyze and categorize potential vulnerabilities into classes (e.g., reentrancy, flash loans)",
+              "Identify potential mitigation strategies for each vulnerability class",
+              "Develop a comprehensive list of hypotheses for testing",
+              "Document and prioritize potential vulnerabilities"
+            ],
+            "tools": [
+              "Vulnerability analysis frameworks (e.g., OWASP, ImmuniGuard)",
+              "Smart contract analysis tools (e.g., Etherscan, Remix)",
+              "Penetration testing frameworks (e.g., Metasploit, Kali Linux)"
+            ],
+            "time_estimate": "3 weeks",
+            "success_criteria": [
+              "Comprehensive list of vulnerabilities categorized and prioritized",
+              "Potential mitigation strategies for each vulnerability class identified",
+              "Hypotheses for testing developed and documented"
+            ]
+          },
+          {
+            "phase": "exploit",
+            "objectives": [
+              "Test hypotheses by crafting and deploying payloads",
+              "Verify the vulnerability and reproduce the issue",
+              "Test mitigation strategies and verify their effectiveness",
+              "Document and report findings"
+            ],
+            "tools": [
+              "Smart contract development frameworks (e.g., Truffle, OpenZeppelin)",
+              "Penetration testing frameworks (e.g., Metasploit, Kali Linux)",
+              "Payload crafting tools (e.g., Ropemover, Gadget)",
+              "Local-forking tools (e.g., Hardhat, Truffle)"
+            ],
+            "time_estimate": "4 weeks",
+            "success_criteria": [
+              "Hypotheses verified and vulnerabilities reproduced",
+              "Mitigation strategies tested and effective",
+              "Findings documented and reported"
+            ]
+          },
+          {
+            "phase": "triage",
+            "objectives": [
+              "Validate and prioritize findings based on severity and impact",
+              "Verify the impact on the target and its ecosystem",
+              "Document and report the triage process",
+              "Prioritize findings for potential payouts"
+            ],
+            "tools": [
+              "Vulnerability severity classification frameworks (e.g., OWASP, ImmuniGuard)",
+              "Risk assessment tools (e.g., Risk Matrix, Risk Scorecard)",
+              "Document management tools (e.g., Evernote, Trello)"
+            ],
+            "time_estimate": "2 weeks",
+            "success_criteria": [
+              "Findings validated and prioritized based on severity and impact",
+              "Impact on the target and its ecosystem verified",
+              "Triage process documented and reported",
+              "Prioritized findings for potential payouts"
+            ]
+          },
+          {
+            "phase": "report",
+            "objectives": [
+              "Document and prepare submissions for potential payouts",
+              "Include detailed descriptions of vulnerabilities, exploits, and findings",
+              "Provide recommendations for mitigation and remediation",
+              "Submit findings to the Threshold Network team"
+            ],
+            "tools": [
+              "Document management tools (e.g., Evernote, Trello)",
+              "Submission formatting tools (e.g., Docxtemplater, template.io)",
+              "Communication tools (e.g., Slack, Email)"
+            ],
+            "time_estimate": "1 week",
+            "success_criteria": [
+              "Submissions formatted and documented",
+              "Findings and recommendations included",
+              "Submissions submitted to the Threshold Network team"
+            ]
+          }
+        ],
+        "priority_targets": [
+          {
+            "target": "Bitcoin bridge (tBTC)",
+            "priority": "High",
+            "description": "Smart contract vulnerabilities in the Bitcoin bridge (tBTC) could result in significant financial losses for users."
+          },
+          {
+            "target": "Threshold Network smart contracts",
+            "priority": "Medium",
+            "description": "Vulnerabilities in the Threshold Network smart contracts could result in financial losses for users and compromise the security of the network."
+          },
+          {
+            "target": "Oracle manipulation",
+            "priority": "Low",
+            "description": "Oracle manipulation vulnerabilities could result in manipulation of oracle feeds, potentially leading to malicious behavior."
+          }
+        ],
+        "risk_considerations": [
+          {
+            "risk": "Loss of user funds",
+            "description": "The most significant risk associated with the Threshold Network is the potential loss of user funds due to smart contract vulnerabilities or oracle manipulation.",
+            "mitigation": "Implementing robust security measures and testing for vulnerabilities are essential to prevent loss of user funds."
+          },
+          {
+            "risk": "Exploitation by malicious actors",
+            "description": "The Threshold Network is vulnerable to exploitation by malicious actors who could exploit vulnerabilities to steal user funds or compromise the security of the network.",
+            "mitigation": "Implementing robust security measures, testing for vulnerabilities, and conducting regular security audits are essential to prevent exploitation."
+          }
+        ]
+      },
+      "review": {
+        "approved": true,
+        "concerns": [],
+        "suggestions": [],
+        "risk_level": "medium"
+      },
+      "phases": [
+        "recon",
+        "hypothesis",
+        "exploit",
+        "triage",
+        "report"
+      ]
+    }
+  },
+  "timestamp": "2025-12-25T10:02:10.099211+00:00",
+  "metadata": {
+    "timestamp": "2025-12-25T04:02:10.099204"
+  }
+}
