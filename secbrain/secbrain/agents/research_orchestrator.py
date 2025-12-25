@@ -193,12 +193,18 @@ class ResearchOrchestrator:
                         error="No research client available",
                     )
 
-                # Execute research query
-                response = await self.research_client.ask_research(
-                    question=query.question,
-                    context=query.context,
-                    run_context=self.run_context,
-                )
+                # Execute research query; support both ask_research and legacy research()
+                if hasattr(self.research_client, "ask_research"):
+                    response = await self.research_client.ask_research(
+                        question=query.question,
+                        context=query.context,
+                        run_context=self.run_context,
+                    )
+                else:
+                    response = await self.research_client.research(
+                        question=query.question,
+                        context=query.context,
+                    )
 
                 self._stats["executed_queries"] += 1
 

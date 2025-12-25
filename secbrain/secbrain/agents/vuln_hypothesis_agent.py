@@ -172,7 +172,13 @@ class VulnHypothesisAgent(BaseAgent):
         super().__init__(*args, **kwargs)
         self._oracle_detector = OracleManipulationDetector()
         # Configurable concurrency limits
-        self._max_llm_concurrent = getattr(self.run_context.scope, "max_llm_concurrent", 5)
+        scope = getattr(self.run_context, "scope", None)
+        if scope is None:
+            class _DefaultScope:
+                max_llm_concurrent = 5
+            scope = _DefaultScope()
+            self.run_context.scope = scope
+        self._max_llm_concurrent = getattr(scope, "max_llm_concurrent", 5)
         self._contract_llm_sem = asyncio.Semaphore(self._max_llm_concurrent)
 
         # Add hypothesis enhancer

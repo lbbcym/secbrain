@@ -100,6 +100,15 @@ class HypothesisEnhancer:
                 failure_types[category] = []
             failure_types[category].append(attempt)
 
+        # If we saw revert/unknown but no actionable category, generate a cautious refinement
+        if not refinements and failed_attempts and {"revert", "unknown"} & set(failure_types.keys()):
+            refinements.append({
+                **original_hypothesis,
+                "id": f"refined-{original_hypothesis['id']}",
+                "refinement": "Add preconditions and input validation checks to bypass revert.",
+                "confidence": max(original_hypothesis.get("confidence", 0.5) * 0.9, 0.1),
+            })
+
         # Research validation for near-misses
         if "insufficient_profit" in failure_types:
             # This was close - research profit amplification
@@ -127,6 +136,14 @@ class HypothesisEnhancer:
                     "expected_profit_hint_eth": original_hypothesis.get("expected_profit_hint_eth", 0) * 3,
                 })
 
+        if "insufficient_balance" in failure_types:
+            refinements.append({
+                **original_hypothesis,
+                "id": f"refined-{original_hypothesis['id']}",
+                "refinement": "Adjust balances/allowances or use smaller chunks to bypass insufficient balance errors.",
+                "confidence": max(original_hypothesis.get("confidence", 0.5) * 0.85, 0.1),
+            })
+
         if "access_control" in failure_types:
             # Research privilege escalation
             query = ResearchQuery(
@@ -145,6 +162,7 @@ class HypothesisEnhancer:
                     "id": f"refined-{original_hypothesis['id']}",
                     "vuln_type": "access_control_bypass",
                     "confidence": 0.7,
+                    "refinement": "Identify access control bypass (delegatecall, signature replay, frontrun).",
                     "exploit_notes": [
                         "Try delegate call path",
                         "Check for signature reuse",
@@ -161,7 +179,11 @@ class HypothesisEnhancer:
     ) -> str:
         """Generate a highly targeted LLM prompt using research context."""
 
-        protocol_type = contract_metadata.get("classification", {}).get("protocol_type", "generic")
+        protocol_type = (
+            contract_metadata.get("protocol_type")
+            or contract_metadata.get("classification", {}).get("protocol_type")
+            or "generic"
+        )
         functions = contract_metadata.get("functions", [])[:20]
         address = contract_metadata.get("address", "")
         name = contract_metadata.get("name", "")
@@ -242,7 +264,7 @@ Return ONLY a JSON array of 3-5 hypotheses. No markdown, no prose."""
 
     def _categorize_failure(self, attempt: dict[str, Any]) -> str:
         """Categorize failure type for targeted refinement."""
-        revert = (attempt.get("revert_reason") or "").lower()
+        revert = (attempt.get("revert_reason") or attempt.get("error") or "").lower()
 
         # Check balance/liquidity before insufficient to avoid false positives
         if "balance" in revert or "liquidity" in revert:
@@ -255,6 +277,8 @@ Return ONLY a JSON array of 3-5 hypotheses. No markdown, no prose."""
             return "insufficient_profit"
         if "permission" in revert or "authorized" in revert or "owner" in revert:
             return "access_control"
+        if "revert" in revert:
+            return "revert"
 
         return "unknown"
 
