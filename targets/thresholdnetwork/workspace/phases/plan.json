@@ -1,0 +1,125 @@
+{
+  "run_id": "ced16570",
+  "phase": "plan",
+  "success": true,
+  "duration_seconds": 9.764269,
+  "errors": [],
+  "data": {
+    "plan": {
+      "phases": [
+        {
+          "phase": "recon",
+          "objectives": [
+            "Discover target domains and identify potential vulnerabilities",
+            "Map and catalog target domains for efficient testing"
+          ],
+          "tools": [
+            "Domain name registrar API access",
+            "Web crawling and scraping tools (e.g., Ahrefs, Scrapy)",
+            "Social media and online presence mapping tools (e.g., Hootsuite, Brand24)"
+          ],
+          "time_estimate": "2 weeks",
+          "success_criteria": [
+            "Complete domain mapping for all target domains",
+            "Identify at least 10 potential vulnerabilities or areas for improvement per domain"
+          ]
+        },
+        {
+          "phase": "hypothesis",
+          "objectives": [
+            "Identify potential vulnerability classes and patterns",
+            "Develop hypotheses and testable hypotheses for each vulnerability class"
+          ],
+          "tools": [
+            "Vulnerability scanning tools (e.g., OpenVAS, Nessus)",
+            "Smart contract analysis tools (e.g., Etherscan, Remix)",
+            "Threat modeling and attack surface analysis tools (e.g., threat modeling frameworks, OWASP ZAP)"
+          ],
+          "time_estimate": "3 weeks",
+          "success_criteria": [
+            "Develop at least 20 testable hypotheses for each vulnerability class",
+            "Identify at least 5 potential vulnerability classes with high priority"
+          ]
+        },
+        {
+          "phase": "exploit",
+          "objectives": [
+            "Test hypotheses with payloads and simulate attacks",
+            "Validate findings and gather exploitable data"
+          ],
+          "tools": [
+            "Smart contract testing frameworks (e.g., Truffle, Solidity)",
+            "Exploit development frameworks (e.g., Metasploit, Burp Suite)",
+            "Mocking and stubbing tools (e.g., Mockk, StubHub)"
+          ],
+          "time_estimate": "4 weeks",
+          "success_criteria": [
+            "Test at least 50 hypotheses with payloads and gather exploitable data for each vulnerability class",
+            "Identify at least 2 critical vulnerabilities with high-severity and high-priority"
+          ]
+        },
+        {
+          "phase": "triage",
+          "objectives": [
+            "Validate and prioritize findings",
+            "Classify vulnerabilities according to severity and risk"
+          ],
+          "tools": [
+            "Vulnerability classification frameworks (e.g., CVSS, CVSS-2)",
+            "Risk assessment tools (e.g., RiskMatrix, Threathinking)",
+            "Triage and prioritization tools (e.g., JIRA, Trello)"
+          ],
+          "time_estimate": "2 weeks",
+          "success_criteria": [
+            "Classify vulnerabilities according to severity and risk",
+            "Prioritize findings according to Immunefi Vulnerability Severity Classification System V2.3"
+          ]
+        },
+        {
+          "phase": "report",
+          "objectives": [
+            "Document and prepare submissions",
+            "Create actionable recommendations and mitigation plans"
+          ],
+          "tools": [
+            "Reporting and documentation tools (e.g., Markdown, Jekyll)",
+            "Template and template engine tools (e.g., Handlebars, Mustache)"
+          ],
+          "time_estimate": "1 week",
+          "success_criteria": [
+            "Create actionable recommendations and mitigation plans for each vulnerability",
+            "Document findings and submissions according to program rules"
+          ]
+        }
+      ],
+      "priority_targets": [
+        "Smart contract vulnerabilities",
+        "Threat modeling and attack surface analysis",
+        "Flash loan attacks",
+        "Oracle manipulation",
+        "Proxy pattern implementations"
+      ],
+      "risk_considerations": [
+        "Confidentiality and non-disclosure agreement (NDA) requirements",
+        "KYC and AML regulations",
+        "Program rules and requirements",
+        "Budget and resource constraints",
+        "Time and timeline constraints"
+      ]
+    },
+    "review": {
+      "approved": true,
+      "concerns": [],
+      "suggestions": [],
+      "risk_level": "medium"
+    },
+    "phases": [
+      "recon",
+      "hypothesis",
+      "exploit",
+      "triage",
+      "report"
+    ]
+  },
+  "timestamp": "2025-12-25T00:51:46.644876"
+}

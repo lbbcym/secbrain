@@ -1,0 +1,44 @@
+{
+  "run_id": "ced16570",
+  "success": true,
+  "phases_completed": [
+    "ingest",
+    "plan",
+    "recon",
+    "hypothesis",
+    "exploit",
+    "static",
+    "triage",
+    "report",
+    "meta"
+  ],
+  "phases_failed": [],
+  "findings_count": 2,
+  "reports_generated": 2,
+  "duration_seconds": 775.7377,
+  "errors": [],
+  "economic": {
+    "decision": "SKIP",
+    "reason": "No profit detected",
+    "max_profit_eth": 0.0,
+    "max_profit_usd": 0.0,
+    "gas_used": null,
+    "gas_cost_usd_est": 0.0,
+    "net_usd_est": 0.0,
+    "threshold_usd": 300.0,
+    "gas_price_gwei": 50.0
+  },
+  "attempts_count": 11,
+  "meta_metrics": {
+    "hypotheses_count": 84,
+    "hypotheses_with_concrete_target": 84,
+    "missing_targets": {
+      "missing_contract_or_function": 0,
+      "total_hypotheses": 84
+    },
+    "attempts_count": 11,
+    "attempts_with_profit": 0,
+    "economic_decision": "SKIP",
+    "total_duration_seconds": 775.7377
+  }
+}
