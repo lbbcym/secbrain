@@ -102,14 +102,14 @@ class BaseAgent(ABC):
         self._reasoning_chain.clear()
         return chain
 
-    def _log_error(self, error: str, **kwargs: Any) -> None:
+    def _log_error(self, message: str, **kwargs: Any) -> None:
         """Log an error if logger is available."""
         if self.logger:
             if "agent" not in kwargs:
                 kwargs["agent"] = self.name
             if "phase" not in kwargs:
                 kwargs["phase"] = self.phase
-            self.logger.error(error, **kwargs)
+            self.logger.error(message, **kwargs)
 
     async def _call_worker(
         self,
