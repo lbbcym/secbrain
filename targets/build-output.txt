@@ -1,0 +1,1344 @@
+Compiling 3 files with Solc 0.5.11
+Compiling 43 files with Solc 0.8.10
+Compiling 236 files with Solc 0.8.28
+Solc 0.5.11 finished in 236.67ms
+Solc 0.8.10 finished in 972.43ms
+Solc 0.8.28 finished in 1.10s
+Error: Compiler run failed:
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ExponentialStakingProxy_6389/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ExponentialStakingProxy_6389/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> src/ExponentialStakingProxy_6389/contracts/upgrades/ExponentialStakingProxy.sol:7:1:
+  |
+7 | contract ExponentialStakingProxy is InitializeGovernedUpgradeabilityProxy {}
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The payable fallback function is defined here.
+  --> src/ExponentialStakingProxy_6389/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/FixedRateRewardsSourceProxy_7609/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/FixedRateRewardsSourceProxy_7609/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> src/FixedRateRewardsSourceProxy_7609/contracts/upgrades/FixedRateRewardsSourceProxy.sol:7:1:
+  |
+7 | contract FixedRateRewardsSourceProxy is InitializeGovernedUpgradeabilityProxy {}
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The payable fallback function is defined here.
+  --> src/FixedRateRewardsSourceProxy_7609/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/MigratorProxy_95c3/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/MigratorProxy_95c3/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> src/MigratorProxy_95c3/contracts/upgrades/MigratorProxy.sol:7:1:
+  |
+7 | contract MigratorProxy is InitializeGovernedUpgradeabilityProxy {}
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The payable fallback function is defined here.
+  --> src/MigratorProxy_95c3/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (6321): Unnamed return variable can remain unassigned. Add an explicit return with value to all non-reverting code paths or name the variable.
+   --> src/ExponentialStaking_9771/contracts/ExponentialStaking.sol:200:88:
+    |
+200 |     function _collectRewards(address user, bool shouldRetainRewards) internal returns (uint256) {
+    |                                                                                        ^^^^^^^
+
+Warning (2018): Function state mutability can be restricted to pure
+  --> src/ExponentialStaking_9771/contracts/ExponentialStaking.sol:66:5:
+   |
+66 |     function transfer(address, uint256) public override returns (bool) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to pure
+  --> src/ExponentialStaking_9771/contracts/ExponentialStaking.sol:70:5:
+   |
+70 |     function transferFrom(address, address, uint256) public override returns (bool) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/CompoundingStakingSSVStrategy_452b/contracts/token/OUSD.sol:504:18:
+    |
+504 |         returns (uint256 rebasingCredits)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/CompoundingStakingSSVStrategy_452b/contracts/token/OUSD.sol:172:5:
+    |
+172 |     function rebasingCredits() external view returns (uint256) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/LidoARM_c029/src/contracts/AbstractARM.sol:367:29:
+    |
+367 |     function _transferAsset(address asset, address to, uint256 amount) internal virtual {
+    |                             ^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/LidoARM_c029/src/contracts/AbstractARM.sol:729:5:
+    |
+729 |     function asset() external view virtual returns (address) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/LidoARM_c029/src/contracts/AbstractARM.sol:374:33:
+    |
+374 |     function _transferAssetFrom(address asset, address from, address to, uint256 amount) internal virtual {
+    |                                 ^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/LidoARM_c029/src/contracts/AbstractARM.sol:729:5:
+    |
+729 |     function asset() external view virtual returns (address) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/OETHVaultCore_2243/contracts/token/OUSD.sol:492:18:
+    |
+492 |         returns (uint256 rebasingCredits)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/OETHVaultCore_2243/contracts/token/OUSD.sol:162:5:
+    |
+162 |     function rebasingCredits() external view returns (uint256) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/OUSD_a7b7/contracts/token/OUSD.sol:504:18:
+    |
+504 |         returns (uint256 rebasingCredits)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/OUSD_a7b7/contracts/token/OUSD.sol:172:5:
+    |
+172 |     function rebasingCredits() external view returns (uint256) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/SingleAssetStaking_3675/contracts/staking/SingleAssetStaking.sol:102:13:
+    |
+102 |             Stake storage stake = stakes[i];
+    |             ^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/SingleAssetStaking_3675/contracts/staking/SingleAssetStaking.sol:395:5:
+    |
+395 |     function stake(uint256 amount, uint256 duration) external requireLiquidity {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2519): This declaration shadows an existing declaration.
+   --> src/SingleAssetStaking_3675/contracts/staking/SingleAssetStaking.sol:109:29:
+    |
+109 |     function _totalExpected(Stake storage _stake)
+    |                             ^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+   --> src/SingleAssetStaking_3675/contracts/staking/SingleAssetStaking.sol:156:5:
+    |
+156 |     function _stake(
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/SingleAssetStaking_3675/contracts/staking/SingleAssetStaking.sol:307:13:
+    |
+307 |             Stake storage stake = stakes[i];
+    |             ^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/SingleAssetStaking_3675/contracts/staking/SingleAssetStaking.sol:395:5:
+    |
+395 |     function stake(uint256 amount, uint256 duration) external requireLiquidity {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/VaultCore_6b89/contracts/token/OUSD.sol:492:18:
+    |
+492 |         returns (uint256 rebasingCredits)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/VaultCore_6b89/contracts/token/OUSD.sol:162:5:
+    |
+162 |     function rebasingCredits() external view returns (uint256) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/WOETH_3887/contracts/token/OUSD.sol:492:18:
+    |
+492 |         returns (uint256 rebasingCredits)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/WOETH_3887/contracts/token/OUSD.sol:162:5:
+    |
+162 |     function rebasingCredits() external view returns (uint256) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:9:1:
+  |
+9 | contract OUSDProxy is InitializeGovernedUpgradeabilityProxy {
+  | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:16:1:
+   |
+16 | contract WrappedOUSDProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:23:1:
+   |
+23 | contract VaultProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:30:1:
+   |
+30 | contract CompoundStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:37:1:
+   |
+37 | contract AaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:44:1:
+   |
+44 | contract ThreePoolStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:51:1:
+   |
+51 | contract ConvexStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:58:1:
+   |
+58 | contract HarvesterProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:65:1:
+   |
+65 | contract DripperProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:72:1:
+   |
+72 | contract MorphoCompoundStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:79:1:
+   |
+79 | contract ConvexOUSDMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:86:1:
+   |
+86 | contract ConvexLUSDMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:93:1:
+   |
+93 | contract MorphoAaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:100:1:
+    |
+100 | contract OETHProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:107:1:
+    |
+107 | contract WOETHProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:114:1:
+    |
+114 | contract OETHVaultProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:121:1:
+    |
+121 | contract OETHDripperProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:128:1:
+    |
+128 | contract OETHHarvesterProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:135:1:
+    |
+135 | contract FraxETHStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:142:1:
+    |
+142 | contract ConvexEthMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/Proxies.sol:149:1:
+    |
+149 | contract BuybackProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ConvexEthMetaStrategyProxy_1827/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/ExponentialStakingProxy_6389/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/ExponentialStakingProxy_6389/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/FixedRateRewardsSourceProxy_7609/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/FixedRateRewardsSourceProxy_7609/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Error (7723): Data locations of parameters have to be the same when overriding non-external functions, but they differ.
+   --> src/Governance_1d3f/lib/openzeppelin-contracts/contracts/governance/Governor.sol:130:5:
+    |
+130 |     function hashProposal(
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+Note: Overridden function is here:
+   --> src/Governance_1d3f/lib/openzeppelin-contracts/contracts/governance/IGovernor.sol:113:5:
+    |
+113 |     function hashProposal(
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/MigratorProxy_95c3/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/MigratorProxy_95c3/contracts/upgrades/InitializeGovernedUpgradeabilityProxy.sol:87:5:
+   |
+87 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:9:1:
+  |
+9 | contract OUSDProxy is InitializeGovernedUpgradeabilityProxy {
+  | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:16:1:
+   |
+16 | contract WrappedOUSDProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:23:1:
+   |
+23 | contract VaultProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:30:1:
+   |
+30 | contract CompoundStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:37:1:
+   |
+37 | contract AaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:44:1:
+   |
+44 | contract ConvexStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:51:1:
+   |
+51 | contract HarvesterProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:58:1:
+   |
+58 | contract DripperProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:65:1:
+   |
+65 | contract MorphoCompoundStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:72:1:
+   |
+72 | contract ConvexOUSDMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:79:1:
+   |
+79 | contract MorphoAaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:86:1:
+   |
+86 | contract OETHProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:93:1:
+   |
+93 | contract WOETHProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:100:1:
+    |
+100 | contract OETHVaultProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:107:1:
+    |
+107 | contract OETHDripperProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:114:1:
+    |
+114 | contract OETHHarvesterProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:121:1:
+    |
+121 | contract ConvexEthMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:128:1:
+    |
+128 | contract BuybackProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:135:1:
+    |
+135 | contract OETHMorphoAaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:142:1:
+    |
+142 | contract OETHBalancerMetaPoolrEthStrategyProxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:151:1:
+    |
+151 | contract OETHBalancerMetaPoolwstEthStrategyProxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:160:1:
+    |
+160 | contract MakerDsrStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:167:1:
+    |
+167 | contract OETHBuybackProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:174:1:
+    |
+174 | contract BridgedWOETHProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:181:1:
+    |
+181 | contract NativeStakingSSVStrategyProxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:190:1:
+    |
+190 | contract NativeStakingFeeAccumulatorProxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:199:1:
+    |
+199 | contract NativeStakingSSVStrategy2Proxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:208:1:
+    |
+208 | contract NativeStakingFeeAccumulator2Proxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:217:1:
+    |
+217 | contract NativeStakingSSVStrategy3Proxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:226:1:
+    |
+226 | contract NativeStakingFeeAccumulator3Proxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:235:1:
+    |
+235 | contract MetaMorphoStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:242:1:
+    |
+242 | contract ARMBuybackProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:249:1:
+    |
+249 | contract MorphoGauntletPrimeUSDCStrategyProxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:258:1:
+    |
+258 | contract MorphoGauntletPrimeUSDTStrategyProxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:267:1:
+    |
+267 | contract CurvePoolBoosterProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:274:1:
+    |
+274 | contract OETHFixedRateDripperProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:281:1:
+    |
+281 | contract OETHSimpleHarvesterProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:288:1:
+    |
+288 | contract PoolBoostCentralRegistryProxy is
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:297:1:
+    |
+297 | contract MakerSSRStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:304:1:
+    |
+304 | contract OUSDCurveAMOProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/Proxies.sol:311:1:
+    |
+311 | contract OETHCurveAMOProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/OETHCurveAMOProxy_af04/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:103:5:
+    |
+103 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:9:1:
+  |
+9 | contract OUSDProxy is InitializeGovernedUpgradeabilityProxy {
+  | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:16:1:
+   |
+16 | contract WrappedOUSDProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:23:1:
+   |
+23 | contract VaultProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:30:1:
+   |
+30 | contract CompoundStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:37:1:
+   |
+37 | contract AaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:44:1:
+   |
+44 | contract ThreePoolStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:51:1:
+   |
+51 | contract ConvexStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:58:1:
+   |
+58 | contract HarvesterProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:65:1:
+   |
+65 | contract DripperProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:72:1:
+   |
+72 | contract MorphoCompoundStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:79:1:
+   |
+79 | contract ConvexOUSDMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:86:1:
+   |
+86 | contract ConvexLUSDMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:93:1:
+   |
+93 | contract MorphoAaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:100:1:
+    |
+100 | contract OETHProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:107:1:
+    |
+107 | contract WOETHProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:114:1:
+    |
+114 | contract OETHVaultProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:121:1:
+    |
+121 | contract OETHDripperProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/OETHVaultProxy_3925/contracts/proxies/Proxies.sol:128:1:
+    |
+128 | contract FraxETHStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/OETHVaultProxy_3925/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/Proxy_85b7/src/Proxy.sol:12:1:
+   |
+12 | contract Proxy is Ownable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/Proxy_85b7/src/Proxy.sol:91:5:
+   |
+91 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:15:1:
+   |
+15 | contract InitializeGovernedUpgradeabilityProxy is Governable {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:9:1:
+  |
+9 | contract OUSDProxy is InitializeGovernedUpgradeabilityProxy {
+  | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:16:1:
+   |
+16 | contract WrappedOUSDProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:23:1:
+   |
+23 | contract VaultProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:30:1:
+   |
+30 | contract CompoundStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:37:1:
+   |
+37 | contract AaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:44:1:
+   |
+44 | contract ThreePoolStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:51:1:
+   |
+51 | contract ConvexStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:58:1:
+   |
+58 | contract HarvesterProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:65:1:
+   |
+65 | contract DripperProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:72:1:
+   |
+72 | contract MorphoCompoundStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:79:1:
+   |
+79 | contract ConvexOUSDMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:86:1:
+   |
+86 | contract ConvexLUSDMetaStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:93:1:
+   |
+93 | contract MorphoAaveStrategyProxy is InitializeGovernedUpgradeabilityProxy {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:100:1:
+    |
+100 | contract OETHProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+   --> src/WOETHProxy_dcee/contracts/proxies/Proxies.sol:107:1:
+    |
+107 | contract WOETHProxy is InitializeGovernedUpgradeabilityProxy {
+    | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> src/WOETHProxy_dcee/contracts/proxies/InitializeGovernedUpgradeabilityProxy.sol:98:5:
+   |
+98 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
