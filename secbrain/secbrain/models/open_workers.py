@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import warnings
 from typing import Any
 
 import httpx
@@ -39,8 +40,19 @@ class OpenWorkerClient(ModelClient):
             api_key
             or os.environ.get("TOGETHER_API_KEY")
             or os.environ.get("OPENROUTER_API_KEY")
-            or os.environ.get("OPENAI_API_KEY", "")
+            or os.environ.get("OPENAI_API_KEY")
         )
+        
+        # Validate API key is provided (will be None in dry-run mode)
+        if self.api_key is None:
+            warnings.warn(
+                "No API key provided for OpenWorkerClient. "
+                "Set TOGETHER_API_KEY, OPENROUTER_API_KEY, or OPENAI_API_KEY environment variable. "
+                "API calls will fail unless running in dry-run mode.",
+                stacklevel=2
+            )
+            # Use empty string for header compatibility, but we've warned
+            self.api_key = ""
 
         # Optimized HTTP client with connection pooling and keep-alive
         self.client = httpx.AsyncClient(
