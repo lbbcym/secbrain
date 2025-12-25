@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import tempfile
 from pathlib import Path
 
@@ -11,340 +12,496 @@ import pytest
 from secbrain.tools.storage import WorkspaceStorage
 
 
-class MockRunContext:
-    """Mock RunContext for testing."""
-
-    def __init__(self, workspace_path: Path, run_id: str):
-        self.workspace_path = workspace_path
-        self.run_id = run_id
-
-
-@pytest.mark.asyncio
-async def test_storage_initialization_with_run_context():
-    """Test WorkspaceStorage initialization with RunContext."""
+@pytest.fixture
+def temp_workspace():
+    """Create a temporary workspace directory."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-001"
-        run_context = MockRunContext(workspace_path, run_id)
-
-        storage = WorkspaceStorage(run_context)
-        assert storage.workspace_path == workspace_path
-        assert storage.run_id == run_id
-        assert storage.db_path == workspace_path / "secbrain.db"
+        yield Path(tmpdir)
 
 
-@pytest.mark.asyncio
-async def test_storage_initialization_with_path():
-    """Test WorkspaceStorage initialization with Path and run_id."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-002"
-
-        storage = WorkspaceStorage(workspace_path, run_id)
-        assert storage.workspace_path == workspace_path
-        assert storage.run_id == run_id
+@pytest.fixture
+async def storage(temp_workspace):
+    """Create and initialize a storage instance."""
+    stor = WorkspaceStorage(temp_workspace, "test-run-001")
+    await stor.initialize()
+    yield stor
+    await stor.close()
 
 
-@pytest.mark.asyncio
-async def test_storage_initialization_missing_run_id():
-    """Test WorkspaceStorage raises TypeError when run_id is missing."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-
-        with pytest.raises(TypeError, match="WorkspaceStorage requires run_id"):
-            WorkspaceStorage(workspace_path)
+async def fetch_one(storage, cursor):
+    """Helper to fetch one row from cursor, handling both aiosqlite and sqlite3."""
+    if storage._sqlite_backend == "aiosqlite":
+        return await cursor.fetchone()
+    return await asyncio.to_thread(cursor.fetchone)
 
 
-@pytest.mark.asyncio
-async def test_storage_database_initialization():
-    """Test database initialization and table creation."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-003"
+class TestWorkspaceStorageInit:
+    """Test WorkspaceStorage initialization."""
 
-        storage = WorkspaceStorage(workspace_path, run_id)
+    def test_init_with_path_and_run_id(self, temp_workspace) -> None:
+        """Test initialization with Path and run_id."""
+        storage = WorkspaceStorage(temp_workspace, "test-run")
+        assert storage.workspace_path == temp_workspace
+        assert storage.run_id == "test-run"
+        assert storage.db_path == temp_workspace / "secbrain.db"
+
+    def test_init_without_run_id_raises_error(self, temp_workspace) -> None:
+        """Test initialization without run_id raises TypeError."""
+        with pytest.raises(TypeError, match="requires run_id"):
+            WorkspaceStorage(temp_workspace)
+
+    @pytest.mark.asyncio
+    async def test_initialize_creates_database(self, temp_workspace) -> None:
+        """Test that initialize creates the database file."""
+        storage = WorkspaceStorage(temp_workspace, "test-run")
+        assert not storage.db_path.exists()
+        
         await storage.initialize()
-
-        # Verify database file was created
         assert storage.db_path.exists()
         
-        # Verify we can perform basic operations (tests that tables were created)
-        await storage.start_run("test-scope-hash")
-        assets = await storage.get_assets()
-        assert isinstance(assets, list)
-
         await storage.close()
 
-
-@pytest.mark.asyncio
-async def test_start_run():
-    """Test starting a run."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-004"
-
-        storage = WorkspaceStorage(workspace_path, run_id)
-        await storage.initialize()
-
-        scope_hash = "abc123"
-        metadata = {"target": "example.com", "phase": "recon"}
-
-        # Start the run - should succeed without errors
-        await storage.start_run(scope_hash, metadata)
-
-        # Verify we can save assets after starting run (tests run was recorded)
-        await storage.save_asset({
-            "id": "test-asset",
-            "type": "domain",
-            "value": "example.com"
-        })
-        assets = await storage.get_assets()
-        assert len(assets) == 1
-
-        await storage.close()
-
-
-@pytest.mark.asyncio
-async def test_end_run():
-    """Test ending a run."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-005"
-
-        storage = WorkspaceStorage(workspace_path, run_id)
-        await storage.initialize()
-        await storage.start_run("hash123")
+    @pytest.mark.asyncio
+    async def test_execute_before_init_raises_error(self, temp_workspace) -> None:
+        """Test that executing queries before initialization raises error."""
+        storage = WorkspaceStorage(temp_workspace, "test-run")
         
-        # End the run - should succeed without errors
+        with pytest.raises(RuntimeError, match="Database not initialized"):
+            await storage._execute("SELECT 1")
+
+
+class TestWorkspaceStorageRuns:
+    """Test run tracking functionality."""
+
+    @pytest.mark.asyncio
+    async def test_start_run(self, storage) -> None:
+        """Test starting a run."""
+        await storage.start_run("scope-hash-123", {"key": "value"})
+        
+        # Verify run was created
+        cursor = await storage._execute(
+            "SELECT * FROM runs WHERE run_id = ?",
+            (storage.run_id,)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        assert row is not None
+        assert row[0] == storage.run_id  # run_id
+        assert row[3] == "running"  # status
+        assert row[4] == "scope-hash-123"  # scope_hash
+
+    @pytest.mark.asyncio
+    async def test_end_run(self, storage) -> None:
+        """Test ending a run."""
+        await storage.start_run("scope-hash")
         await storage.end_run("completed")
+        
+        # Verify run was updated
+        cursor = await storage._execute(
+            "SELECT status, end_time FROM runs WHERE run_id = ?",
+            (storage.run_id,)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        assert row is not None
+        assert row[0] == "completed"  # status
+        assert row[1] is not None  # end_time
 
-        # Verify we can still query data after ending run
-        assets = await storage.get_assets()
-        assert isinstance(assets, list)
+    @pytest.mark.asyncio
+    async def test_start_run_with_metadata(self, storage) -> None:
+        """Test starting a run with metadata."""
+        metadata = {"target": "example.com", "mode": "full"}
+        await storage.start_run("hash", metadata)
+        
+        cursor = await storage._execute(
+            "SELECT metadata FROM runs WHERE run_id = ?",
+            (storage.run_id,)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        stored_metadata = json.loads(row[0])
+        assert stored_metadata == metadata
 
-        await storage.close()
 
+class TestWorkspaceStorageAssets:
+    """Test asset storage functionality."""
 
-@pytest.mark.asyncio
-async def test_save_and_get_asset():
-    """Test saving and retrieving an asset."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-006"
-
-        storage = WorkspaceStorage(workspace_path, run_id)
-        await storage.initialize()
-        await storage.start_run("hash123")
-
+    @pytest.mark.asyncio
+    async def test_save_asset(self, storage) -> None:
+        """Test saving a single asset."""
         asset = {
-            "id": "asset-001",
+            "id": "asset-1",
             "type": "domain",
             "value": "example.com",
             "technologies": ["nginx", "php"],
-            "metadata": {"ip": "1.2.3.4"},
+            "metadata": {"ip": "1.2.3.4"}
         }
-
+        
         await storage.save_asset(asset)
+        
+        # Verify asset was saved
+        cursor = await storage._execute(
+            "SELECT * FROM assets WHERE id = ?",
+            ("asset-1",)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        assert row is not None
+        assert row[2] == "domain"  # type
+        assert row[3] == "example.com"  # value
 
-        # Retrieve the asset
+    @pytest.mark.asyncio
+    async def test_save_multiple_assets(self, storage) -> None:
+        """Test saving multiple assets."""
+        assets = [
+            {"id": "asset-1", "type": "domain", "value": "example.com"},
+            {"id": "asset-2", "type": "url", "value": "https://test.com"},
+        ]
+        
+        await storage.save_assets(assets)
+        
+        # Verify both assets were saved
+        cursor = await storage._execute(
+            "SELECT COUNT(*) FROM assets WHERE run_id = ?",
+            (storage.run_id,)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        assert row[0] == 2
+
+    @pytest.mark.asyncio
+    async def test_get_assets(self, storage) -> None:
+        """Test retrieving all assets."""
+        await storage.save_asset({
+            "id": "asset-1",
+            "type": "domain",
+            "value": "example.com",
+            "technologies": ["nginx"],
+            "metadata": {"test": "data"}
+        })
+        
+        assets = await storage.get_assets()
+        
+        assert len(assets) == 1
+        assert assets[0]["id"] == "asset-1"
+        assert assets[0]["type"] == "domain"
+        assert assets[0]["technologies"] == ["nginx"]
+        assert assets[0]["metadata"] == {"test": "data"}
+
+    @pytest.mark.asyncio
+    async def test_get_assets_filtered_by_type(self, storage) -> None:
+        """Test retrieving assets filtered by type."""
+        await storage.save_assets([
+            {"id": "asset-1", "type": "domain", "value": "example.com"},
+            {"id": "asset-2", "type": "url", "value": "https://test.com"},
+            {"id": "asset-3", "type": "domain", "value": "test.org"},
+        ])
+        
+        domains = await storage.get_assets(asset_type="domain")
+        
+        assert len(domains) == 2
+        assert all(a["type"] == "domain" for a in domains)
+
+    @pytest.mark.asyncio
+    async def test_save_asset_with_minimal_data(self, storage) -> None:
+        """Test saving asset with minimal required data."""
+        asset = {"id": "minimal", "type": "test", "value": "value"}
+        await storage.save_asset(asset)
+        
         assets = await storage.get_assets()
         assert len(assets) == 1
-        assert assets[0]["id"] == "asset-001"
-        assert assets[0]["type"] == "domain"
-        assert assets[0]["value"] == "example.com"
-        assert assets[0]["technologies"] == ["nginx", "php"]
-        assert assets[0]["metadata"] == {"ip": "1.2.3.4"}
-
-        await storage.close()
+        assert assets[0]["id"] == "minimal"
+        assert assets[0]["technologies"] == []
+        assert assets[0]["metadata"] == {}
 
 
-@pytest.mark.asyncio
-async def test_save_multiple_assets():
-    """Test saving multiple assets."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-007"
+class TestWorkspaceStorageHypotheses:
+    """Test hypothesis storage functionality."""
 
-        storage = WorkspaceStorage(workspace_path, run_id)
-        await storage.initialize()
-        await storage.start_run("hash123")
-
-        assets = [
-            {"id": "asset-001", "type": "domain", "value": "example.com"},
-            {"id": "asset-002", "type": "ip", "value": "1.2.3.4"},
-            {"id": "asset-003", "type": "domain", "value": "test.com"},
-        ]
-
-        await storage.save_assets(assets)
-
-        # Retrieve all assets
-        retrieved = await storage.get_assets()
-        assert len(retrieved) == 3
-
-        # Filter by type
-        domains = await storage.get_assets("domain")
-        assert len(domains) == 2
-
-        await storage.close()
-
-
-@pytest.mark.asyncio
-async def test_save_and_get_hypothesis():
-    """Test saving and retrieving a hypothesis."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-008"
-
-        storage = WorkspaceStorage(workspace_path, run_id)
-        await storage.initialize()
-        await storage.start_run("hash123")
-
+    @pytest.mark.asyncio
+    async def test_save_hypothesis(self, storage) -> None:
+        """Test saving a vulnerability hypothesis."""
         hypothesis = {
-            "id": "hyp-001",
-            "asset_id": "asset-001",
-            "vuln_type": "SQL Injection",
+            "id": "hyp-1",
+            "asset_id": "asset-1",
+            "vuln_type": "sqli",
             "confidence": 0.85,
-            "rationale": "Input parameter not sanitized",
+            "rationale": "SQL syntax in response",
             "status": "pending",
-            "result": None,
+            "result": {"test": "data"}
         }
-
+        
         await storage.save_hypothesis(hypothesis)
+        
+        # Verify hypothesis was saved
+        cursor = await storage._execute(
+            "SELECT * FROM hypotheses WHERE id = ?",
+            ("hyp-1",)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        assert row is not None
+        assert row[3] == "sqli"  # vuln_type
+        assert row[4] == 0.85  # confidence
 
-        # Retrieve hypotheses
+    @pytest.mark.asyncio
+    async def test_get_hypotheses(self, storage) -> None:
+        """Test retrieving all hypotheses."""
+        await storage.save_hypothesis({
+            "id": "hyp-1",
+            "asset_id": "asset-1",
+            "vuln_type": "xss",
+            "confidence": 0.7,
+            "result": {"findings": [1, 2]}
+        })
+        
         hypotheses = await storage.get_hypotheses()
+        
         assert len(hypotheses) == 1
-        assert hypotheses[0]["id"] == "hyp-001"
-        assert hypotheses[0]["vuln_type"] == "SQL Injection"
-        assert hypotheses[0]["confidence"] == 0.85
+        assert hypotheses[0]["id"] == "hyp-1"
+        assert hypotheses[0]["vuln_type"] == "xss"
+        assert hypotheses[0]["result"] == {"findings": [1, 2]}
 
-        await storage.close()
+    @pytest.mark.asyncio
+    async def test_get_hypotheses_filtered_by_status(self, storage) -> None:
+        """Test retrieving hypotheses filtered by status."""
+        await storage.save_hypothesis({
+            "id": "hyp-1",
+            "asset_id": "asset-1",
+            "vuln_type": "xss",
+            "status": "pending"
+        })
+        await storage.save_hypothesis({
+            "id": "hyp-2",
+            "asset_id": "asset-2",
+            "vuln_type": "sqli",
+            "status": "confirmed"
+        })
+        
+        pending = await storage.get_hypotheses(status="pending")
+        
+        assert len(pending) == 1
+        assert pending[0]["status"] == "pending"
 
-
-@pytest.mark.asyncio
-async def test_save_and_get_finding():
-    """Test saving and retrieving a finding."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-009"
-
-        storage = WorkspaceStorage(workspace_path, run_id)
-        await storage.initialize()
-        await storage.start_run("hash123")
-
-        finding = {
-            "id": "finding-001",
-            "title": "SQL Injection in login form",
-            "severity": "high",
-            "status": "confirmed",
-            "vuln_type": "SQL Injection",
-            "target": "https://example.com/login",
-            "description": "Parameter 'username' is vulnerable",
-            "evidence": {"payload": "' OR 1=1--", "response": "200 OK"},
+    @pytest.mark.asyncio
+    async def test_hypothesis_with_defaults(self, storage) -> None:
+        """Test hypothesis creation with default values."""
+        hypothesis = {
+            "id": "hyp-1",
+            "asset_id": "asset-1",
+            "vuln_type": "test"
         }
+        
+        await storage.save_hypothesis(hypothesis)
+        hypotheses = await storage.get_hypotheses()
+        
+        assert hypotheses[0]["confidence"] == 0.5
+        assert hypotheses[0]["status"] == "pending"
+        assert hypotheses[0]["result"] == {}
 
+
+class TestWorkspaceStorageFindings:
+    """Test finding storage functionality."""
+
+    @pytest.mark.asyncio
+    async def test_save_finding(self, storage) -> None:
+        """Test saving a security finding."""
+        finding = {
+            "id": "finding-1",
+            "title": "SQL Injection",
+            "severity": "critical",
+            "status": "confirmed",
+            "vuln_type": "sqli",
+            "target": "https://example.com/login",
+            "description": "SQL injection in login form",
+            "evidence": ["payload1", "payload2"]
+        }
+        
         await storage.save_finding(finding)
+        
+        # Verify finding was saved
+        cursor = await storage._execute(
+            "SELECT * FROM findings WHERE id = ?",
+            ("finding-1",)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        assert row is not None
+        assert row[2] == "SQL Injection"  # title
+        assert row[3] == "critical"  # severity
 
-        # Retrieve findings
+    @pytest.mark.asyncio
+    async def test_get_findings(self, storage) -> None:
+        """Test retrieving all findings."""
+        await storage.save_finding({
+            "id": "finding-1",
+            "title": "XSS",
+            "severity": "high",
+            "vuln_type": "xss",
+            "evidence": ["test1", "test2"]
+        })
+        
         findings = await storage.get_findings()
+        
         assert len(findings) == 1
-        assert findings[0]["id"] == "finding-001"
-        assert findings[0]["severity"] == "high"
+        assert findings[0]["id"] == "finding-1"
+        assert findings[0]["title"] == "XSS"
+        assert findings[0]["evidence"] == ["test1", "test2"]
 
-        # Filter by severity
-        high_findings = await storage.get_findings("high")
-        assert len(high_findings) == 1
+    @pytest.mark.asyncio
+    async def test_get_findings_filtered_by_severity(self, storage) -> None:
+        """Test retrieving findings filtered by severity."""
+        await storage.save_finding({
+            "id": "finding-1",
+            "title": "Critical Issue",
+            "severity": "critical",
+            "vuln_type": "test"
+        })
+        await storage.save_finding({
+            "id": "finding-2",
+            "title": "Minor Issue",
+            "severity": "low",
+            "vuln_type": "test"
+        })
+        
+        critical = await storage.get_findings(severity="critical")
+        
+        assert len(critical) == 1
+        assert critical[0]["severity"] == "critical"
 
-        await storage.close()
+    @pytest.mark.asyncio
+    async def test_finding_with_default_status(self, storage) -> None:
+        """Test finding creation with default status."""
+        finding = {
+            "id": "finding-1",
+            "title": "Test",
+            "severity": "low",
+            "vuln_type": "test"
+        }
+        
+        await storage.save_finding(finding)
+        findings = await storage.get_findings()
+        
+        assert findings[0]["status"] == "potential"
+        assert findings[0]["evidence"] == []
 
 
-@pytest.mark.asyncio
-async def test_log_tool_call():
-    """Test logging a tool call."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-010"
+class TestWorkspaceStorageToolCalls:
+    """Test tool call logging."""
 
-        storage = WorkspaceStorage(workspace_path, run_id)
-        await storage.initialize()
-        await storage.start_run("hash123")
-
-        # Log tool call - should succeed without errors
+    @pytest.mark.asyncio
+    async def test_log_tool_call(self, storage) -> None:
+        """Test logging a tool invocation."""
         await storage.log_tool_call(
-            tool="nuclei",
+            tool="nmap",
             action="scan",
             target="example.com",
             success=True,
-            duration_ms=1500.5,
+            duration_ms=1234.5
         )
+        
+        # Verify tool call was logged
+        cursor = await storage._execute(
+            "SELECT * FROM tool_calls WHERE run_id = ?",
+            (storage.run_id,)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        assert row is not None
+        assert row[2] == "nmap"  # tool
+        assert row[3] == "scan"  # action
+        assert row[4] == "example.com"  # target
+        assert row[5] == 1  # success (True -> 1)
+        assert row[6] == 1234.5  # duration_ms
 
-        # Verify operation completed successfully by checking other operations work
-        assets = await storage.get_assets()
-        assert isinstance(assets, list)
+    @pytest.mark.asyncio
+    async def test_log_failed_tool_call(self, storage) -> None:
+        """Test logging a failed tool invocation."""
+        await storage.log_tool_call(
+            tool="nuclei",
+            action="scan",
+            target="test.com",
+            success=False,
+            duration_ms=500.0
+        )
+        
+        cursor = await storage._execute(
+            "SELECT success FROM tool_calls WHERE tool = ?",
+            ("nuclei",)
+        )
+        row = await fetch_one(storage, cursor)
+        
+        assert row[0] == 0  # success (False -> 0)
 
-        await storage.close()
 
+class TestWorkspaceStorageExport:
+    """Test data export functionality."""
 
-@pytest.mark.asyncio
-async def test_export_to_json():
-    """Test exporting data to JSON."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-011"
-
-        storage = WorkspaceStorage(workspace_path, run_id)
-        await storage.initialize()
-        await storage.start_run("hash123", {"target": "example.com"})
-
+    @pytest.mark.asyncio
+    async def test_export_to_json(self, storage, temp_workspace) -> None:
+        """Test exporting all data to JSON files."""
         # Add some test data
-        await storage.save_asset({"id": "asset-001", "type": "domain", "value": "example.com"})
-        await storage.save_hypothesis(
-            {
-                "id": "hyp-001",
-                "asset_id": "asset-001",
-                "vuln_type": "XSS",
-                "confidence": 0.7,
-            }
-        )
-
-        output_dir = Path(tmpdir) / "export"
-        output_dir.mkdir(exist_ok=True)
-        exports = await storage.export_to_json(output_dir)
-
-        # Verify exported files
+        await storage.save_asset({"id": "asset-1", "type": "domain", "value": "example.com"})
+        await storage.save_hypothesis({"id": "hyp-1", "asset_id": "asset-1", "vuln_type": "xss"})
+        await storage.save_finding({"id": "finding-1", "title": "Test", "severity": "low", "vuln_type": "test"})
+        
+        # Export
+        exports = await storage.export_to_json()
+        
+        # Verify files were created
         assert "assets" in exports
         assert "hypotheses" in exports
         assert "findings" in exports
+        
         assert exports["assets"].exists()
         assert exports["hypotheses"].exists()
-
-        # Verify JSON content
-        import json
-
+        assert exports["findings"].exists()
+        
+        # Verify content
         with open(exports["assets"]) as f:
             assets = json.load(f)
-        assert len(assets) == 1
+            assert len(assets) == 1
+            assert assets[0]["id"] == "asset-1"
 
-        with open(exports["hypotheses"]) as f:
-            hypotheses = json.load(f)
-        assert len(hypotheses) == 1
+    @pytest.mark.asyncio
+    async def test_export_run(self, storage, temp_workspace) -> None:
+        """Test exporting a complete run."""
+        await storage.save_asset({"id": "asset-1", "type": "test", "value": "test"})
+        
+        output_dir = await storage.export_run()
+        
+        assert output_dir == temp_workspace
+        assert (output_dir / "recon" / "assets.json").exists()
 
+    @pytest.mark.asyncio
+    async def test_export_to_custom_directory(self, storage, temp_workspace) -> None:
+        """Test exporting to a custom directory."""
+        custom_dir = temp_workspace / "custom_export"
+        custom_dir.mkdir()
+        
+        await storage.save_asset({"id": "asset-1", "type": "test", "value": "test"})
+        
+        exports = await storage.export_to_json(output_dir=custom_dir)
+        
+        assert exports["assets"].parent.parent == custom_dir
+
+
+class TestWorkspaceStorageClose:
+    """Test database connection cleanup."""
+
+    @pytest.mark.asyncio
+    async def test_close(self, temp_workspace) -> None:
+        """Test closing the database connection."""
+        storage = WorkspaceStorage(temp_workspace, "test-run")
+        await storage.initialize()
+        
+        # Should not raise an error
         await storage.close()
 
-
-@pytest.mark.asyncio
-async def test_create_storage_helper():
-    """Test the create_storage helper function."""
-    from secbrain.tools.storage import create_storage
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        workspace_path = Path(tmpdir)
-        run_id = "test-run-012"
-        run_context = MockRunContext(workspace_path, run_id)
-
-        storage = await create_storage(run_context)
-        assert isinstance(storage, WorkspaceStorage)
-        assert storage.workspace_path == workspace_path
-        assert storage.run_id == run_id
-
+    @pytest.mark.asyncio
+    async def test_close_without_init(self, temp_workspace) -> None:
+        """Test closing before initialization."""
+        storage = WorkspaceStorage(temp_workspace, "test-run")
+        
+        # Should not raise an error
         await storage.close()
