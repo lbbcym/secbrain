@@ -648,7 +648,7 @@ workflow = BugBountyWorkflow(
 
 For questions or issues:
 
-1. Check [Troubleshooting Guide](../docs/TROUBLESHOOTING.md)
+1. Check [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
 2. Review workflow logs in workspace
 3. Open an issue on GitHub with:
    - Performance metrics JSON
