@@ -801,13 +801,14 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
         addr = address.strip()
         if not addr.startswith("0x"):
             raise ValueError("start with '0x'")
-        if len(addr) != 42:
-            raise ValueError("42 characters")
 
         try:
             int(addr, 16)
         except ValueError as exc:
             raise ValueError("invalid hex") from exc
+
+        if len(addr) != 42:
+            raise ValueError("42 characters")
 
         if not is_address(addr):
             raise ValueError(f"Invalid Ethereum address format: {address}")

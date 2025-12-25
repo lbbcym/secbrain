@@ -114,7 +114,7 @@ class PerplexityResearch:
 
     def _is_cache_valid(self, cache_key: str, ttl_hours: int, run_context: RunContext) -> bool:
         """Check if cached data is still valid based on TTL.
-        
+
         Validates both the TTL timestamp exists AND the cached data exists
         to prevent stale timestamp issues.
         """
@@ -178,8 +178,8 @@ class PerplexityResearch:
                 "limited": True,
             }
 
-        # Check dry-run mode
-        if run_context.dry_run:
+        # Dry-run if explicitly requested or if no API key is available
+        if run_context.dry_run or not self.api_key:
             result = {
                 "answer": f"[DRY-RUN] Would research: {question[:100]}...",
                 "sources": ["dry-run-source"],
@@ -203,7 +203,7 @@ class PerplexityResearch:
 
 Question: {question}
 
-Provide a focused, technical answer relevant to security research and bug bounty hunting. 
+Provide a focused, technical answer relevant to security research and bug bounty hunting.
 Include specific techniques, tools, CVE references, exploit dates, and profit amounts when applicable.
 Prioritize data from within the last 6 months (from {datetime.now().strftime('%B %Y')})."""
 
