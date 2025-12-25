@@ -56,7 +56,7 @@ This PR comprehensively optimizes SecBrain for bug hunting in the Threshold Netw
 - Contract-specific focus areas (tBTC, Bridge, etc.)
 - Immunefi severity mapping
 - Testing priorities with confidence scores
-- **Note:** This was a specific implementation case study that has been archived
+- **Note:** This was a specific implementation case study. The code implementations remain in the codebase. For documentation history, see git commit history (removed in cleanup PR).
 
 ## Impact
 
