@@ -20,7 +20,7 @@ contracts:
     chain_id: 1
     foundry_profile: "contract_BridgeGovernance_a94d"
     verified: true
-  
+
   # Token and Staking - High Priority
   - name: T
     address: "0xCdF7028ceAB81fA0C6971208e83fa7872994beE5"
@@ -37,7 +37,7 @@ contracts:
     chain_id: 1
     foundry_profile: "contract_RebateStaking_e490"
     verified: true
-  
+
   # Wallet Registry - High Priority
   - name: WalletRegistry
     address: "0xfbae130e06bbc8ca198861beecae6e2b830398fb"
@@ -49,14 +49,14 @@ contracts:
     chain_id: 1
     foundry_profile: "contract_WalletRegistryGovernance_6aed"
     verified: true
-  
+
   # Governance - High Priority
   - name: TokenholderGovernor
     address: "0xd101f2b25bcbf992bdf55db67c104fe7646f5447"
     chain_id: 1
     foundry_profile: "contract_TokenholderGovernor_d101"
     verified: true
-  
+
   # Bank and Vaults - Medium-High Priority
   - name: Bank
     address: "0x65Fbae61ad2C8836fFbFB502A0dA41b0789D9Fc6"
@@ -68,7 +68,7 @@ contracts:
     chain_id: 1
     foundry_profile: "contract_DonationVault_a544"
     verified: true
-  
+
   # Cross-Chain Bridges - Medium-High Priority
   - name: StarknetTokenBridge
     address: "0xf39d314c5ad7dc88958116dfa7d5ac095d563aff"
@@ -98,7 +98,7 @@ allowed_methods:
   - OPTIONS
 max_depth: 3
 notes: "Threshold Network (Immunefi) - Critical contracts only. Focus on tBTC bridge, staking, and governance. Use forked execution; do not test on mainnet directly."
-foundry_root: /home/runner/work/secbrain/secbrain/targets/thresholdnetwork/instascope
+foundry_root: c:/Users/Michael/CascadeProjects/windsurf-project-2/targets/thresholdnetwork/instascope
 max_requests_per_second: 10
 respect_robots_txt: true
 
