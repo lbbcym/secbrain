@@ -293,10 +293,10 @@ class InsightsAnalyzer:
 
         # Add critical items first
         for insight in results.get_critical_insights():
-            recommendations.append(f"🔴 CRITICAL: {insight.title} - {insight.action}")
+            recommendations.append(f"[CRITICAL] {insight.title} - {insight.action}")
 
         # Add high priority items
         for insight in results.get_high_priority_insights():
-            recommendations.append(f"🟠 HIGH: {insight.title} - {insight.action}")
+            recommendations.append(f"[HIGH] {insight.title} - {insight.action}")
 
         return recommendations[:10]  # Top 10

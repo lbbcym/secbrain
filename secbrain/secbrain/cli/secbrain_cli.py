@@ -573,7 +573,7 @@ def insights(
             console.print()
             console.print("[bold red]Critical Issues:[/]")
             for insight in critical:
-                console.print(f"  • {insight.title}")
+                console.print(f"  - {insight.title}")
                 console.print(f"    {insight.action}")
 
         # Generate reports
@@ -689,7 +689,7 @@ def immunefi(
                 if program.assets_in_scope:
                     console.print(f"\n[bold]In Scope:[/]")
                     for asset in program.assets_in_scope:
-                        console.print(f"  • {asset}")
+                        console.print(f"  - {asset}")
 
             elif action == "trends":
                 trends = await client.get_trending_vulnerabilities(days=90)
@@ -733,12 +733,12 @@ def immunefi(
                 if intel['recommended_focus_areas']:
                     console.print(f"\n[bold]Recommended Focus Areas:[/]")
                     for area in intel['recommended_focus_areas'][:5]:
-                        console.print(f"  • {area}")
+                        console.print(f"  - {area}")
 
                 if intel['relevant_trends']:
                     console.print(f"\n[bold]Relevant Vulnerabilities:[/]")
                     for trend in intel['relevant_trends'][:3]:
-                        console.print(f"  • {trend['type']} ({trend['severity']}) - ${trend['avg_bounty']:,.0f}")
+                        console.print(f"  - {trend['type']} ({trend['severity']}) - ${trend['avg_bounty']:,.0f}")
 
             else:
                 console.print(f"[red]Unknown action: {action}[/]")
@@ -879,7 +879,7 @@ def research(
         if results["emerging_patterns"]:
             console.print("\n[bold]Top Emerging Patterns:[/]")
             for pattern in results["emerging_patterns"][:3]:
-                console.print(f"  • [{pattern['severity'].upper()}] {pattern['title']}")
+                console.print(f"  - [{pattern['severity'].upper()}] {pattern['title']}")
 
         # Save to file if requested
         if output:
@@ -1006,7 +1006,7 @@ def metrics(
             console.print("\n[bold green]High-Value Patterns (Focus Here!):[/]")
             for pattern in insights["high_value_patterns"][:5]:
                 console.print(
-                    f"  • {pattern['pattern']} - "
+                    f"  - {pattern['pattern']} - "
                     f"{pattern['effectiveness']:.1%} success, "
                     f"${pattern['avg_bounty']:,.0f} avg"
                 )
@@ -1015,7 +1015,7 @@ def metrics(
             console.print("\n[bold red]Low-Confidence Patterns (Avoid/Improve):[/]")
             for pattern in insights["low_confidence_patterns"][:5]:
                 console.print(
-                    f"  • {pattern['pattern']} - "
+                    f"  - {pattern['pattern']} - "
                     f"{pattern['effectiveness']:.1%} success, "
                     f"{pattern['times_submitted']} submissions"
                 )
@@ -1023,7 +1023,7 @@ def metrics(
         if insights["recommended_focus_areas"]:
             console.print("\n[bold yellow]Recommended Focus Areas:[/]")
             for area in insights["recommended_focus_areas"][:5]:
-                console.print(f"  • {area['pattern']}: {area['reason']}")
+                console.print(f"  - {area['pattern']}: {area['reason']}")
 
     else:
         console.print(f"[red]Unknown action: {action}[/]")

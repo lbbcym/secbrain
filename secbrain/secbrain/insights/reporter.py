@@ -59,7 +59,7 @@ class InsightsReporter:
         # Priority Insights
         critical = results.get_critical_insights()
         if critical:
-            lines.append("\n## 🔴 Critical Issues\n")
+            lines.append("\n## Critical Issues (HIGH)\n")
             for insight in critical:
                 lines.append(f"\n### {insight.title}\n")
                 lines.append(f"{insight.description}\n")
@@ -67,7 +67,7 @@ class InsightsReporter:
 
         high = results.get_high_priority_insights()
         if high:
-            lines.append("\n## 🟠 High Priority Items\n")
+            lines.append("\n## High Priority Items\n")
             for insight in high:
                 lines.append(f"\n### {insight.title}\n")
                 lines.append(f"{insight.description}\n")
@@ -81,13 +81,13 @@ class InsightsReporter:
             if cat_insights:
                 lines.append(f"\n### {category.replace('_', ' ').title()}\n")
                 for insight in cat_insights:
-                    priority_emoji = {
-                        "critical": "🔴",
-                        "high": "🟠",
-                        "medium": "🟡",
-                        "low": "⚪",
-                    }.get(insight.priority, "⚪")
-                    lines.append(f"- {priority_emoji} **{insight.title}** - {insight.description}\n")
+                    priority_label = {
+                        "critical": "[CRITICAL]",
+                        "high": "[HIGH]",
+                        "medium": "[MEDIUM]",
+                        "low": "[LOW]",
+                    }.get(insight.priority, "[LOW]")
+                    lines.append(f"- {priority_label} **{insight.title}** - {insight.description}\n")
 
         # Recommendations
         if results.recommendations:
@@ -285,7 +285,7 @@ class InsightsReporter:
 
         if critical:
             html += """
-        <h2>🔴 Critical Issues</h2>
+        <h2>Critical Issues</h2>
 """
             for insight in critical:
                 html += f"""
@@ -298,7 +298,7 @@ class InsightsReporter:
 
         if high:
             html += """
-        <h2>🟠 High Priority Items</h2>
+        <h2>High Priority Items</h2>
 """
             for insight in high:
                 html += f"""
