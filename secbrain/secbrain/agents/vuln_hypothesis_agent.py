@@ -830,7 +830,8 @@ Fix and return ONLY a JSON array matching the schema and using function signatur
                 addr = addr[:42]
 
             if is_address(addr):
-                return to_checksum_address(addr).upper()
+                # Return uppercase hex with lowercase 0x prefix for test expectations
+                return "0x" + to_checksum_address(addr)[2:].upper()
         except Exception as exc:
             logger.debug("Failed to normalize address '%s': %s", address, exc)
 
