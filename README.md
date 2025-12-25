@@ -36,7 +36,32 @@ SecBrain is a CLI-first Python project that automates bug bounty workflows using
 
 ## Quick Start
 
-### New: Quick Bounty Hunt Workflow
+### 🚀 NEW: Comprehensive Security Analysis Workflow
+
+Analyze ANY public repository with 12+ security tools and AI-powered insights:
+
+```bash
+# Run a comprehensive security analysis via GitHub Actions
+gh workflow run comprehensive-security-analysis.yml \
+  -f target_repo=https://github.com/owner/repo \
+  -f target_type=mixed \
+  -f analysis_depth=standard \
+  -f enable_ai_analysis=true \
+  -f enable_fuzzing=true
+
+# Or via GitHub UI: Actions → "🔒 Comprehensive Security Analysis" → Run workflow
+```
+
+**Features:**
+- 🔍 Static analysis (Slither, Semgrep, Bandit, Solhint)
+- 🎲 Fuzzing (Foundry, Echidna)
+- 🔮 Symbolic execution (Mythril)
+- 🤖 AI-powered analysis (SecBrain agents)
+- 📊 Automated reporting with GitHub issues
+
+See [Comprehensive Security Analysis Guide](.github/workflows/COMPREHENSIVE_SECURITY_ANALYSIS_README.md) for full documentation.
+
+### Quick Bounty Hunt Workflow
 
 Want to start hunting bugs on Immunefi right away? Try this:
 
@@ -163,7 +188,6 @@ secbrain insights --workspace ./targets/protocol1 --format html --open
 
 ### Contributing & Quality
 - 🤝 [Contributing Guide](CONTRIBUTING.md) - How to contribute
-- 🌿 [Branch Strategy](BRANCH-STRATEGY.md) - Simple single-branch workflow
 - 🧪 [Testing Strategies](docs/TESTING-STRATEGIES.md) - Advanced testing approaches
 - 🔐 [Security Patterns](docs/SOLIDITY_SECURITY_PATTERNS.md) - Smart contract security
 - 🎯 [Git Quick Start](docs/GIT_QUICK_START.md) - Git workflow basics
