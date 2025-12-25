@@ -1,23 +1,23 @@
 {
-  "run_id": "2ce379c2",
+  "run_id": "9118563b",
   "phase": "meta",
   "success": true,
-  "duration_seconds": 30.530354,
+  "duration_seconds": 6.63895,
   "errors": [],
   "data": {
-    "run_id": "2ce379c2",
+    "run_id": "9118563b",
     "program": "Threshold Network",
-    "timestamp": "2025-12-25T17:06:33.252736+00:00",
+    "timestamp": "2025-12-25T17:47:26.580726+00:00",
     "metrics": {
       "recon": {
         "assets_discovered": 15,
         "live_hosts": 0
       },
       "hypotheses": {
-        "total_generated": 45,
+        "total_generated": 44,
         "by_type": {
-          "reentrancy": 4,
-          "generic_contract": 14,
+          "reentrancy": 6,
+          "generic_contract": 12,
           "storage_collision": 4,
           "first_depositor_inflation": 4,
           "access_control": 4,
@@ -42,9 +42,9 @@
     "analysis": {
       "effective_types": {},
       "ineffective_types": {
-        "reentrancy": 4,
+        "reentrancy": 6,
         "cross_function_reentrancy": 2,
-        "generic_contract": 13,
+        "generic_contract": 10,
         "first_depositor_inflation": 4,
         "storage_collision": 4,
         "stale_price_data": 1,
@@ -55,51 +55,53 @@
         "missing_commit_reveal": 3
       },
       "success_rates": {
-        "reentrancy": 0.0,
-        "first_depositor_inflation": 0.0,
         "access_control": 0.0,
-        "unchecked_arithmetic": 0.0,
-        "generic_contract": 0.0,
-        "storage_collision": 0.0,
-        "missing_commit_reveal": 0.0,
+        "single_oracle_dependency": 0.0,
         "role_based_access_needed": 0.0,
         "cross_function_reentrancy": 0.0,
-        "single_oracle_dependency": 0.0,
-        "stale_price_data": 0.0
+        "storage_collision": 0.0,
+        "missing_commit_reveal": 0.0,
+        "reentrancy": 0.0,
+        "stale_price_data": 0.0,
+        "first_depositor_inflation": 0.0,
+        "unchecked_arithmetic": 0.0,
+        "generic_contract": 0.0
       },
       "top_performing": [
-        [
-          "reentrancy",
-          0.0
-        ],
-        [
-          "first_depositor_inflation",
-          0.0
-        ],
         [
           "access_control",
           0.0
         ],
         [
-          "unchecked_arithmetic",
+          "single_oracle_dependency",
           0.0
         ],
         [
-          "generic_contract",
+          "role_based_access_needed",
+          0.0
+        ],
+        [
+          "cross_function_reentrancy",
+          0.0
+        ],
+        [
+          "storage_collision",
           0.0
         ]
       ],
       "hypothesis_effectiveness": {
         "reentrancy": {
-          "generated": 4,
+          "generated": 6,
           "confirmed": 0,
           "success_rate": 0.0,
-          "avg_confidence": 0.875,
+          "avg_confidence": 0.833,
           "hypothesis_ids": [
-            "hyp-9a7af7e5",
-            "hyp-dff68663",
-            "hyp-f5823e62",
-            "hyp-29eda64e"
+            "hyp-5430acaa",
+            "hyp-3a6b8bea",
+            "hyp-c0be58fd",
+            "hyp-afa1cece",
+            "hyp-b030bcb5",
+            "hyp-f63825c8"
           ],
           "finding_ids": []
         },
@@ -109,30 +111,27 @@
           "success_rate": 0.0,
           "avg_confidence": 0.7,
           "hypothesis_ids": [
-            "hyp-099fcc71",
-            "hyp-df8145a7"
+            "hyp-25d17cc4",
+            "hyp-42649d58"
           ],
           "finding_ids": []
         },
         "generic_contract": {
-          "generated": 13,
+          "generated": 10,
           "confirmed": 0,
           "success_rate": 0.0,
-          "avg_confidence": 0.723,
+          "avg_confidence": 0.72,
           "hypothesis_ids": [
-            "hyp-b7d0f0f6",
-            "hyp-00711185",
-            "hyp-64a3cde3",
-            "hyp-1f14dd3f",
-            "hyp-56e7411c",
-            "hyp-802637e4",
-            "hyp-847cfb19",
-            "hyp-0f04d108",
-            "hyp-889b134a",
-            "hyp-76d09054",
-            "hyp-b222bac1",
-            "hyp-7f615715",
-            "hyp-56cb77d1"
+            "hyp-93f7af2b",
+            "hyp-de9a8d3e",
+            "hyp-a1ec50e8",
+            "hyp-58147bc1",
+            "hyp-26221b0d",
+            "hyp-d2e51646",
+            "hyp-24bab5fe",
+            "hyp-8984a318",
+            "hyp-1c75d65a",
+            "hyp-5f2d2885"
           ],
           "finding_ids": []
         },
@@ -142,10 +141,10 @@
           "success_rate": 0.0,
           "avg_confidence": 0.7,
           "hypothesis_ids": [
-            "hyp-2bfac3d4",
-            "hyp-9fdc797e",
-            "hyp-5edc48a7",
-            "hyp-3adb2fed"
+            "hyp-f50daf01",
+            "hyp-7bf45f19",
+            "hyp-074e1488",
+            "hyp-eda51f5d"
           ],
           "finding_ids": []
         },
@@ -155,10 +154,10 @@
           "success_rate": 0.0,
           "avg_confidence": 0.7,
           "hypothesis_ids": [
-            "hyp-4279b1e1",
-            "hyp-8bcb3cd3",
-            "hyp-61b65dd1",
-            "hyp-95f22c14"
+            "hyp-2c2219e5",
+            "hyp-1aeacd92",
+            "hyp-be777920",
+            "hyp-adfafabf"
           ],
           "finding_ids": []
         },
@@ -168,7 +167,7 @@
           "success_rate": 0.0,
           "avg_confidence": 0.75,
           "hypothesis_ids": [
-            "hyp-27cf011e"
+            "hyp-949f456a"
           ],
           "finding_ids": []
         },
@@ -178,10 +177,10 @@
           "success_rate": 0.0,
           "avg_confidence": 0.65,
           "hypothesis_ids": [
-            "hyp-a504f3f1",
-            "hyp-11a0068b",
-            "hyp-196be29d",
-            "hyp-4c25729e"
+            "hyp-c822b44f",
+            "hyp-e2660dab",
+            "hyp-744fda74",
+            "hyp-ae1a6997"
           ],
           "finding_ids": []
         },
@@ -191,10 +190,10 @@
           "success_rate": 0.0,
           "avg_confidence": 0.55,
           "hypothesis_ids": [
-            "hyp-edf70b77",
-            "hyp-f30da195",
-            "hyp-e266e1ba",
-            "hyp-e6989d7d"
+            "hyp-46c9f3a6",
+            "hyp-dfa65e32",
+            "hyp-5ed87a5e",
+            "hyp-c5e1f5ad"
           ],
           "finding_ids": []
         },
@@ -204,7 +203,7 @@
           "success_rate": 0.0,
           "avg_confidence": 0.65,
           "hypothesis_ids": [
-            "hyp-81f46e73"
+            "hyp-56cbd578"
           ],
           "finding_ids": []
         },
@@ -214,11 +213,11 @@
           "success_rate": 0.0,
           "avg_confidence": 0.55,
           "hypothesis_ids": [
-            "hyp-7bac7ff0",
-            "hyp-1ad26f6d",
-            "hyp-3185b952",
-            "hyp-f745f428",
-            "hyp-5935a0ad"
+            "hyp-0092a00d",
+            "hyp-c05bde33",
+            "hyp-e7e51b84",
+            "hyp-e01142b1",
+            "hyp-cda0a2dc"
           ],
           "finding_ids": []
         },
@@ -228,9 +227,9 @@
           "success_rate": 0.0,
           "avg_confidence": 0.6,
           "hypothesis_ids": [
-            "hyp-2da45ca4",
-            "hyp-5651a126",
-            "hyp-031c445f"
+            "hyp-671a8e7a",
+            "hyp-b5aba320",
+            "hyp-3e03068b"
           ],
           "finding_ids": []
         }
@@ -238,10 +237,10 @@
     },
     "recommendations": [
       "Low confirmation rate - consider improving hypothesis quality or testing methodology",
-      "Focus on reentrancy vulnerabilities - highest success rate",
+      "Focus on access_control vulnerabilities - highest success rate",
       "No findings - consider expanding attack surface or trying new techniques",
-      "AI Insights: Based on the provided security testing run analysis, here are 2-3 specific recommendations for improving future runs:\n\n1. **Improve the effectiveness of generic contract hypothesis testing**: The generic contract hypothesis testing has a low success rate (0.0) and average confidence (0.723). This su"
+      "AI Insights: Based on the security testing run analysis, here are 3 actionable recommendations for improving future runs:\n\n1. **Focus on high-confidence hypothesis types**: The analysis shows that only a few hypothesis types have a non-zero success rate, such as \"reentrancy\" (0.0), \"cross_function_reentrancy\" (0"
     ]
   },
-  "timestamp": "2025-12-25T17:06:33.797913+00:00"
+  "timestamp": "2025-12-25T17:47:27.135222+00:00"
 }

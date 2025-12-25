@@ -1,8 +1,8 @@
 {
-  "run_id": "2ce379c2",
+  "run_id": "9118563b",
   "phase": "triage",
   "success": true,
-  "duration_seconds": 0.000573,
+  "duration_seconds": 0.000723,
   "errors": [],
   "data": {
     "findings": [],
@@ -19,5 +19,5 @@
       "gas_price_gwei": 50.0
     }
   },
-  "timestamp": "2025-12-25T17:06:33.794420+00:00"
+  "timestamp": "2025-12-25T17:47:27.127492+00:00"
 }
