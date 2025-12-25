@@ -1,0 +1,78 @@
+{
+  "generated_at": "2025-12-25T07:36:44.152493+00:00",
+  "entries": [
+    {
+      "hypothesis_id": "hyp-425dc964",
+      "contract_address": "0xeA7CA290c7811d1cC2e79f8d706bD05d8280BD37",
+      "function_signature": "claim(address,address,uint256,bytes32,bytes32[])",
+      "categories": {
+        "unknown_failure": 3
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x3)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-942de729",
+      "contract_address": "0xD3585922B7F6B30953Fc81726F48046826B8B2CA",
+      "function_signature": "finalizeDeposit(uint256)",
+      "categories": {
+        "unknown_failure": 2
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x2)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-908c6022",
+      "contract_address": "0x2111A49ebb717959059693a3698872a0aE9866b9",
+      "function_signature": "addImplementation(address,bytes,bool)",
+      "categories": {
+        "unknown_failure": 3
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x3)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-aee14fb0",
+      "contract_address": "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+      "function_signature": "approve(address,uint256)",
+      "categories": {
+        "unknown_failure": 3
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x3)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-9d9a56ef",
+      "contract_address": "0xCdF7028ceAB81fA0C6971208e83fa7872994beE5",
+      "function_signature": "approveAndCall(address,uint256,bytes)",
+      "categories": {
+        "unknown_failure": 1
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x1)"
+      ]
+    }
+  ],
+  "aggregate": {
+    "unknown_failure": 12
+  }
+}
