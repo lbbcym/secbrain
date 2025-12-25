@@ -10,7 +10,7 @@ import shutil
 import tomllib
 import uuid
 from collections.abc import Awaitable, Callable
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, TypeVar
 
@@ -198,12 +198,11 @@ class ReconAgent(BaseAgent):
 
         for domain in domains:
             # Skip wildcard prefix
-            if domain.startswith("*."):
-                domain = domain[2:]
+            domain_clean = domain[2:] if domain.startswith("*.") else domain
 
-            self._log("enumerating_subdomains", domain=domain)
+            self._log("enumerating_subdomains", domain=domain_clean)
 
-            result = await runner.run_subfinder(domain)
+            result = await runner.run_subfinder(domain_clean)
 
             if result.success:
                 for item in result.parsed_data:
@@ -597,7 +596,7 @@ class ReconAgent(BaseAgent):
                         "status": "compilation_timeout",
                         "metadata": {
                             "error": "Forge build timeout after 300s",
-                            "timestamp": datetime.now().isoformat(),
+                            "timestamp": datetime.now(UTC).isoformat(),
                         },
                     }
                     if self.storage:
@@ -621,7 +620,7 @@ class ReconAgent(BaseAgent):
                         "metadata": {
                             "error": str(exc),
                             "error_type": type(exc).__name__,
-                            "timestamp": datetime.now().isoformat(),
+                            "timestamp": datetime.now(UTC).isoformat(),
                         },
                     }
                     if self.storage:

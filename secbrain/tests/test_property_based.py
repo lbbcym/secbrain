@@ -7,6 +7,7 @@ helping discover edge cases and corner cases that traditional tests might miss.
 from __future__ import annotations
 
 import json
+import math
 from typing import Any
 
 from hypothesis import given
@@ -192,7 +193,7 @@ def test_entropy_bounded(text: str) -> None:
     assert entropy >= 0
     # For non-empty strings, entropy should be finite
     if text:
-        assert entropy == entropy  # Not NaN
+        assert not math.isnan(entropy)  # Not NaN
         # Entropy upper bound is log2(n) where n is the length
         # But practically, it should be reasonable
         assert entropy <= 20.0  # Reasonable upper bound for text

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from secbrain.agents.base import AgentResult, BaseAgent
@@ -69,7 +69,7 @@ class MetaLearningAgent(BaseAgent):
         learnings = {
             "run_id": self.run_context.run_id,
             "program": ingest_data.get("program_name", ""),
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "metrics": metrics,
             "analysis": analysis,
             "recommendations": recommendations,
@@ -230,7 +230,7 @@ class MetaLearningAgent(BaseAgent):
                     by_type[vtype]["finding_ids"].append(finding.get("id"))
 
         # Calculate success rates and average confidence
-        for vtype, stats in by_type.items():
+        for _vtype, stats in by_type.items():
             if stats["generated"] > 0:
                 stats["success_rate"] = round(
                     stats["confirmed"] / stats["generated"], 3

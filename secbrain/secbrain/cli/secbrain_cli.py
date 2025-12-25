@@ -245,13 +245,13 @@ async def _run_workflow(
     from secbrain.workflows.bug_bounty_run import run_bug_bounty
 
     # Load scope config
-    with open(scope_path) as f:
+    with scope_path.open() as f:
         scope_data = yaml.safe_load(f)
 
     scope_config = ScopeConfig(**scope_data)
 
     # Load program config
-    with open(program_path) as f:
+    with program_path.open() as f:
         program_data = json.load(f)
 
     program_config = ProgramConfig(
@@ -295,7 +295,7 @@ async def _run_workflow(
             console.print(f"\n{missing_report}")
             console.print("[bold red]Cannot proceed: required tools are missing[/]")
             raise RuntimeError("Required tools are not installed")
-        elif "RECOMMENDED TOOLS MISSING" in missing_report:
+        if "RECOMMENDED TOOLS MISSING" in missing_report:
             console.print(f"\n[dim]{missing_report}[/]")
             console.print(
                 "[yellow]Warning: Some recommended tools are missing. "
@@ -379,7 +379,7 @@ def _initialize_models(dry_run: bool) -> tuple[ModelClient | None, ModelClient |
         )
         return None, None
 
-    with open(config_path, encoding="utf-8") as f:
+    with config_path.open(encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
 
     profile = os.environ.get("SECBRAIN_MODELS_PROFILE")
@@ -663,7 +663,7 @@ def insights(
 
     except Exception as e:
         console.print(f"[bold red]Error:[/] {e}")
-        raise typer.Exit(code=1)
+        raise typer.Exit(code=1) from e
 
 
 @app.command()
@@ -702,7 +702,7 @@ def immunefi(
     console.print("[bold blue]SecBrain Immunefi Intelligence[/]")
 
     async def _run_action():
-        from secbrain.tools.immunefi_client import ImmunefiClient, get_immunefi_intelligence
+        from secbrain.tools.immunefi_client import ImmunefiClient
 
         client = ImmunefiClient()
         try:
@@ -739,7 +739,7 @@ def immunefi(
                     raise typer.Exit(code=1)
 
                 console.print(f"\n[bold]{program.name}[/]")
-                console.print(f"Platform: Immunefi")
+                console.print("Platform: Immunefi")
                 console.print(f"Max Bounty: [green]${program.max_bounty:,}[/]")
                 console.print(f"Priority Score: [yellow]{program.get_priority_score():.1f}/100[/]")
                 console.print(f"Blockchain: {', '.join(program.blockchain)}")
@@ -748,7 +748,7 @@ def immunefi(
                 console.print(f"High Reward: ${program.high_reward[0]:,} - ${program.high_reward[1]:,}")
 
                 if program.assets_in_scope:
-                    console.print(f"\n[bold]In Scope:[/]")
+                    console.print("\n[bold]In Scope:[/]")
                     for asset in program.assets_in_scope:
                         console.print(f"  - {asset}")
 
@@ -785,19 +785,19 @@ def immunefi(
                 console.print(f"\n[bold]{intel['program']['name']}[/]")
                 console.print(f"Priority Score: [yellow]{intel['program']['priority_score']:.1f}/100[/]")
 
-                console.print(f"\n[bold]Statistics:[/]")
+                console.print("\n[bold]Statistics:[/]")
                 stats = intel['statistics']
                 console.print(f"  Total Paid: ${stats['total_paid']:,}")
                 console.print(f"  Submissions: {stats['submission_count']}")
                 console.print(f"  Avg Bounty: ${stats['avg_bounty']:,.0f}")
 
                 if intel['recommended_focus_areas']:
-                    console.print(f"\n[bold]Recommended Focus Areas:[/]")
+                    console.print("\n[bold]Recommended Focus Areas:[/]")
                     for area in intel['recommended_focus_areas'][:5]:
                         console.print(f"  - {area}")
 
                 if intel['relevant_trends']:
-                    console.print(f"\n[bold]Relevant Vulnerabilities:[/]")
+                    console.print("\n[bold]Relevant Vulnerabilities:[/]")
                     for trend in intel['relevant_trends'][:3]:
                         console.print(f"  - {trend['type']} ({trend['severity']}) - ${trend['avg_bounty']:,.0f}")
 
@@ -849,7 +849,7 @@ def research(
 
     async def _run_research():
         from secbrain.agents.advanced_research_agent import AdvancedResearchAgent
-        from secbrain.core.context import RunContext, ScopeConfig, ProgramConfig
+        from secbrain.core.context import ProgramConfig, RunContext, ScopeConfig
 
         # Create minimal context for research
         workspace = Path.cwd() / "research_output"
@@ -944,7 +944,7 @@ def research(
 
         # Save to file if requested
         if output:
-            with open(output, 'w') as f:
+            with output.open('w') as f:
                 json.dump(results, f, indent=2)
             console.print(f"\nSaved results to {output}")
 
