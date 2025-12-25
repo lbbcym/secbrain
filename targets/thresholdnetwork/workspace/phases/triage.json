@@ -1,159 +1,20 @@
 {
-  "run_id": "ced16570",
+  "run_id": "c644d148",
   "phase": "triage",
   "success": true,
-  "duration_seconds": 120.077785,
+  "duration_seconds": 0.000655,
   "errors": [],
   "data": {
-    "findings": [
-      {
-        "id": "finding-02fcc4ed",
-        "title": "Exploit success for TokenholderGovernor@0xd101f2B25bCBF992BdF55dB67c104FE7646F5447",
-        "severity": "critical",
-        "status": "confirmed",
-        "vuln_type": "reentrancy",
-        "target": "TokenholderGovernor@0xd101f2B25bCBF992BdF55dB67c104FE7646F5447",
-        "description": "The contract uses a function with an array of arguments, which can be exploited by a reentrancy attack. The `cancel` function has multiple array arguments, which can be used to bypass reentrancy checks.",
-        "verified": true,
-        "confidence_score": 0.9,
-        "evidence": [
-          "Compiler run failed:",
-          "Error (2314): Expected '(' but got identifier",
-          "  --> test/secbrain/SecBrainExploit_hyp-115e5efc_1.t.sol:55:14:",
-          "   |",
-          "55 |     function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {",
-          "   |              ^^^^^^^^^^^^^^^^^^^^^^",
-          "",
-          "Error (6933): Expected primary expression.",
-          "  --> test/secbrain/SecBrainExploit_hyp-115e5efc_100.t.sol:55:5:",
-          "   |",
-          "55 |     pragma solidity ^0.8.0;",
-          "   |     ^^^^^^",
-          "",
-          "Error (6933): Expected primary expression.",
-          "  --> test/secbrain/SecBrainExploit_hyp-115e5efc_900.t.sol:55:5:",
-          "   |",
-          "55 |     pragma solidity ^0.8.0;",
-          "   |     ^^^^^^",
-          "",
-          "Error (2314): Expected '(' but got identifier",
-          "  --> test/secbrain/SecBrainExploit_hyp-7052ead4_1.t.sol:55:14:",
-          "   |",
-          "55 |     function testExploit() public payable {",
-          "   |              ^^^^^^^^^^^",
-          "",
-          "Error (6933): Expected primary expression.",
-          "  --> test/secbrain/SecBrainExploit_hyp-7052ead4_100.t.sol:55:5:",
-          "   |",
-          "55 |     contract Target {",
-          "   |     ^^^^^^^^",
-          "",
-          "Error: Compilation failed"
-        ],
-        "profit_logs": [
-          "55 |     function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {"
-        ],
-        "token_transfers": [],
-        "profit_eth": null,
-        "profit_tokens": {},
-        "profit_eth_equiv": 0.0,
-        "profit_breakdown": {},
-        "profit_usd_estimate": null,
-        "execution_trace": "Compiler run failed:\nError (2314): Expected '(' but got identifier\n  --> test/secbrain/SecBrainExploit_hyp-115e5efc_1.t.sol:55:14:\n   |\n55 |     function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {\n   |              ^^^^^^^^^^^^^^^^^^^^^^\n\nError (6933): Expected primary expression.\n  --> test/secbrain/SecBrainExploit_hyp-115e5efc_100.t.sol:55:5:\n   |\n55 |     pragma solidity ^0.8.0;\n   |     ^^^^^^\n\nError (6933): Expected primary expression.\n  --> test/secbrain/SecBrainExploit_hyp-115e5efc_900.t.sol:55:5:\n   |\n55 |     pragma solidity ^0.8.0;\n   |     ^^^^^^\n\nError (2314): Expected '(' but got identifier\n  --> test/secbrain/SecBrainExploit_hyp-7052ead4_1.t.sol:55:14:\n   |\n55 |     function testExploit() public payable {\n   |              ^^^^^^^^^^^\n\nError (6933): Expected primary expression.\n  --> test/secbrain/SecBrainExploit_hyp-7052ead4_100.t.sol:55:5:\n   |\n55 |     contract Target {\n   |     ^^^^^^^^\n\nError: Compilation failed\n",
-        "state_changes": {},
-        "root_cause": {
-          "contract": "0xd101f2B25bCBF992BdF55dB67c104FE7646F5447",
-          "function": "cancel(address[],uint256[],bytes[],bytes32)",
-          "vulnerability_pattern": "reentrancy",
-          "trigger_condition": null
-        },
-        "confidence_components": null,
-        "gas_used": null,
-        "attempt_index": 100,
-        "hypothesis_id": "hyp-7052ead4"
-      },
-      {
-        "id": "finding-aff20d54",
-        "title": "Exploit success for DonationVault@0xa544b70dC6af906862f68eb8e68c27bb7150e672",
-        "severity": "critical",
-        "status": "confirmed",
-        "vuln_type": "reentrancy",
-        "target": "DonationVault@0xa544b70dC6af906862f68eb8e68c27bb7150e672",
-        "description": "The contract does not have a proper reentrancy guard for the receiveBalanceIncrease function, which allows an attacker to continuously drain funds from the vault.",
-        "verified": true,
-        "confidence_score": 0.9,
-        "evidence": [
-          "Compiler run failed:",
-          "Error (2314): Expected '(' but got identifier",
-          "  --> test/secbrain/SecBrainExploit_hyp-115e5efc_1.t.sol:55:14:",
-          "   |",
-          "55 |     function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {",
-          "   |              ^^^^^^^^^^^^^^^^^^^^^^",
-          "",
-          "Error (6933): Expected primary expression.",
-          "  --> test/secbrain/SecBrainExploit_hyp-115e5efc_100.t.sol:55:5:",
-          "   |",
-          "55 |     pragma solidity ^0.8.0;",
-          "   |     ^^^^^^",
-          "",
-          "Error (2314): Expected '(' but got identifier",
-          "  --> test/secbrain/SecBrainExploit_hyp-7052ead4_1.t.sol:55:14:",
-          "   |",
-          "55 |     function testExploit() public payable {",
-          "   |              ^^^^^^^^^^^",
-          "",
-          "Error (6933): Expected primary expression.",
-          "  --> test/secbrain/SecBrainExploit_hyp-7052ead4_100.t.sol:55:5:",
-          "   |",
-          "55 |     contract Target {",
-          "   |     ^^^^^^^^",
-          "",
-          "Error: Compilation failed"
-        ],
-        "profit_logs": [
-          "55 |     function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {"
-        ],
-        "token_transfers": [],
-        "profit_eth": null,
-        "profit_tokens": {},
-        "profit_eth_equiv": 0.0,
-        "profit_breakdown": {},
-        "profit_usd_estimate": null,
-        "execution_trace": "Compiler run failed:\nError (2314): Expected '(' but got identifier\n  --> test/secbrain/SecBrainExploit_hyp-115e5efc_1.t.sol:55:14:\n   |\n55 |     function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {\n   |              ^^^^^^^^^^^^^^^^^^^^^^\n\nError (6933): Expected primary expression.\n  --> test/secbrain/SecBrainExploit_hyp-115e5efc_100.t.sol:55:5:\n   |\n55 |     pragma solidity ^0.8.0;\n   |     ^^^^^^\n\nError (2314): Expected '(' but got identifier\n  --> test/secbrain/SecBrainExploit_hyp-7052ead4_1.t.sol:55:14:\n   |\n55 |     function testExploit() public payable {\n   |              ^^^^^^^^^^^\n\nError (6933): Expected primary expression.\n  --> test/secbrain/SecBrainExploit_hyp-7052ead4_100.t.sol:55:5:\n   |\n55 |     contract Target {\n   |     ^^^^^^^^\n\nError: Compilation failed\n",
-        "state_changes": {},
-        "root_cause": {
-          "contract": "0xa544b70dC6af906862f68eb8e68c27bb7150e672",
-          "function": "receiveBalanceIncrease(address[],uint256[])",
-          "vulnerability_pattern": "reentrancy",
-          "trigger_condition": null
-        },
-        "confidence_components": null,
-        "gas_used": null,
-        "attempt_index": 100,
-        "hypothesis_id": "hyp-115e5efc"
-      }
-    ],
-    "clusters": {
-      "reentrancy": [
-        "finding-02fcc4ed",
-        "finding-aff20d54"
-      ]
-    },
-    "by_severity": {
-      "critical": 2
-    },
-    "ready_for_report": [],
+    "findings": [],
+    "triaged": 0,
     "economic": {
       "decision": "SKIP",
-      "reason": "No profit detected",
+      "reason": "no_attempts",
       "max_profit_eth": 0.0,
       "max_profit_usd": 0.0,
-      "gas_used": null,
       "gas_cost_usd_est": 0.0,
-      "net_usd_est": 0.0,
-      "threshold_usd": 300.0,
-      "gas_price_gwei": 50.0
+      "net_usd_est": 0.0
     }
   },
-  "timestamp": "2025-12-25T00:51:46.747650"
+  "timestamp": "2025-12-25T01:22:41.962960"
 }

