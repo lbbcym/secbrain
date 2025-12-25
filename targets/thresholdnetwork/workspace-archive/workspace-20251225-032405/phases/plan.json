@@ -1,0 +1,132 @@
+{
+  "run_id": "55b3b7ee",
+  "phase": "plan",
+  "success": true,
+  "duration_seconds": 22.973529,
+  "errors": [],
+  "data": {
+    "plan": {
+      "phases": [
+        {
+          "phase": "recon",
+          "objectives": [
+            "Discover target domains",
+            "Map assets and identify potential vulnerabilities",
+            "Identify connections between domains and protocols"
+          ],
+          "tools": [
+            "Subdomain search tools (e.g., Sub Brute, Dominate)",
+            "Domain name system (DNS) lookup tools (e.g., DNSRecon)",
+            "Network mapping tools (e.g., Nmap)",
+            "Open-source intelligence (OSINT) tools (e.g., Hunter, PwnBait)"
+          ],
+          "time_estimate": "2 days",
+          "success_criteria": [
+            "All target domains discovered",
+            "All connections between domains and protocols identified",
+            "All potential vulnerabilities mapped"
+          ]
+        },
+        {
+          "phase": "hypothesis",
+          "objectives": [
+            "Identify potential vulnerability classes",
+            "Determine attack vectors",
+            "Prioritize potential vulnerabilities"
+          ],
+          "tools": [
+            "Vulnerability databases (e.g., National Vulnerability Database, CVE)",
+            "Smart contract analysis tools (e.g., Etherscan, Remix)",
+            "Penetration testing frameworks (e.g., Metasploit, Burp Suite)"
+          ],
+          "time_estimate": "3 days",
+          "success_criteria": [
+            "All potential vulnerability classes identified",
+            "All attack vectors determined",
+            "All potential vulnerabilities prioritized"
+          ]
+        },
+        {
+          "phase": "exploit",
+          "objectives": [
+            "Test hypotheses with payloads",
+            "Demonstrate proof of concept",
+            "Verify vulnerabilities"
+          ],
+          "tools": [
+            "Exploit frameworks (e.g., Metasploit, Exploit-DB)",
+            "Smart contract exploitation libraries (e.g., Etherscan, Remix)",
+            "Penetration testing frameworks (e.g., Metasploit, Burp Suite)"
+          ],
+          "time_estimate": "4 days",
+          "success_criteria": [
+            "All hypotheses tested with payloads",
+            "All proof of concepts demonstrated",
+            "All vulnerabilities verified"
+          ]
+        },
+        {
+          "phase": "triage",
+          "objectives": [
+            "Validate and prioritize findings",
+            "Filter out duplicates and known issues",
+            "Classify vulnerabilities according to severity"
+          ],
+          "tools": [
+            "Vulnerability classification systems (e.g., CWE, CVSS)",
+            "Smart contract analysis tools (e.g., Etherscan, Remix)",
+            "Penetration testing frameworks (e.g., Metasploit, Burp Suite)"
+          ],
+          "time_estimate": "2 days",
+          "success_criteria": [
+            "All findings validated and prioritized",
+            "All duplicates and known issues filtered out",
+            "All vulnerabilities classified according to severity"
+          ]
+        },
+        {
+          "phase": "report",
+          "objectives": [
+            "Document and prepare submissions",
+            "Create detailed reports",
+            "Ensure all required information is included"
+          ],
+          "tools": [
+            "Reporting templates (e.g., PDF, CSV)",
+            "Word processing software (e.g., Microsoft Word, Google Docs)"
+          ],
+          "time_estimate": "1 day",
+          "success_criteria": [
+            "All submissions documented and prepared",
+            "All reports created and reviewed",
+            "All required information included"
+          ]
+        }
+      ],
+      "priority_targets": [
+        "Smart contract vulnerabilities",
+        "Loss of user funds",
+        "Cross-chain bridge security"
+      ],
+      "risk_considerations": [
+        "Target domains may contain sensitive information",
+        "Potential for data breaches or unauthorized access",
+        "Risk of exploits being used for malicious purposes"
+      ]
+    },
+    "review": {
+      "approved": true,
+      "concerns": [],
+      "suggestions": [],
+      "risk_level": "medium"
+    },
+    "phases": [
+      "recon",
+      "hypothesis",
+      "exploit",
+      "triage",
+      "report"
+    ]
+  },
+  "timestamp": "2025-12-25T03:09:29.212260"
+}

@@ -1,3 +1,9 @@
+rpc_urls:
+  - "${ALCHEMY_MAINNET_RPC}"
+  - "${RPC_FALLBACK}"
+  - "${RPC_URL}"
+  - "${ETH_RPC_URL}"
+
 contracts:
   - name: Bank
     address: "0x65Fbae61ad2C8836fFbFB502A0dA41b0789D9Fc6"

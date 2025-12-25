@@ -322,12 +322,23 @@ class RunContext:
         # Ensure workspace directories exist
         self._setup_workspace()
 
+    def _expand_env(self, value: Any) -> Any:
+        """Recursively expand environment variables in scope data."""
+        if isinstance(value, str):
+            return os.path.expandvars(value)
+        if isinstance(value, list):
+            return [self._expand_env(item) for item in value]
+        if isinstance(value, dict):
+            return {key: self._expand_env(val) for key, val in value.items()}
+        return value
+
     def _load_scope(self, path: Path) -> ScopeConfig:
         """Load scope configuration from YAML."""
         if not path.exists():
             return ScopeConfig(foundry_root=None)
         with open(path) as f:
             data = yaml.safe_load(f) or {}
+        data = self._expand_env(data)
         return ScopeConfig(**data)
 
     def _load_program(self, path: Path) -> ProgramConfig:
