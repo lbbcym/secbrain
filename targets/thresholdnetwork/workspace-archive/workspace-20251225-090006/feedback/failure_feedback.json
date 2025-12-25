@@ -1,0 +1,78 @@
+{
+  "generated_at": "2025-12-25T10:21:14.790654+00:00",
+  "entries": [
+    {
+      "hypothesis_id": "hyp-9425ca5a",
+      "contract_address": "0x2111A49ebb717959059693a3698872a0aE9866b9",
+      "function_signature": "addImplementation(address,bytes,bool)",
+      "categories": {
+        "unknown_failure": 2
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x2)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-002c4383",
+      "contract_address": "0x836cdFE63fe2d63f8Bdb69b96f6097F36635896E",
+      "function_signature": "authorize(address)",
+      "categories": {
+        "unknown_failure": 1
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x1)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-0e55b36e",
+      "contract_address": "0xa544b70dC6af906862f68eb8e68c27bb7150e672",
+      "function_signature": "receiveBalanceIncrease(address[],uint256[])",
+      "categories": {
+        "unknown_failure": 3
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x3)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-3507bff5",
+      "contract_address": "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+      "function_signature": "approve(address,uint256)",
+      "categories": {
+        "unknown_failure": 1
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x1)"
+      ]
+    },
+    {
+      "hypothesis_id": "hyp-d0574836",
+      "contract_address": "0xd101f2B25bCBF992BdF55dB67c104FE7646F5447",
+      "function_signature": "castVote(uint256,uint8)",
+      "categories": {
+        "unknown_failure": 1
+      },
+      "targets": [
+        "exploit"
+      ],
+      "recommendations": [
+        "unknown_failure: Investigate failure category 'unknown_failure' for richer instrumentation. (x1)"
+      ]
+    }
+  ],
+  "aggregate": {
+    "unknown_failure": 8
+  }
+}
