@@ -259,7 +259,7 @@ async def _run_workflow(
                 "Workflow will continue but functionality may be limited.[/]\n"
             )
         else:
-            console.print("[dim]✓ All tools available[/]\n")
+            console.print("[dim]All tools available[/]\n")
     except ImportError as e:
         # Tool checker not available, skip check
         if logger:
@@ -426,7 +426,7 @@ def _display_results(result: dict) -> None:
         console.print()
         console.print("[bold red]Errors:[/]")
         for error in result["errors"]:
-            console.print(f"  • {error}")
+            console.print(f"  - {error}")
 
 
 @app.command()
@@ -480,35 +480,35 @@ def validate(
 
     try:
         validate_scope_file(scope)
-        console.print(f"  Scope: {scope} [green]✓[/]")
+        console.print(f"  Scope: {scope} [green]OK[/]")
     except ValidationError as e:
         errors.append(f"Scope invalid: {e}")
 
     if program:
         try:
             validate_program_file(program)
-            console.print(f"  Program: {program} [green]✓[/]")
+            console.print(f"  Program: {program} [green]OK[/]")
         except ValidationError as e:
             errors.append(f"Program invalid: {e}")
 
     if require_env:
         try:
             validate_environment(require_env)
-            console.print(f"  Env: {', '.join(require_env)} [green]✓[/]")
+            console.print(f"  Env: {', '.join(require_env)} [green]OK[/]")
         except ValidationError as e:
             errors.append(str(e))
 
     if require_tools:
         try:
             validate_tools_on_path(require_tools)
-            console.print(f"  Tools: {', '.join(require_tools)} [green]✓[/]")
+            console.print(f"  Tools: {', '.join(require_tools)} [green]OK[/]")
         except ValidationError as e:
             errors.append(str(e))
 
     if errors:
         console.print("[bold red]Configuration invalid[/]")
         for err in errors:
-            console.print(f"  • {err}")
+            console.print(f"  - {err}")
         raise typer.Exit(code=1)
 
     console.print("[green]Configuration valid.[/]")
@@ -552,12 +552,12 @@ def insights(
         # Aggregate data
         aggregator = InsightsAggregator(workspace)
         data = aggregator.aggregate()
-        console.print(f"  ✓ Loaded {data.total_runs} runs, {data.total_hypotheses} hypotheses, {data.total_attempts} attempts")
+        console.print(f"  Loaded {data.total_runs} runs, {data.total_hypotheses} hypotheses, {data.total_attempts} attempts")
 
         # Analyze
         analyzer = InsightsAnalyzer()
         results = analyzer.analyze(data)
-        console.print(f"  ✓ Generated {len(results.insights)} insights")
+        console.print(f"  Generated {len(results.insights)} insights")
 
         # Display summary
         console.print()
@@ -571,7 +571,7 @@ def insights(
         critical = results.get_critical_insights()
         if critical:
             console.print()
-            console.print("[bold red]🔴 Critical Issues:[/]")
+            console.print("[bold red]Critical Issues:[/]")
             for insight in critical:
                 console.print(f"  • {insight.title}")
                 console.print(f"    {insight.action}")
@@ -584,21 +584,21 @@ def insights(
         if format.lower() == "all":
             files = reporter.save_all_formats(results)
             for fmt, filepath in files.items():
-                console.print(f"  ✓ {fmt.capitalize()}: {filepath}")
+                console.print(f"  {fmt.capitalize()}: {filepath}")
             html_file = files.get("html")
         else:
             filepath = reporter.save_report(results, format.lower())
-            console.print(f"  ✓ {format.capitalize()}: {filepath}")
+            console.print(f"  {format.capitalize()}: {filepath}")
             html_file = filepath if format.lower() == "html" else None
 
         # Open in browser if requested
         if open_report and html_file:
             import webbrowser
             webbrowser.open(f"file://{html_file.absolute()}")
-            console.print(f"  ✓ Opened {html_file} in browser")
+            console.print(f"  Opened {html_file} in browser")
 
         console.print()
-        console.print("[green]✓ Insights generation complete![/]")
+        console.print("[green]Insights generation complete![/]")
 
     except Exception as e:
         console.print(f"[bold red]Error:[/] {e}")
@@ -631,7 +631,7 @@ def immunefi(
     ),
 ) -> None:
     """Interact with Immunefi platform intelligence.
-    
+
     Actions:
       list        - List high-value bounty programs
       show        - Show details for a specific program
@@ -639,10 +639,10 @@ def immunefi(
       intelligence - Get comprehensive intelligence for a program
     """
     console.print("[bold blue]SecBrain Immunefi Intelligence[/]")
-    
+
     async def _run_action():
         from secbrain.tools.immunefi_client import ImmunefiClient, get_immunefi_intelligence
-        
+
         client = ImmunefiClient()
         try:
             if action == "list":
@@ -650,13 +650,13 @@ def immunefi(
                     min_bounty=min_bounty,
                     limit=limit,
                 )
-                
+
                 table = Table(title=f"High-Value Programs (≥${min_bounty:,})")
                 table.add_column("Program", style="cyan")
                 table.add_column("Max Bounty", justify="right", style="green")
                 table.add_column("Priority", justify="right", style="yellow")
                 table.add_column("Blockchain", style="blue")
-                
+
                 for prog in programs:
                     table.add_row(
                         prog.name,
@@ -664,19 +664,19 @@ def immunefi(
                         f"{prog.get_priority_score():.1f}",
                         ", ".join(prog.blockchain[:2]),
                     )
-                
+
                 console.print(table)
-                
+
             elif action == "show":
                 if not program_id:
                     console.print("[red]Error: --program (program ID) required for 'show' action[/]")
                     raise typer.Exit(code=1)
-                
+
                 program = await client.get_program_by_id(program_id)
                 if not program:
                     console.print(f"[red]Program '{program_id}' not found[/]")
                     raise typer.Exit(code=1)
-                
+
                 console.print(f"\n[bold]{program.name}[/]")
                 console.print(f"Platform: Immunefi")
                 console.print(f"Max Bounty: [green]${program.max_bounty:,}[/]")
@@ -685,21 +685,21 @@ def immunefi(
                 console.print(f"Language: {', '.join(program.language)}")
                 console.print(f"\nCritical Reward: ${program.critical_reward[0]:,} - ${program.critical_reward[1]:,}")
                 console.print(f"High Reward: ${program.high_reward[0]:,} - ${program.high_reward[1]:,}")
-                
+
                 if program.assets_in_scope:
                     console.print(f"\n[bold]In Scope:[/]")
                     for asset in program.assets_in_scope:
                         console.print(f"  • {asset}")
-                
+
             elif action == "trends":
                 trends = await client.get_trending_vulnerabilities(days=90)
-                
+
                 table = Table(title="Trending Vulnerabilities (Last 90 Days)")
                 table.add_column("Vulnerability Type", style="cyan")
                 table.add_column("Severity", style="red")
                 table.add_column("Count", justify="right", style="yellow")
                 table.add_column("Avg Bounty", justify="right", style="green")
-                
+
                 for trend in trends[:limit]:
                     table.add_row(
                         trend.vulnerability_type,
@@ -707,47 +707,47 @@ def immunefi(
                         str(trend.occurrences),
                         f"${trend.avg_bounty:,.0f}",
                     )
-                
+
                 console.print(table)
-                
+
             elif action == "intelligence":
                 if not program_id:
                     console.print("[red]Error: --program (program ID) required for 'intelligence' action[/]")
                     raise typer.Exit(code=1)
-                
+
                 intel = await client.get_program_intelligence(program_id)
-                
+
                 if "error" in intel:
                     console.print(f"[red]{intel['error']}[/]")
                     raise typer.Exit(code=1)
-                
+
                 console.print(f"\n[bold]{intel['program']['name']}[/]")
                 console.print(f"Priority Score: [yellow]{intel['program']['priority_score']:.1f}/100[/]")
-                
+
                 console.print(f"\n[bold]Statistics:[/]")
                 stats = intel['statistics']
                 console.print(f"  Total Paid: ${stats['total_paid']:,}")
                 console.print(f"  Submissions: {stats['submission_count']}")
                 console.print(f"  Avg Bounty: ${stats['avg_bounty']:,.0f}")
-                
+
                 if intel['recommended_focus_areas']:
                     console.print(f"\n[bold]Recommended Focus Areas:[/]")
                     for area in intel['recommended_focus_areas'][:5]:
                         console.print(f"  • {area}")
-                
+
                 if intel['relevant_trends']:
                     console.print(f"\n[bold]Relevant Vulnerabilities:[/]")
                     for trend in intel['relevant_trends'][:3]:
                         console.print(f"  • {trend['type']} ({trend['severity']}) - ${trend['avg_bounty']:,.0f}")
-                
+
             else:
                 console.print(f"[red]Unknown action: {action}[/]")
                 console.print("Valid actions: list, show, trends, intelligence")
                 raise typer.Exit(code=1)
-                
+
         finally:
             await client.close()
-    
+
     asyncio.run(_run_action())
 
 
@@ -779,27 +779,27 @@ def research(
     ),
 ) -> None:
     """Conduct advanced vulnerability research using cutting-edge techniques.
-    
+
     This command analyzes emerging vulnerability patterns, protocol-specific
     risks, and generates novel vulnerability hypotheses based on the latest
     security research.
     """
     console.print("[bold blue]SecBrain Advanced Research[/]")
-    
+
     async def _run_research():
         from secbrain.agents.advanced_research_agent import AdvancedResearchAgent
         from secbrain.core.context import RunContext, ScopeConfig, ProgramConfig
-        
+
         # Create minimal context for research
         workspace = Path.cwd() / "research_output"
         workspace.mkdir(exist_ok=True)
-        
+
         scope_config = ScopeConfig(
             in_scope_domains=[],
             in_scope_ips=[],
             out_of_scope_domains=[],
         )
-        
+
         program_config = ProgramConfig(
             name=protocol or "research",
             platform="research",
@@ -807,25 +807,25 @@ def research(
             rules=[],
             rewards={},
         )
-        
+
         run_context = RunContext(
             scope=scope_config,
             program=program_config,
             workspace_path=workspace,
             dry_run=True,
         )
-        
+
         agent = AdvancedResearchAgent(
             run_context=run_context,
             research_client=None,  # Will use curated data
         )
-        
+
         results = {
             "emerging_patterns": [],
             "protocol_findings": [],
             "novel_hypotheses": [],
         }
-        
+
         # Research emerging patterns
         console.print(f"🔍 Researching emerging patterns (last {timeframe} days)...")
         emerging = await agent.research_emerging_patterns(timeframe_days=timeframe)
@@ -839,8 +839,8 @@ def research(
             }
             for f in emerging
         ]
-        console.print(f"  ✓ Found {len(emerging)} emerging patterns")
-        
+        console.print(f"  Found {len(emerging)} emerging patterns")
+
         # Protocol-specific research
         if protocol:
             console.print(f"🔍 Analyzing {protocol}...")
@@ -856,8 +856,8 @@ def research(
                 }
                 for f in protocol_findings
             ]
-            console.print(f"  ✓ Generated {len(protocol_findings)} protocol-specific findings")
-        
+            console.print(f"  Generated {len(protocol_findings)} protocol-specific findings")
+
         # Generate novel hypotheses
         if contracts:
             contract_list = [c.strip() for c in contracts.split(",")]
@@ -867,26 +867,26 @@ def research(
                 context=f"Analyzing {protocol}" if protocol else "",
             )
             results["novel_hypotheses"] = hypotheses
-            console.print(f"  ✓ Generated {len(hypotheses)} novel hypotheses")
-        
+            console.print(f"  Generated {len(hypotheses)} novel hypotheses")
+
         # Display summary
         console.print("\n[bold]Research Summary:[/]")
         console.print(f"  Emerging Patterns: {len(results['emerging_patterns'])}")
         console.print(f"  Protocol Findings: {len(results['protocol_findings'])}")
         console.print(f"  Novel Hypotheses: {len(results['novel_hypotheses'])}")
-        
+
         # Show top findings
         if results["emerging_patterns"]:
             console.print("\n[bold]Top Emerging Patterns:[/]")
             for pattern in results["emerging_patterns"][:3]:
                 console.print(f"  • [{pattern['severity'].upper()}] {pattern['title']}")
-        
+
         # Save to file if requested
         if output:
             with open(output, 'w') as f:
                 json.dump(results, f, indent=2)
-            console.print(f"\n✓ Saved results to {output}")
-    
+            console.print(f"\nSaved results to {output}")
+
     asyncio.run(_run_research())
 
 
@@ -934,7 +934,7 @@ def metrics(
             console.print("\n[yellow]No submissions recorded yet.[/]")
             console.print("Submissions can be recorded programmatically using BountyMetricsTracker.")
             return
-        
+
         console.print("\n[bold]Overall Metrics:[/]")
         console.print(f"  Total Submissions: {metrics['total_submissions']}")
         console.print(f"  Accepted: [green]{metrics['accepted']}[/]")
@@ -944,14 +944,14 @@ def metrics(
         console.print(f"  Total Earned: [green]${metrics['total_earned']:,.2f}[/]")
         console.print(f"  Avg Bounty: [green]${metrics['avg_bounty']:,.2f}[/]")
         console.print(f"  Programs: {metrics['programs_participated']}")
-        
+
     elif action == "programs":
         programs = tracker.get_top_performing_programs(limit=10)
-        
+
         if not programs:
             console.print("\n[yellow]No program data available.[/]")
             return
-        
+
         table = Table(title="Top Performing Programs")
         table.add_column("Program", style="cyan")
         table.add_column("Platform", style="blue")
@@ -959,7 +959,7 @@ def metrics(
         table.add_column("Accepted", justify="right", style="green")
         table.add_column("Rate", justify="right")
         table.add_column("Total Earned", justify="right", style="green")
-        
+
         for prog in programs:
             table.add_row(
                 prog.program,
@@ -969,23 +969,23 @@ def metrics(
                 f"{prog.acceptance_rate:.1%}",
                 f"${prog.total_earned:,.0f}",
             )
-        
+
         console.print(table)
-        
+
     elif action == "patterns":
         patterns = tracker.get_most_effective_patterns(limit=10)
-        
+
         if not patterns:
             console.print("\n[yellow]No pattern data available.[/]")
             return
-        
+
         table = Table(title="Most Effective Vulnerability Patterns")
         table.add_column("Pattern", style="cyan")
         table.add_column("Submitted", justify="right")
         table.add_column("Accepted", justify="right", style="green")
         table.add_column("Effectiveness", justify="right", style="yellow")
         table.add_column("Avg Bounty", justify="right", style="green")
-        
+
         for pattern in patterns:
             table.add_row(
                 pattern.pattern_name,
@@ -994,14 +994,14 @@ def metrics(
                 f"{pattern.detection_effectiveness:.1%}",
                 f"${pattern.avg_bounty:,.0f}",
             )
-        
+
         console.print(table)
-        
+
     elif action == "insights":
         insights = tracker.get_learning_insights()
-        
+
         console.print("\n[bold]Learning Insights:[/]")
-        
+
         if insights["high_value_patterns"]:
             console.print("\n[bold green]High-Value Patterns (Focus Here!):[/]")
             for pattern in insights["high_value_patterns"][:5]:
@@ -1010,7 +1010,7 @@ def metrics(
                     f"{pattern['effectiveness']:.1%} success, "
                     f"${pattern['avg_bounty']:,.0f} avg"
                 )
-        
+
         if insights["low_confidence_patterns"]:
             console.print("\n[bold red]Low-Confidence Patterns (Avoid/Improve):[/]")
             for pattern in insights["low_confidence_patterns"][:5]:
@@ -1019,12 +1019,12 @@ def metrics(
                     f"{pattern['effectiveness']:.1%} success, "
                     f"{pattern['times_submitted']} submissions"
                 )
-        
+
         if insights["recommended_focus_areas"]:
             console.print("\n[bold yellow]Recommended Focus Areas:[/]")
             for area in insights["recommended_focus_areas"][:5]:
                 console.print(f"  • {area['pattern']}: {area['reason']}")
-    
+
     else:
         console.print(f"[red]Unknown action: {action}[/]")
         console.print("Valid actions: summary, programs, patterns, insights")
