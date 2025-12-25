@@ -201,38 +201,6 @@ async def _run_workflow(
     from secbrain.core.logging import setup_logging
     from secbrain.workflows.bug_bounty_run import run_bug_bounty
 
-    # Set up logging first
-    logger = setup_logging(
-        workspace_path=workspace_path,
-        run_id=None,  # Will be set by RunContext
-    )
-
-    # Check tool availability
-    try:
-        from secbrain.utils.tool_checker import check_tools_on_startup
-
-        console.print("[dim]Checking tool availability...[/]")
-        tool_checker = check_tools_on_startup(logger)
-
-        # Check for missing required tools
-        missing_report = tool_checker.get_missing_tools_report()
-        if "REQUIRED TOOLS MISSING" in missing_report:
-            console.print(f"\n{missing_report}")
-            console.print("[bold red]Cannot proceed: required tools are missing[/]")
-            raise RuntimeError("Required tools are not installed")
-        elif "RECOMMENDED TOOLS MISSING" in missing_report:
-            console.print(f"\n[dim]{missing_report}[/]")
-            console.print(
-                "[yellow]⚠ Some recommended tools are missing. "
-                "Workflow will continue but functionality may be limited.[/]\n"
-            )
-        else:
-            console.print("[dim]✓ All tools available[/]\n")
-    except ImportError as e:
-        # Tool checker not available, skip check
-        if logger:
-            logger.warning("tool_checker_unavailable", reason="import_error", error=str(e))
-
     # Load scope config
     with open(scope_path) as f:
         scope_data = yaml.safe_load(f)
@@ -265,18 +233,44 @@ async def _run_workflow(
         approval_audit_log=workspace_path / "audit.jsonl",
     )
 
+    # Set up logging
+    logger = setup_logging(
+        workspace_path=workspace_path,
+        run_id=run_context.run_id,
+    )
+
+    # Check tool availability
+    try:
+        from secbrain.utils.tool_checker import check_tools_on_startup
+
+        console.print("[dim]Checking tool availability...[/]")
+        tool_checker = check_tools_on_startup(logger)
+
+        # Check for missing required tools
+        missing_report = tool_checker.get_missing_tools_report()
+        if "REQUIRED TOOLS MISSING" in missing_report:
+            console.print(f"\n{missing_report}")
+            console.print("[bold red]Cannot proceed: required tools are missing[/]")
+            raise RuntimeError("Required tools are not installed")
+        elif "RECOMMENDED TOOLS MISSING" in missing_report:
+            console.print(f"\n[dim]{missing_report}[/]")
+            console.print(
+                "[yellow]Warning: Some recommended tools are missing. "
+                "Workflow will continue but functionality may be limited.[/]\n"
+            )
+        else:
+            console.print("[dim]✓ All tools available[/]\n")
+    except ImportError as e:
+        # Tool checker not available, skip check
+        if logger:
+            logger.warning("tool_checker_unavailable", reason="import_error", error=str(e))
+
     # Load model clients (worker/advisor)
     worker_model, advisor_model = _initialize_models(dry_run=dry_run)
     if worker_model:
         run_context.worker_model = worker_model
     if advisor_model:
         run_context.advisor_model = advisor_model
-
-    # Set up logging
-    logger = setup_logging(
-        workspace_path=workspace_path,
-        run_id=run_context.run_id,
-    )
 
     # Run workflow
     try:
@@ -409,9 +403,9 @@ async def _shutdown_model_client(client: ModelClient | None) -> None:
 
 def _display_results(result: dict) -> None:
     """Display workflow results in a formatted table."""
-    console.print()
-    console.print("[bold blue]═══ SecBrain Run Complete ═══[/]")
-    console.print()
+    console.print("\n" + "=" * 30)
+    console.print("[bold green]SecBrain Run Complete[/]")
+    console.print("=" * 30)
 
     # Summary table
     table = Table(title="Run Summary")

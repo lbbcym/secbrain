@@ -1,0 +1,55 @@
+{
+  "run_id": "21d94c6d",
+  "current_phase": "ingest",
+  "completed_phases": [
+    "ingest"
+  ],
+  "phase_data": {
+    "ingest": {
+      "program_name": "dummy-localhost",
+      "platform": "solo-lab",
+      "domains": [
+        "localhost",
+        "127.0.0.1"
+      ],
+      "urls": [
+        "http://localhost",
+        "http://127.0.0.1"
+      ],
+      "focus_areas": [
+        "http",
+        "static"
+      ],
+      "rules": [
+        "Localhost-only testing",
+        "No real external network calls",
+        "Dry-run preferred"
+      ],
+      "research": {},
+      "normalized": {
+        "domains": [
+          "localhost",
+          "127.0.0.1"
+        ],
+        "urls": [
+          "http://localhost",
+          "http://127.0.0.1"
+        ],
+        "target_types": [
+          "web"
+        ],
+        "excluded_paths": [],
+        "allowed_methods": [
+          "GET",
+          "POST",
+          "HEAD",
+          "OPTIONS"
+        ]
+      }
+    }
+  },
+  "timestamp": "2025-12-25T10:40:40.978870+00:00",
+  "metadata": {
+    "timestamp": "2025-12-25T04:40:40.978863"
+  }
+}

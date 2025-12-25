@@ -40,7 +40,7 @@ Install via foundryup:
 
 Or via package manager:
   brew install foundry     # macOS
-  
+
 Verify installation:
   forge --version
 """,
@@ -52,7 +52,7 @@ Install via:
 
 Or via package manager:
   brew install nuclei      # macOS
-  
+
 Update templates:
   nuclei -update-templates
 
@@ -67,7 +67,7 @@ Install via pip:
 
 Or via package manager:
   brew install semgrep     # macOS
-  
+
 Verify installation:
   semgrep --version
 """,
@@ -79,7 +79,7 @@ Install via:
 
 Or via package manager:
   brew install subfinder   # macOS
-  
+
 Verify installation:
   subfinder -version
 """,
@@ -91,7 +91,7 @@ Install via:
 
 Or via package manager:
   brew install amass       # macOS
-  
+
 Verify installation:
   amass -version
 """,
@@ -103,7 +103,7 @@ Install via:
 
 Or via package manager:
   brew install httpx       # macOS
-  
+
 Verify installation:
   httpx -version
 """,
@@ -115,7 +115,7 @@ Install via:
 
 Or via package manager:
   brew install ffuf        # macOS
-  
+
 Verify installation:
   ffuf -V
 """,
@@ -126,7 +126,7 @@ Install via package manager:
   brew install nmap        # macOS
   apt install nmap         # Ubuntu/Debian
   yum install nmap         # CentOS/RHEL
-  
+
 Verify installation:
   nmap --version
 """,
@@ -275,19 +275,19 @@ Verify installation:
         report_lines = []
 
         if missing_required:
-            report_lines.append("⚠️  REQUIRED TOOLS MISSING:")
+            report_lines.append("WARNING: REQUIRED TOOLS MISSING:")
             report_lines.append("")
             for tool in missing_required:
-                report_lines.append(f"  ❌ {tool.name}")
+                report_lines.append(f"  - {tool.name}")
                 if tool.install_guide:
                     report_lines.append(f"{tool.install_guide}")
                 report_lines.append("")
 
         if missing_recommended:
-            report_lines.append("ℹ️  RECOMMENDED TOOLS MISSING:")
+            report_lines.append("INFO: RECOMMENDED TOOLS MISSING:")
             report_lines.append("")
             for tool in missing_recommended:
-                report_lines.append(f"  ⚪ {tool.name}")
+                report_lines.append(f"  - {tool.name}")
                 if tool.install_guide:
                     # Add indented install guide
                     indent = "    "
@@ -296,7 +296,7 @@ Verify installation:
                 report_lines.append("")
 
         if not missing_required and not missing_recommended:
-            report_lines.append("✅ All tools are available!")
+            report_lines.append("All tools are available!")
 
         return "\n".join(report_lines)
 

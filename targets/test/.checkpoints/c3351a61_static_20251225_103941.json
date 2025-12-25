@@ -1,0 +1,210 @@
+{
+  "run_id": "c3351a61",
+  "current_phase": "static",
+  "completed_phases": [
+    "ingest",
+    "plan",
+    "recon",
+    "hypothesis",
+    "static"
+  ],
+  "phase_data": {
+    "ingest": {
+      "program_name": "dummy-localhost",
+      "platform": "solo-lab",
+      "domains": [
+        "localhost",
+        "127.0.0.1"
+      ],
+      "urls": [
+        "http://localhost",
+        "http://127.0.0.1"
+      ],
+      "focus_areas": [
+        "http",
+        "static"
+      ],
+      "rules": [
+        "Localhost-only testing",
+        "No real external network calls",
+        "Dry-run preferred"
+      ],
+      "research": {},
+      "normalized": {
+        "domains": [
+          "localhost",
+          "127.0.0.1"
+        ],
+        "urls": [
+          "http://localhost",
+          "http://127.0.0.1"
+        ],
+        "target_types": [
+          "web"
+        ],
+        "excluded_paths": [],
+        "allowed_methods": [
+          "GET",
+          "POST",
+          "HEAD",
+          "OPTIONS"
+        ]
+      }
+    },
+    "plan": {
+      "plan": {
+        "phases": [
+          {
+            "phase": "recon",
+            "objectives": [
+              "Subdomain enumeration",
+              "Port scanning",
+              "Technology detection"
+            ],
+            "tools": [
+              "subfinder",
+              "httpx",
+              "nmap"
+            ],
+            "time_estimate": "30 minutes",
+            "success_criteria": [
+              "Complete asset inventory",
+              "Technology stack identified"
+            ]
+          },
+          {
+            "phase": "hypothesis",
+            "objectives": [
+              "Identify vulnerability classes",
+              "Map attack surface"
+            ],
+            "tools": [
+              "worker_model",
+              "research"
+            ],
+            "time_estimate": "20 minutes",
+            "success_criteria": [
+              "Hypothesis list generated",
+              "Priorities assigned"
+            ]
+          },
+          {
+            "phase": "exploit",
+            "objectives": [
+              "Test hypotheses",
+              "Validate vulnerabilities"
+            ],
+            "tools": [
+              "http_client",
+              "nuclei"
+            ],
+            "time_estimate": "60 minutes",
+            "success_criteria": [
+              "Hypotheses tested",
+              "Findings documented"
+            ]
+          },
+          {
+            "phase": "triage",
+            "objectives": [
+              "Validate findings",
+              "Assess severity"
+            ],
+            "tools": [
+              "advisor_model"
+            ],
+            "time_estimate": "15 minutes",
+            "success_criteria": [
+              "Findings validated",
+              "Severity assigned"
+            ]
+          },
+          {
+            "phase": "report",
+            "objectives": [
+              "Create PoCs",
+              "Write reports"
+            ],
+            "tools": [
+              "worker_model",
+              "research"
+            ],
+            "time_estimate": "30 minutes",
+            "success_criteria": [
+              "Reports ready for submission"
+            ]
+          }
+        ],
+        "priority_targets": [
+          "localhost",
+          "127.0.0.1"
+        ],
+        "risk_considerations": [
+          "Stay within scope boundaries",
+          "Respect rate limits",
+          "Avoid destructive testing"
+        ]
+      },
+      "review": {
+        "approved": true,
+        "concerns": [],
+        "suggestions": [],
+        "risk_level": "medium"
+      },
+      "phases": [
+        "recon",
+        "hypothesis",
+        "exploit",
+        "triage",
+        "report"
+      ]
+    },
+    "recon": {
+      "assets": [
+        {
+          "id": "sub-30c633fe",
+          "type": "subdomain",
+          "value": "[DRY-RUN] Would run: subfinder -d localhost -silent",
+          "metadata": {
+            "source": "subfinder",
+            "parent_domain": "localhost"
+          }
+        },
+        {
+          "id": "sub-9e09426e",
+          "type": "subdomain",
+          "value": "[DRY-RUN] Would run: subfinder -d 127.0.0.1 -silent",
+          "metadata": {
+            "source": "subfinder",
+            "parent_domain": "127.0.0.1"
+          }
+        }
+      ],
+      "subdomains_count": 2,
+      "live_hosts_count": 0,
+      "nuclei_findings_count": 0,
+      "technologies": [],
+      "tech_research": {}
+    },
+    "hypothesis": {
+      "hypotheses": [],
+      "top_hypotheses": [],
+      "review": {
+        "reviewed": false
+      },
+      "by_vuln_type": {},
+      "missing_targets": {
+        "missing_contract_or_function": 0,
+        "total_hypotheses": 0
+      }
+    },
+    "static": {
+      "skipped": true,
+      "reason": "no_source"
+    }
+  },
+  "timestamp": "2025-12-25T10:39:41.138275+00:00",
+  "metadata": {
+    "timestamp": "2025-12-25T04:39:41.138261"
+  }
+}

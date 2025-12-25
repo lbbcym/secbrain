@@ -1,5 +1,5 @@
 {
-  "run_id": "2f93c626",
+  "run_id": "21d94c6d",
   "success": true,
   "phases_completed": [
     "ingest",
@@ -16,14 +16,17 @@
   ],
   "findings_count": 0,
   "reports_generated": 0,
-  "duration_seconds": 0.023219,
+  "duration_seconds": 0.038078,
   "errors": [
     "No hypotheses to test"
   ],
   "economic": {
     "decision": "SKIP",
     "reason": "no_attempts",
-    "max_profit_eth": 0.0
+    "max_profit_eth": 0.0,
+    "max_profit_usd": 0.0,
+    "gas_cost_usd_est": 0.0,
+    "net_usd_est": 0.0
   },
   "attempts_count": 0,
   "meta_metrics": {
@@ -36,6 +39,366 @@
     "attempts_count": 0,
     "attempts_with_profit": 0,
     "economic_decision": "SKIP",
-    "total_duration_seconds": 0.023219
+    "total_duration_seconds": 0.038078,
+    "performance": {
+      "run_id": "21d94c6d",
+      "start_time": 1766659240.977204,
+      "end_time": 1766659241.0155609,
+      "total_duration_seconds": 0.038356781005859375,
+      "phases": {
+        "ingest": {
+          "phase_name": "ingest",
+          "start_time": 1766659240.9780235,
+          "end_time": 1766659240.9788568,
+          "duration_seconds": 0.0008332729339599609,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": true,
+          "metadata": {
+            "program_name": "dummy-localhost",
+            "platform": "solo-lab",
+            "domains": [
+              "localhost",
+              "127.0.0.1"
+            ],
+            "urls": [
+              "http://localhost",
+              "http://127.0.0.1"
+            ],
+            "focus_areas": [
+              "http",
+              "static"
+            ],
+            "rules": [
+              "Localhost-only testing",
+              "No real external network calls",
+              "Dry-run preferred"
+            ],
+            "research": {},
+            "normalized": {
+              "domains": [
+                "localhost",
+                "127.0.0.1"
+              ],
+              "urls": [
+                "http://localhost",
+                "http://127.0.0.1"
+              ],
+              "target_types": [
+                "web"
+              ],
+              "excluded_paths": [],
+              "allowed_methods": [
+                "GET",
+                "POST",
+                "HEAD",
+                "OPTIONS"
+              ]
+            }
+          }
+        },
+        "plan": {
+          "phase_name": "plan",
+          "start_time": 1766659240.9808633,
+          "end_time": 1766659240.9822938,
+          "duration_seconds": 0.001430511474609375,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": true,
+          "metadata": {
+            "plan": {
+              "phases": [
+                {
+                  "phase": "recon",
+                  "objectives": [
+                    "Subdomain enumeration",
+                    "Port scanning",
+                    "Technology detection"
+                  ],
+                  "tools": [
+                    "subfinder",
+                    "httpx",
+                    "nmap"
+                  ],
+                  "time_estimate": "30 minutes",
+                  "success_criteria": [
+                    "Complete asset inventory",
+                    "Technology stack identified"
+                  ]
+                },
+                {
+                  "phase": "hypothesis",
+                  "objectives": [
+                    "Identify vulnerability classes",
+                    "Map attack surface"
+                  ],
+                  "tools": [
+                    "worker_model",
+                    "research"
+                  ],
+                  "time_estimate": "20 minutes",
+                  "success_criteria": [
+                    "Hypothesis list generated",
+                    "Priorities assigned"
+                  ]
+                },
+                {
+                  "phase": "exploit",
+                  "objectives": [
+                    "Test hypotheses",
+                    "Validate vulnerabilities"
+                  ],
+                  "tools": [
+                    "http_client",
+                    "nuclei"
+                  ],
+                  "time_estimate": "60 minutes",
+                  "success_criteria": [
+                    "Hypotheses tested",
+                    "Findings documented"
+                  ]
+                },
+                {
+                  "phase": "triage",
+                  "objectives": [
+                    "Validate findings",
+                    "Assess severity"
+                  ],
+                  "tools": [
+                    "advisor_model"
+                  ],
+                  "time_estimate": "15 minutes",
+                  "success_criteria": [
+                    "Findings validated",
+                    "Severity assigned"
+                  ]
+                },
+                {
+                  "phase": "report",
+                  "objectives": [
+                    "Create PoCs",
+                    "Write reports"
+                  ],
+                  "tools": [
+                    "worker_model",
+                    "research"
+                  ],
+                  "time_estimate": "30 minutes",
+                  "success_criteria": [
+                    "Reports ready for submission"
+                  ]
+                }
+              ],
+              "priority_targets": [
+                "localhost",
+                "127.0.0.1"
+              ],
+              "risk_considerations": [
+                "Stay within scope boundaries",
+                "Respect rate limits",
+                "Avoid destructive testing"
+              ]
+            },
+            "review": {
+              "approved": true,
+              "concerns": [],
+              "suggestions": [],
+              "risk_level": "medium"
+            },
+            "phases": [
+              "recon",
+              "hypothesis",
+              "exploit",
+              "triage",
+              "report"
+            ]
+          }
+        },
+        "recon": {
+          "phase_name": "recon",
+          "start_time": 1766659240.985847,
+          "end_time": 1766659240.9908998,
+          "duration_seconds": 0.005052804946899414,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": true,
+          "metadata": {
+            "assets": [
+              {
+                "id": "sub-0b9f2d03",
+                "type": "subdomain",
+                "value": "[DRY-RUN] Would run: subfinder -d localhost -silent",
+                "metadata": {
+                  "source": "subfinder",
+                  "parent_domain": "localhost"
+                }
+              },
+              {
+                "id": "sub-b4994579",
+                "type": "subdomain",
+                "value": "[DRY-RUN] Would run: subfinder -d 127.0.0.1 -silent",
+                "metadata": {
+                  "source": "subfinder",
+                  "parent_domain": "127.0.0.1"
+                }
+              }
+            ],
+            "subdomains_count": 2,
+            "live_hosts_count": 0,
+            "nuclei_findings_count": 0,
+            "technologies": [],
+            "tech_research": {}
+          }
+        },
+        "hypothesis": {
+          "phase_name": "hypothesis",
+          "start_time": 1766659240.9934797,
+          "end_time": 1766659240.9946373,
+          "duration_seconds": 0.001157522201538086,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": true,
+          "metadata": {
+            "hypotheses": [],
+            "top_hypotheses": [],
+            "review": {
+              "reviewed": false
+            },
+            "by_vuln_type": {},
+            "missing_targets": {
+              "missing_contract_or_function": 0,
+              "total_hypotheses": 0
+            }
+          }
+        },
+        "exploit": {
+          "phase_name": "exploit",
+          "start_time": 1766659240.997366,
+          "end_time": 1766659240.9981165,
+          "duration_seconds": 0.0007505416870117188,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": false,
+          "metadata": {}
+        },
+        "static": {
+          "phase_name": "static",
+          "start_time": 1766659240.9983847,
+          "end_time": 1766659240.999473,
+          "duration_seconds": 0.0010883808135986328,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": true,
+          "metadata": {
+            "skipped": true,
+            "reason": "no_source"
+          }
+        },
+        "triage": {
+          "phase_name": "triage",
+          "start_time": 1766659241.0024576,
+          "end_time": 1766659241.0033338,
+          "duration_seconds": 0.0008761882781982422,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": true,
+          "metadata": {
+            "findings": [],
+            "triaged": 0,
+            "economic": {
+              "decision": "SKIP",
+              "reason": "no_attempts",
+              "max_profit_eth": 0.0,
+              "max_profit_usd": 0.0,
+              "gas_cost_usd_est": 0.0,
+              "net_usd_est": 0.0
+            }
+          }
+        },
+        "report": {
+          "phase_name": "report",
+          "start_time": 1766659241.0061066,
+          "end_time": 1766659241.0069642,
+          "duration_seconds": 0.0008575916290283203,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": true,
+          "metadata": {
+            "reports": []
+          }
+        },
+        "meta": {
+          "phase_name": "meta",
+          "start_time": 1766659241.0098917,
+          "end_time": 1766659241.012414,
+          "duration_seconds": 0.0025222301483154297,
+          "api_calls": 0,
+          "cache_hits": 0,
+          "cache_misses": 0,
+          "errors": 0,
+          "success": true,
+          "metadata": {
+            "run_id": "21d94c6d",
+            "program": "dummy-localhost",
+            "timestamp": "2025-12-25T04:40:41.010877",
+            "metrics": {
+              "recon": {
+                "assets_discovered": 2,
+                "live_hosts": 0
+              },
+              "hypotheses": {
+                "total_generated": 0,
+                "by_type": {}
+              },
+              "exploitation": {
+                "tested": 0,
+                "confirmed": 0,
+                "confirmation_rate": 0
+              },
+              "findings": {
+                "total": 0,
+                "by_severity": {}
+              }
+            },
+            "analysis": {
+              "effective_types": {},
+              "ineffective_types": {},
+              "success_rates": {},
+              "top_performing": [],
+              "hypothesis_effectiveness": {}
+            },
+            "recommendations": [
+              "Low confirmation rate - consider improving hypothesis quality or testing methodology",
+              "No findings - consider expanding attack surface or trying new techniques",
+              "AI Insights: [DRY-RUN] Mock response for prompt: Based on this security testing run analysis, provide 2-3 specific recommendations.\n\nMetrics:\n{\n  \"re..."
+            ]
+          }
+        }
+      },
+      "total_api_calls": 0,
+      "total_cache_hits": 0,
+      "total_cache_misses": 0,
+      "total_errors": 0,
+      "cache_hit_rate": 0.0,
+      "successful_phases": 8,
+      "failed_phases": 1
+    },
+    "quality_metrics": {}
   }
 }

@@ -1,13 +1,13 @@
 {
-  "run_id": "2f93c626",
+  "run_id": "21d94c6d",
   "phase": "recon",
   "success": true,
-  "duration_seconds": 0.003349,
+  "duration_seconds": 0.004729,
   "errors": [],
   "data": {
     "assets": [
       {
-        "id": "sub-29b76d61",
+        "id": "sub-0b9f2d03",
         "type": "subdomain",
         "value": "[DRY-RUN] Would run: subfinder -d localhost -silent",
         "metadata": {
@@ -16,7 +16,7 @@
         }
       },
       {
-        "id": "sub-60a2b633",
+        "id": "sub-b4994579",
         "type": "subdomain",
         "value": "[DRY-RUN] Would run: subfinder -d 127.0.0.1 -silent",
         "metadata": {
@@ -27,8 +27,9 @@
     ],
     "subdomains_count": 2,
     "live_hosts_count": 0,
+    "nuclei_findings_count": 0,
     "technologies": [],
     "tech_research": {}
   },
-  "timestamp": "2025-12-20T05:09:19.383450"
+  "timestamp": "2025-12-25T04:40:41.027361"
 }

@@ -1,0 +1,5 @@
+{"run_id": "8cabc21e", "tool": "amass", "required": false, "event": "tool_unavailable", "level": "info", "timestamp": "2025-12-25T04:37:50.929521"}
+{"run_id": "8cabc21e", "tool": "nuclei", "required": false, "event": "tool_unavailable", "level": "info", "timestamp": "2025-12-25T04:37:50.995565"}
+{"run_id": "8cabc21e", "tool": "semgrep", "required": false, "event": "tool_unavailable", "level": "info", "timestamp": "2025-12-25T04:37:51.029740"}
+{"run_id": "8cabc21e", "tool": "subfinder", "required": false, "event": "tool_unavailable", "level": "info", "timestamp": "2025-12-25T04:37:51.057362"}
+{"run_id": "8cabc21e", "available_count": 2, "missing_count": 4, "available": ["foundry", "httpx"], "missing": ["amass", "nuclei", "semgrep", "subfinder"], "event": "tool_check_complete", "level": "info", "timestamp": "2025-12-25T04:37:51.058441"}
