@@ -207,7 +207,7 @@ allowed_methods:
   - OPTIONS
 max_depth: 3
 notes: "Threshold Network (Immunefi) - 39 smart contracts on Ethereum mainnet. Focus on tBTC bridge, threshold cryptography, token staking, and governance. Use forked execution; do not test on mainnet directly."
-foundry_root: /home/runner/work/secbrain/secbrain/targets/thresholdnetwork/instascope
+foundry_root: c:/Users/Michael/CascadeProjects/windsurf-project-2/targets/thresholdnetwork/instascope
 max_requests_per_second: 10
 respect_robots_txt: true
 
