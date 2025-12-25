@@ -425,17 +425,15 @@ tests/test_parallel_execution.py    # Parallel execution
 ### Current Documentation Structure (Fragmented)
 
 ```
-Root level (15+ files):
+Root level:
 ├── README.md                           # Main docs
 ├── OPTIMIZATION-GUIDE.md               # Optimization features
-├── WORKFLOW_OPTIMIZATION_GUIDE.md      # Overlaps with above
-├── WORKFLOW_OPTIMIZATION_SUMMARY.md    # Summary
-├── OPTIMIZATION_SUMMARY.md             # Another summary
+├── WORKFLOW_OPTIMIZATION_GUIDE.md      # Workflow optimization
+├── OPTIMIZATION_SUMMARY.md             # Optimization summary
 ├── RUN_ANALYSIS_GUIDANCE.md            # Run analysis
 ├── AUTOMATION-QUICK-REF.md             # Quick reference
 ├── CONTRIBUTING.md                     # Contributing
-├── QUICK_START.md                      # Quick start
-└── ... (many more)
+└── ... (other docs)
 ```
 
 ### Proposed Consolidated Structure

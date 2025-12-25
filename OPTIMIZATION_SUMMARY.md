@@ -50,13 +50,13 @@ This PR comprehensively optimizes SecBrain for bug hunting in the Threshold Netw
 
 ### 3. Documentation
 
-#### `THRESHOLD_NETWORK_OPTIMIZATION.md` (450 lines)
-- Comprehensive guide to all optimizations
+#### Threshold Network Optimization (archived)
+- Comprehensive optimization patterns for Threshold Network
 - Usage examples and best practices
-- Contract-specific focus areas
+- Contract-specific focus areas (tBTC, Bridge, etc.)
 - Immunefi severity mapping
 - Testing priorities with confidence scores
-- References and resources
+- **Note:** This was a specific implementation case study that has been archived
 
 ## Impact
 
@@ -90,7 +90,7 @@ This PR comprehensively optimizes SecBrain for bug hunting in the Threshold Netw
 ### New Files (3)
 - `secbrain/secbrain/agents/threshold_network_patterns.py` (571 lines)
 - `secbrain/secbrain/agents/immunefi_intelligence.py` (469 lines)
-- `THRESHOLD_NETWORK_OPTIMIZATION.md` (450 lines)
+- Threshold Network optimization patterns (archived)
 
 ### Modified Files (4)
 - `secbrain/secbrain/agents/vuln_hypothesis_agent.py` (+47 lines)
@@ -164,7 +164,7 @@ secbrain run \
 ```
 
 ### Full Documentation
-See `THRESHOLD_NETWORK_OPTIMIZATION.md` for complete usage guide, examples, and best practices.
+See the codebase implementation for complete usage guide, examples, and best practices.
 
 ## Benefits
 

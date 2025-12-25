@@ -224,7 +224,6 @@ For core project documentation, see the [secbrain/docs/](../secbrain/docs/) dire
 
 ## 🔗 Related Documentation
 
-- **[Main README](../README.md)** - Project overview and quick start
+- **[Main README](../README.md)** - Project overview and quick start (includes status badges)
 - **[AUTOMATION-QUICK-REF.md](../AUTOMATION-QUICK-REF.md)** - Quick reference for automated agents
 - **[IMPLEMENTATION-STATUS.md](IMPLEMENTATION-STATUS.md)** - Summary of major implementations
-- **[BADGES.md](../BADGES.md)** - Status badges for the project
