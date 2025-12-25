@@ -13,6 +13,13 @@ targets/**/instascope/lib/
 pwsh.profile.ps1
 claude-review.*
 
+# Tool caches
+.pip-cache/
+secbrain/.pip-cache/
+.ruff_cache/
+secbrain/.ruff_cache/
+.mypy_cache/
+
 # Python virtual environments
 .venv/
 venv/
@@ -93,6 +100,9 @@ targets/**/insights/
 targets/**/run-live-*
 insights_report_*.md
 insights_report_*.html
+insights-reports/
+daily-reports/
+weekly-review/
 
 # Target workspace directories (runtime generated)
 # Allow critical summary files but ignore most runtime artifacts
@@ -102,7 +112,11 @@ targets/**/workspace/*
 !targets/**/workspace/findings/
 !targets/**/workspace/.gitkeep
 
-# Agent-generated temporary/task-specific documentation  
+# SecBrain cache directories (workspace + phase checkpoints)
+**/.secbrain_cache/
+**/.checkpoints/
+
+# Agent-generated temporary/task-specific documentation
 # (These are generated during specific tasks and become obsolete)
 IMPLEMENTATION_COMPLETE.md
 INVESTIGATION_COMPLETE.md

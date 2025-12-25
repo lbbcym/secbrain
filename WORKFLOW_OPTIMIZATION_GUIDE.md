@@ -46,6 +46,7 @@ This enables by default:
 - ✅ Hypothesis quality filtering
 - ✅ Performance metrics collection
 - ✅ All integrated tools (Foundry, Perplexity, HTTP, Recon, Semgrep*)
+- ✅ CLI guard rails (RPC URL, block/chain parameters, exploit iteration/profit thresholds are validated before the run starts)
 
 *Semgrep requires source code at `--source` path
 
@@ -172,6 +173,21 @@ custom_filter = HypothesisQualityFilter(
     require_function_signature=True,  # Must have function signature
 )
 ```
+
+**Scope-based configuration (recommended):**
+
+You can now store the quality thresholds directly inside `scope.yaml`. The workflow will automatically pick these overrides up when constructing the `RunContext`.
+
+```yaml
+# scope.yaml
+hypothesis_quality:
+  min_confidence: 0.55
+  min_overall_score: 0.6
+  require_contract_address: true
+  require_function_signature: true
+```
+
+This keeps protocol-specific tuning alongside the rest of your targeting metadata and avoids hard-coding values in Python.
 
 **Output:**
 - Filtered hypotheses are logged separately
