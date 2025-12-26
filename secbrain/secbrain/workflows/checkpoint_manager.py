@@ -1,4 +1,11 @@
-"""Checkpoint and resume capability for long-running workflows."""
+"""Checkpoint and resume capability for long-running workflows.
+
+This module provides checkpoint management for SecBrain workflows including:
+- Saving and restoring workflow state
+- Phase progress tracking
+- Incremental data persistence
+- Resume capability for interrupted runs
+"""
 
 from __future__ import annotations
 
@@ -38,8 +45,7 @@ class Checkpoint:
 
 
 class CheckpointManager:
-    """
-    Manage workflow checkpoints for resume capability.
+    """Manage workflow checkpoints for resume capability.
 
     Features:
     - Save workflow state at phase boundaries
@@ -49,6 +55,16 @@ class CheckpointManager:
     """
 
     def __init__(self, workspace_path: Path):
+        """Initialize checkpoint manager.
+        
+        Args:
+            workspace_path: Path to the workspace directory
+            
+        Raises:
+            ValueError: If workspace_path is not a valid Path
+        """
+        if not isinstance(workspace_path, Path):
+            raise ValueError(f"workspace_path must be a Path, got {type(workspace_path).__name__}")
         self.workspace_path = workspace_path
         self.checkpoint_dir = workspace_path / ".checkpoints"
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -61,8 +77,7 @@ class CheckpointManager:
         phase_data: dict[str, dict[str, Any]],
         metadata: dict[str, Any] | None = None,
     ) -> Path:
-        """
-        Save a workflow checkpoint.
+        """Save a workflow checkpoint.
 
         Args:
             run_id: Unique run identifier
@@ -70,9 +85,12 @@ class CheckpointManager:
             completed_phases: List of completed phases
             phase_data: Data from completed phases
             metadata: Optional additional metadata
-
+            
         Returns:
-            Path to saved checkpoint file
+            Path to the saved checkpoint file
+            
+        Raises:
+            ValueError: If run_id is empty or phase data is invalid
         """
         checkpoint = Checkpoint(
             run_id=run_id,

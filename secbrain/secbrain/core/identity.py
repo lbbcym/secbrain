@@ -1,4 +1,11 @@
-"""Identity and session abstractions for multi-context testing."""
+"""Identity and session abstractions for multi-context testing.
+
+This module provides identity management for security testing including:
+- Multiple identity contexts (attacker, victim, admin, etc.)
+- Session state management (headers, cookies, tokens)
+- Identity registry for tracking multiple sessions
+- Request context switching
+"""
 
 from __future__ import annotations
 
@@ -50,12 +57,45 @@ class IdentityRegistry:
             self.active = identity.name
 
     def get(self, name: str | None = None) -> IdentitySession:
+        """Get an identity by name.
+        
+        Args:
+            name: Identity name to retrieve. If None, returns the active identity.
+            
+        Returns:
+            The requested IdentitySession
+            
+        Raises:
+            KeyError: If the identity is not registered
+            ValueError: If name is None and no active identity is set
+        """
         target = name or self.active
-        if target is None or target not in self._identities:
-            raise KeyError(f"Identity '{target}' not registered")
+        if target is None:
+            raise ValueError("No active identity set and no name provided")
+        if target not in self._identities:
+            available = ", ".join(self._identities.keys()) if self._identities else "none"
+            raise KeyError(
+                f"Identity '{target}' not registered. Available identities: {available}"
+            )
         return self._identities[target]
 
     def switch(self, name: str) -> IdentitySession:
+        """Switch to a different identity.
+        
+        Args:
+            name: Name of the identity to switch to
+            
+        Returns:
+            The newly active IdentitySession
+            
+        Raises:
+            KeyError: If the identity is not registered
+        """
+        if name not in self._identities:
+            available = ", ".join(self._identities.keys()) if self._identities else "none"
+            raise KeyError(
+                f"Cannot switch to '{name}': not registered. Available: {available}"
+            )
         self.active = name
         return self.get(name)
 

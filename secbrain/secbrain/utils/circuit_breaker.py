@@ -1,4 +1,11 @@
-"""Circuit breaker for external service calls."""
+"""Circuit breaker for external service calls.
+
+This module implements the circuit breaker pattern to prevent cascading failures:
+- Automatic failure detection and fast-fail behavior
+- State management (CLOSED, OPEN, HALF_OPEN)
+- Configurable thresholds and timeouts
+- Service health monitoring and recovery
+"""
 
 from __future__ import annotations
 
@@ -42,15 +49,29 @@ class CircuitBreaker:
         self._lock = asyncio.Lock()
 
     async def call(self, func: Callable[..., T], *args: Any, **kwargs: Any) -> T:
-        """Execute function with circuit breaker protection."""
+        """Execute function with circuit breaker protection.
+        
+        Args:
+            func: Async function to execute
+            *args: Positional arguments for the function
+            **kwargs: Keyword arguments for the function
+            
+        Returns:
+            Result from the function call
+            
+        Raises:
+            CircuitBreakerOpenError: If circuit is open and not ready to retry
+            Exception: Any exception raised by the wrapped function
+        """
         async with self._lock:
             if self._state == CircuitState.OPEN:
                 if self._should_attempt_reset():
                     self._state = CircuitState.HALF_OPEN
                 else:
+                    retry_after = self._get_retry_after()
                     raise CircuitBreakerOpenError(
-                        "Circuit breaker open, retry after "
-                        f"{self._get_retry_after()} seconds"
+                        f"Circuit breaker open, retry after {retry_after:.1f} seconds",
+                        retry_after=retry_after
                     )
 
         try:
@@ -97,5 +118,19 @@ class CircuitBreaker:
 
 
 class CircuitBreakerOpenError(Exception):
-    """Raised when circuit breaker is open."""
+    """Raised when circuit breaker is open.
+    
+    This exception indicates that the circuit breaker has detected too many
+    failures and is temporarily blocking requests to prevent cascading failures.
+    """
+    
+    def __init__(self, message: str, retry_after: float = 0.0):
+        """Initialize the error.
+        
+        Args:
+            message: Error message
+            retry_after: Seconds to wait before retrying
+        """
+        super().__init__(message)
+        self.retry_after = retry_after
 
