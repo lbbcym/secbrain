@@ -1,13 +1,16 @@
 # SecBrain
 
-**Multi-agent security bounty system with research integration, advisor models, and guarded tooling.**
-
 [![Security Scan](https://github.com/blairmichaelg/secbrain/actions/workflows/security-scan.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/security-scan.yml)
 [![Solidity Security](https://github.com/blairmichaelg/secbrain/actions/workflows/solidity-security.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/solidity-security.yml)
 [![Code Quality](https://github.com/blairmichaelg/secbrain/actions/workflows/code-quality.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/code-quality.yml)
 [![Python Testing](https://github.com/blairmichaelg/secbrain/actions/workflows/python-testing.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/python-testing.yml)
 [![Foundry Fuzzing](https://github.com/blairmichaelg/secbrain/actions/workflows/foundry-fuzzing.yml/badge.svg)](https://github.com/blairmichaelg/secbrain/actions/workflows/foundry-fuzzing.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Python Version](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/downloads/)
+
+> **Multi-agent security bounty system with research integration, advisor models, and guarded tooling.**
+
+---
 
 ## Overview
 
@@ -76,7 +79,7 @@ gh workflow run comprehensive-security-analysis.yml \
 - 🤖 AI-powered analysis (SecBrain agents)
 - 📊 Automated reporting with GitHub issues
 
-See [Comprehensive Security Analysis Guide](.github/workflows/COMPREHENSIVE_SECURITY_ANALYSIS_README.md) for full documentation.
+See [Comprehensive Security Analysis Guide](docs/guides/COMPREHENSIVE_SECURITY_ANALYSIS_QUICKREF.md) for full documentation.
 
 ### Quick Bounty Hunt Workflow
 
@@ -118,7 +121,7 @@ secbrain run \
   --dry-run
 ```
 
-See [VERIFICATION.md](VERIFICATION.md) for complete verification steps.
+See [VERIFICATION.md](docs/guides/VERIFICATION.md) for complete verification steps.
 
 ### Installation
 
@@ -136,7 +139,7 @@ pip install -e ".[dev]"
 
 ### Set up API keys
 
-**All configured to use FREE tier models!** See [FREE_TIER_MODELS.md](FREE_TIER_MODELS.md) for details.
+**All configured to use FREE tier models!** See [FREE_TIER_MODELS.md](docs/guides/FREE_TIER_MODELS.md) for details.
 
 ```bash
 # Required for research integration (FREE with Perplexity PRO - unlimited)
@@ -199,9 +202,10 @@ secbrain insights --workspace ./targets/protocol1 --format html --open
 - 🔧 [Troubleshooting Guide](docs/TROUBLESHOOTING.md) - Common issues and solutions
 
 ### Workflow Optimization & Analysis 🚀
-- 📈 [**Bounty Workflow Analysis**](BOUNTY_WORKFLOW_ANALYSIS.md) - **Complete workflow analysis, tool inventory, and optimization roadmap**
-- ⚡ [**Workflow Optimization Guide**](WORKFLOW_OPTIMIZATION_GUIDE.md) - **Optimization features, tool usage, and best practices**
-- 📋 [Run Analysis Guidance](RUN_ANALYSIS_GUIDANCE.md) - Debugging zero-finding runs
+- 📈 [**Bounty Workflow Analysis**](docs/guides/BOUNTY_WORKFLOW_ANALYSIS.md) - **Complete workflow analysis, tool inventory, and optimization roadmap**
+- ⚡ [**Workflow Optimization Guide**](docs/guides/WORKFLOW_OPTIMIZATION_GUIDE.md) - **Optimization features, tool usage, and best practices**
+- 📋 [Run Analysis Guidance](docs/guides/RUN_ANALYSIS_GUIDANCE.md) - Debugging zero-finding runs
+- 🔧 [Optimization Guide](docs/guides/OPTIMIZATION-GUIDE.md) - Performance and efficiency best practices
 
 ### Contributing & Quality
 - 🤝 [Contributing Guide](CONTRIBUTING.md) - How to contribute
@@ -211,10 +215,13 @@ secbrain insights --workspace ./targets/protocol1 --format html --open
 - 🤖 [Automated Agents](secbrain/docs/automated-agents.md) - CI/CD automation suite
 
 ### Quick References
-- ⚡ [Automation Quick Ref](AUTOMATION-QUICK-REF.md) - Daily workflows and tools
+- ⚡ [Automation Quick Ref](docs/guides/AUTOMATION-QUICK-REF.md) - Daily workflows and tools
 - 📋 [Testing Quick Ref](docs/TESTING-QUICK-REF.md) - Quick testing commands
 - 📚 [Documentation Index](docs/README.md) - All contributor guides
 - 🎯 [Immunefi Integration Guide](docs/IMMUNEFI_INTEGRATION_GUIDE.md) - Bug bounty platform integration
+- 💰 [Free Tier Models](docs/guides/FREE_TIER_MODELS.md) - Using free API tiers
+- 📦 [Dependency Management](docs/guides/DEPENDENCY-MANAGEMENT.md) - Managing project dependencies
+- ✅ [Verification Guide](docs/guides/VERIFICATION.md) - How to verify installation and setup
 
 ## CLI Commands
 
@@ -467,8 +474,18 @@ MIT
 
 ---
 
-**Need help?** Check the [documentation](docs/README.md) or open an issue!
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with cutting-edge AI models and security research
+- Powered by open-source tools: Foundry, Slither, Semgrep, and more
+- Inspired by the security research and bug bounty community
 
 ---
 
-*Last updated: December 25, 2024*
+**Need help?** Check the [documentation](docs/README.md) or [open an issue](https://github.com/blairmichaelg/secbrain/issues)!
+
+**Last updated:** January 8, 2026
