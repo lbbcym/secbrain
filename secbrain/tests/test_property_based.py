@@ -9,10 +9,14 @@ from __future__ import annotations
 import json
 import math
 from typing import Any
+from unittest.mock import Mock
 
 from hypothesis import given
 from hypothesis import strategies as st
 
+from secbrain.agents.triage_agent import EconomicAnalyzer
+from secbrain.core.consensus_engine import ConsensusEngine
+from secbrain.core.payload_adaptation import PayloadMutator
 from secbrain.utils.response_diff import (
     diff_body_size_entropy,
     diff_headers,
@@ -197,3 +201,132 @@ def test_entropy_bounded(text: str) -> None:
         # Entropy upper bound is log2(n) where n is the length
         # But practically, it should be reasonable
         assert entropy <= 20.0  # Reasonable upper bound for text
+
+
+# ============================================================================
+# Property-based tests for PayloadMutator
+# ============================================================================
+
+
+@given(st.text(min_size=1, max_size=200))
+def test_payload_mutator_always_returns_nonempty(payload: str) -> None:
+    """adapt() should always return at least one variant."""
+    response = Mock(text="OK", status_code=200)
+    result = PayloadMutator.adapt(payload, response)
+    assert len(result) >= 1
+
+
+@given(st.text(min_size=1, max_size=200), st.integers(min_value=100, max_value=599))
+def test_payload_mutator_no_duplicates(payload: str, status: int) -> None:
+    """adapt() should never return duplicate variants."""
+    response = Mock(text="blocked by firewall", status_code=status)
+    result = PayloadMutator.adapt(payload, response)
+    assert len(result) == len(set(result))
+
+
+@given(st.text(min_size=1, max_size=100))
+def test_payload_mutator_waf_bypass_count(payload: str) -> None:
+    """_waf_bypass should always return exactly 6 variants."""
+    result = PayloadMutator._waf_bypass(payload)
+    assert len(result) == 6
+
+
+@given(st.text(min_size=1, max_size=100))
+def test_payload_mutator_encoding_bypass_count(payload: str) -> None:
+    """_encoding_bypass should always return exactly 8 variants."""
+    result = PayloadMutator._encoding_bypass(payload)
+    assert len(result) == 8
+
+
+# ============================================================================
+# Property-based tests for EconomicAnalyzer
+# ============================================================================
+
+
+@given(
+    st.lists(
+        st.fixed_dictionaries({
+            "profit_eth": st.floats(min_value=0, max_value=1000, allow_nan=False),
+            "profit_usd_estimate": st.floats(min_value=0, max_value=1_000_000, allow_nan=False),
+        }),
+        min_size=0,
+        max_size=5,
+    )
+)
+def test_economic_analyzer_decision_is_valid(attempts: list[dict[str, Any]]) -> None:
+    """Decision should always be one of PURSUE, CONSIDER, or SKIP."""
+    analyzer = EconomicAnalyzer()
+    result = analyzer.analyze_attempts(attempts)
+    assert result["decision"] in {"PURSUE", "CONSIDER", "SKIP"}
+
+
+@given(
+    st.lists(
+        st.fixed_dictionaries({
+            "profit_eth": st.floats(min_value=0, max_value=100, allow_nan=False),
+        }),
+        min_size=0,
+        max_size=5,
+    )
+)
+def test_economic_analyzer_profit_non_negative(attempts: list[dict[str, Any]]) -> None:
+    """Reported profit values should always be non-negative."""
+    analyzer = EconomicAnalyzer()
+    result = analyzer.analyze_attempts(attempts)
+    assert result["max_profit_eth"] >= 0
+    assert result["max_profit_usd"] >= 0
+
+
+# ============================================================================
+# Property-based tests for ConsensusEngine
+# ============================================================================
+
+
+@given(
+    st.lists(
+        st.fixed_dictionaries({
+            "verified": st.booleans(),
+            "confidence": st.floats(min_value=0, max_value=1, allow_nan=False),
+        }),
+        min_size=1,
+        max_size=10,
+    )
+)
+def test_consensus_confidence_bounded(verifier_results: list[dict[str, Any]]) -> None:
+    """Average confidence should be within [0, 1]."""
+    engine = ConsensusEngine()
+    mocks = []
+    for vr in verifier_results:
+        m = Mock()
+        m.verified = vr["verified"]
+        m.confidence_score = vr["confidence"]
+        m.evidence = None
+        mocks.append(m)
+
+    result = engine.decide(mocks)
+    assert 0 <= result.confidence <= 1
+
+
+@given(
+    st.lists(
+        st.fixed_dictionaries({
+            "verified": st.just(False),
+            "confidence": st.floats(min_value=0, max_value=1, allow_nan=False),
+        }),
+        min_size=1,
+        max_size=10,
+    )
+)
+def test_consensus_no_verified_means_not_verified(verifier_results: list[dict[str, Any]]) -> None:
+    """If no verifier reports verified, consensus should be not verified."""
+    engine = ConsensusEngine()
+    mocks = []
+    for vr in verifier_results:
+        m = Mock()
+        m.verified = False
+        m.confidence_score = vr["confidence"]
+        m.evidence = None
+        mocks.append(m)
+
+    result = engine.decide(mocks)
+    assert result.verified is False
