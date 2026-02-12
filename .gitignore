@@ -143,4 +143,5 @@ claude-review.*
 *.tmp
 *.temp
 tmpclaude-*
+nul
 
