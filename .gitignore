@@ -38,6 +38,7 @@ ENV/
 # Test and validation workspaces (generated during test runs)
 secbrain/test_workspace/
 secbrain/validation_workspace/
+secbrain/tests/.tmp/
 targets/test_cli/
 secbrain/examples/test_workspace/
 
