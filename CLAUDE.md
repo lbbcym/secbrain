@@ -3,9 +3,9 @@
 ## After completing any task
 
 1. **Always commit your work.** Stage all relevant changes and create a commit with a clear message following the project's `<type>: <description>` format (feat, fix, docs, style, refactor, test, chore).
-2. **Clean up temporary files.** Remove any scratch files, temp outputs, or artifacts created during the session (e.g., `commitmsg.txt`, leftover debug files).
-3. **Clean up branches.** If you created a feature branch and the work is merged or complete, delete it. The default workflow is to work directly on `main` unless the user says otherwise.
-4. **Do not push** unless the user explicitly asks.
+2. **Always push after committing.** Keep the remote in sync — run `git push` after every commit. The repo should never be ahead of origin when a task is done.
+3. **Clean up temporary files.** Remove any scratch files, temp outputs, or artifacts created during the session (e.g., `commitmsg.txt`, leftover debug files).
+4. **Clean up branches.** If you created a feature branch and the work is merged or complete, delete it locally and remotely. The default workflow is to work directly on `main` unless the user says otherwise.
 
 ## Platform and environment
 
