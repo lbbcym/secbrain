@@ -42,7 +42,7 @@ class NucleiScanner:
         templates_path: str | None = None,
     ):
         self.run_context = run_context
-        self.templates_path = templates_path or "~/nuclei-templates"
+        self.templates_path = str(Path(templates_path or "~/nuclei-templates").expanduser())
 
     def _find_nuclei(self) -> str | None:
         """Find nuclei executable."""

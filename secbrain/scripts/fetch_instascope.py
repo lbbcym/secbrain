@@ -49,11 +49,17 @@ def run_build(dest_dir: Path) -> None:
     if not build_script.exists():
         return
 
+    if shutil.which("bash") is None:
+        print(
+            "WARNING: bash not found on PATH. Cannot run build.sh. "
+            "Install Git Bash, WSL, or run from a Linux/macOS environment.",
+            file=sys.stderr,
+        )
+        return
+
     try:
         subprocess.check_call(["bash", str(build_script)], cwd=dest_dir)
-    except FileNotFoundError:
-        pass
-    except subprocess.CalledProcessError as exc:
+    except subprocess.CalledProcessError:
         raise
 
 
