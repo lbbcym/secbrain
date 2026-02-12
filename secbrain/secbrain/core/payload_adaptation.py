@@ -1,3 +1,9 @@
+"""Payload adaptation and mutation for exploit evasion.
+
+Provides the PayloadMutator class which generates payload variants in response
+to WAF blocks, encoding-based sanitization, server errors, and timeouts.
+"""
+
 from __future__ import annotations
 
 from typing import Any

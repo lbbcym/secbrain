@@ -27,6 +27,14 @@ except ModuleNotFoundError:  # pragma: no cover
 
 
 class _StdlibBoundLogger:
+    """Stdlib fallback for structlog-compatible bound logging.
+
+    Provides ``bind``, ``info``, and ``error`` methods that mirror
+    structlog's ``BoundLogger`` interface, serializing events as JSON
+    so the output format remains consistent regardless of whether
+    structlog is installed.
+    """
+
     def __init__(self, logger: logging.Logger, bound: dict[str, Any] | None = None):
         self._logger = logger
         self._bound = bound or {}
@@ -172,6 +180,7 @@ def log_event(
     result: str | None = None,
     **kwargs: Any,
 ) -> None:
+    """Log a structured event with optional contextual fields."""
     context: dict[str, Any] = {}
 
     if agent:
@@ -201,6 +210,7 @@ def log_tool_call(
     duration_ms: float | None = None,
     **kwargs: Any,
 ) -> None:
+    """Log a tool invocation with success/failure status and optional timing."""
     log_event(
         logger,
         event="tool_call",
@@ -221,6 +231,7 @@ def log_model_call(
     duration_ms: float | None = None,
     **kwargs: Any,
 ) -> None:
+    """Log an LLM model invocation with token usage and timing."""
     log_event(
         logger,
         event="model_call",
@@ -238,6 +249,7 @@ def log_phase_transition(
     to_phase: str,
     **kwargs: Any,
 ) -> None:
+    """Log a workflow phase transition."""
     log_event(
         logger,
         event="phase_transition",
@@ -254,6 +266,7 @@ def log_finding(
     target: str,
     **kwargs: Any,
 ) -> None:
+    """Log a vulnerability finding with severity and type."""
     log_event(
         logger,
         event="finding",
@@ -271,6 +284,7 @@ def log_error(
     recoverable: bool = True,
     **kwargs: Any,
 ) -> None:
+    """Log an error event with recoverability flag."""
     logger.error(
         "error",
         agent=agent,

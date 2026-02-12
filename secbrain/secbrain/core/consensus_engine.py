@@ -1,3 +1,9 @@
+"""Consensus engine for aggregating multiple verifier results.
+
+Provides a simple majority-vote / highest-confidence aggregation strategy
+used by exploit specialists to combine verification signals.
+"""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -9,6 +15,14 @@ from secbrain.core.verification import VerificationResult
 
 @dataclass
 class ConsensusResult:
+    """Aggregated result from one or more verifiers.
+
+    Attributes:
+        verified: Whether the vulnerability was confirmed by at least one verifier.
+        confidence: Average confidence score across all verifiers (0.0-1.0).
+        evidence: Supporting evidence from the highest-confidence verifier.
+    """
+
     verified: bool
     confidence: float
     evidence: Any | None = None

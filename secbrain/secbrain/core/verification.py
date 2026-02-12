@@ -143,6 +143,7 @@ class VerificationResult:
 
 
 def get_url_path(url: str) -> str:
+    """Extract the path component from a URL, defaulting to '/'."""
     try:
         return urlparse(url).path or "/"
     except Exception:
