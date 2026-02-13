@@ -107,9 +107,10 @@ class AdvancedResearchAgent:
 
         if self.research_client:
             try:
-                result = await self.research_client.research(
+                result = await self.research_client.ask_research(
                     question=query,
                     context="Security research for bug bounty hunting",
+                    run_context=self.run_context,
                     ttl_hours=24,  # Cache for 24 hours
                 )
 
@@ -361,9 +362,10 @@ class AdvancedResearchAgent:
 
         if self.research_client:
             try:
-                result = await self.research_client.research(
+                result = await self.research_client.ask_research(
                     question=query,
                     context=f"Deep security analysis of {protocol_name}",
+                    run_context=self.run_context,
                     ttl_hours=48,  # Cache protocol research for 48 hours
                 )
 
@@ -416,9 +418,10 @@ class AdvancedResearchAgent:
 
         if self.research_client:
             try:
-                result = await self.research_client.research(
+                result = await self.research_client.ask_research(
                     question=query,
                     context="Cross-protocol vulnerability correlation",
+                    run_context=self.run_context,
                     ttl_hours=24,
                 )
 

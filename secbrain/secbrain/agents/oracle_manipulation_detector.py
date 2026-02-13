@@ -46,7 +46,7 @@ class OracleManipulationDetector:
                         try:
                             inputs = item.get("inputs") or []
                             types = [inp.get("type") for inp in inputs if isinstance(inp, dict) and inp.get("type")]
-                            sig = f"{item.get('name')}({','.join(types)})"
+                            sig = f"{item.get('name')}({','.join(t for t in types if t is not None)})"
                         except Exception:
                             pass
                         oracle_functions.append(sig)

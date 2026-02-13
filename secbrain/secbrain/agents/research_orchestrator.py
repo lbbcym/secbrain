@@ -201,7 +201,7 @@ class ResearchOrchestrator:
                         run_context=self.run_context,
                     )
                 else:
-                    response = await self.research_client.research(
+                    response = await self.research_client.research(  # type: ignore[attr-defined]
                         question=query.question,
                         context=query.context,
                     )
