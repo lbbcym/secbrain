@@ -10,6 +10,7 @@ import json
 import shutil
 from collections.abc import Iterable
 from pathlib import Path
+from typing import Any
 
 import yaml
 from pydantic import ValidationError as PydanticValidationError
@@ -21,25 +22,26 @@ class ValidationError(Exception):
     """Raised when configuration validation fails."""
 
 
-def _load_yaml_or_json(path: Path) -> dict:
+def _load_yaml_or_json(path: Path) -> dict[str, Any]:
     """Load configuration from YAML or JSON file.
-    
+
     Args:
         path: Path to the configuration file
-        
+
     Returns:
         Dictionary containing the configuration data
-        
+
     Raises:
         ValidationError: If file doesn't exist or cannot be parsed
     """
     if not path.exists():
         raise ValidationError(f"File not found: {path}")
-    
+
     try:
         if path.suffix.lower() == ".json":
             with path.open(encoding="utf-8") as f:
-                return json.load(f)
+                data: dict[str, Any] = json.load(f)
+                return data
         with path.open(encoding="utf-8") as f:
             data = yaml.safe_load(f)
             return data if data is not None else {}

@@ -17,7 +17,7 @@ from typing import ClassVar
 @dataclass(frozen=True)
 class LLMConfig:
     """LLM-related configuration.
-    
+
     Provides default settings for LLM client operations including
     timeouts, retry logic, and concurrency limits.
     """
@@ -31,7 +31,7 @@ class LLMConfig:
 @dataclass(frozen=True)
 class HypothesisConfig:
     """Hypothesis generation configuration.
-    
+
     Controls parameters for vulnerability hypothesis generation
     including confidence thresholds and preview limits.
     """
@@ -47,7 +47,7 @@ class HypothesisConfig:
 @dataclass(frozen=True)
 class ExploitConfig:
     """Exploitation configuration.
-    
+
     Defines settings for exploit execution including iteration limits,
     profit thresholds, and build timeouts.
     """
@@ -63,7 +63,7 @@ class ExploitConfig:
 @dataclass(frozen=True)
 class RateLimitConfig:
     """Rate limiting configuration.
-    
+
     Configures rate limits for external API calls to prevent
     abuse and stay within service quotas.
     """
@@ -77,7 +77,7 @@ class RateLimitConfig:
 @dataclass(frozen=True)
 class PricingConfig:
     """Token pricing configuration.
-    
+
     Defines default prices and thresholds for profitability calculations.
     """
 

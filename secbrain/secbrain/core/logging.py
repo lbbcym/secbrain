@@ -22,8 +22,8 @@ try:
     from structlog.typing import EventDict, WrappedLogger
 except ModuleNotFoundError:  # pragma: no cover
     structlog = None  # type: ignore[assignment]
-    EventDict = dict  # type: ignore[misc,assignment]
-    WrappedLogger = Any  # type: ignore[misc,assignment]
+    EventDict = dict  # type: ignore[misc]
+    WrappedLogger = Any  # type: ignore[misc]
 
 
 class _StdlibBoundLogger:

@@ -39,11 +39,11 @@ class WorkspaceStorage:
 
     def __init__(self, workspace_path: Path | RunContext, run_id: str | None = None):
         """Initialize workspace storage.
-        
+
         Args:
             workspace_path: Either a Path to the workspace or a RunContext
             run_id: Run identifier (required if workspace_path is a Path)
-            
+
         Raises:
             TypeError: If run_id is None when workspace_path is a Path
             ValueError: If run_id is empty string
@@ -103,9 +103,9 @@ class WorkspaceStorage:
 
     async def initialize(self) -> None:
         """Initialize the storage database.
-        
+
         Creates database connection and schema if not exists.
-        
+
         Raises:
             RuntimeError: If database initialization fails
         """

@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -35,7 +35,7 @@ from secbrain.workflows.hypothesis_quality_filter import HypothesisQualityFilter
 from secbrain.workflows.performance_metrics import PerformanceMetricsCollector
 
 
-class Phase(str, Enum):
+class Phase(StrEnum):
     """Workflow phases."""
 
     INGEST = "ingest"

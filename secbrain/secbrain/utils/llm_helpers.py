@@ -6,16 +6,30 @@ and common response processing patterns.
 """
 
 import json
-from typing import Any, TypeVar
+from typing import Any, TypeVar, overload
 
 T = TypeVar("T")
+
+
+@overload
+def extract_json_from_response(
+    response: str,
+) -> dict[str, Any]: ...
+
+
+@overload
+def extract_json_from_response(
+    response: str,
+    *,
+    expected_type: type[T],
+) -> T: ...
 
 
 def extract_json_from_response(
     response: str,
     *,
-    expected_type: type[T] = dict,
-) -> T:
+    expected_type: type[Any] = dict,
+) -> Any:
     """Extract and parse JSON from LLM response.
 
     Handles common patterns:
@@ -37,7 +51,7 @@ def extract_json_from_response(
     """
     if not isinstance(response, str):
         raise TypeError(f"Response must be a string, got {type(response).__name__}")
-    
+
     if not response:
         raise json.JSONDecodeError("empty response", response, 0)
 

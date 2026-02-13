@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from urllib.parse import urlparse
@@ -97,7 +97,7 @@ class EvidenceBundle:
     confidence_score: float
     tool_name: str = "exploit_agent"
     model_name: str = ""
-    timestamp: datetime = field(default_factory=datetime.utcnow)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     notes: str | None = None
 
     def to_dict(self) -> dict[str, Any]:

@@ -49,7 +49,7 @@ def _install_compile_error_shim() -> None:
                 return "compiler_error"
         return None
 
-    ForgeOutputParser._detect_compile_error = staticmethod(_detect_compile_error)  # type: ignore[attr-defined]
+    ForgeOutputParser._detect_compile_error = staticmethod(_detect_compile_error)  # type: ignore[method-assign,unused-ignore]
 
 
 _install_compile_error_shim()
@@ -260,23 +260,23 @@ class FoundryRunner:
         env = os.environ.copy()
         hyp_solc = hypothesis.get("solc")
 
-        rpc_urls: list[str] = []
+        rpc_urls: list[str | None] = []
         if rpc_url:
             rpc_urls.append(str(rpc_url))
         try:
             scope_rpc_urls = getattr(getattr(self.run_context, "scope", None), "rpc_urls", None) or []
             rpc_urls.extend([str(u) for u in scope_rpc_urls if str(u)])
         except Exception:
-            pass
+            pass  # scope.rpc_urls may not be available; proceed with what we have
         if not rpc_urls:
-            rpc_urls = [None]
+            rpc_urls = [""]
 
         profile_for_run: str | None = str(foundry_profile) if foundry_profile else None
         try:
             if hyp_solc and str(hyp_solc).startswith("0.5"):
                 profile_for_run = self._fallback_profile
         except Exception:
-            pass
+            pass  # solc version parsing failed; use default profile
 
         if profile_for_run:
             env["FOUNDRY_PROFILE"] = profile_for_run
@@ -398,6 +398,7 @@ class FoundryRunner:
         attack_body: str,
     ) -> Path:
         """Write a minimal Exploit.t.sol harness into the Foundry project and copy it into attempt_dir."""
+        assert self.project_root is not None  # caller checks before invoking
         foundry_toml = "[profile.default]\n"
         if rpc_url:
             foundry_toml += f'eth_rpc_url = "{rpc_url}"\n'
@@ -577,6 +578,8 @@ class FoundryRunner:
         (attempt_dir / "Exploit.t.sol").write_text(exploit_test)
 
         # Write into the target Foundry project so forge can compile with its dependencies
+        if self.project_root is None:
+            return attempt_dir / "Exploit.t.sol"
         project_test_dir = self.project_root / self.test_root_rel
         project_test_dir.mkdir(parents=True, exist_ok=True)
         test_filename = f"SecBrainExploit_{hyp_id}_{attempt_index}.t.sol"

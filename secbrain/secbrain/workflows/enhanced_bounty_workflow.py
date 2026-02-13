@@ -10,6 +10,7 @@ This workflow provides an improved bug hunting experience with:
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -98,7 +99,7 @@ class EnhancedBountyWorkflow:
 
         logger.info(f"Gathering intelligence for {target_program}")
 
-        intelligence = {
+        intelligence: dict[str, Any] = {
             "program_details": None,
             "trending_vulnerabilities": [],
             "recommended_focus": [],
@@ -125,8 +126,9 @@ class EnhancedBountyWorkflow:
                 for t in trends[:10]
             ]
 
+            recommended_focus = intelligence['recommended_focus'] or []
             logger.info(f"Gathered intelligence: {len(trends)} trends, "
-                       f"{len(intelligence['recommended_focus'])} focus areas")
+                       f"{len(recommended_focus)} focus areas")
 
             return intelligence
 
@@ -281,7 +283,7 @@ class EnhancedBountyWorkflow:
         """
         logger.info("Starting enhanced bug bounty workflow")
 
-        results = {
+        results: dict[str, Any] = {
             "targets": [],
             "intelligence": {},
             "research": {},

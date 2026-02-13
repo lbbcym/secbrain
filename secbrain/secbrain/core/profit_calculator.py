@@ -302,7 +302,7 @@ class ProfitCalculator:
         """
         if not 0 <= decimals <= MAX_TOKEN_DECIMALS:
             raise ValueError(f"Invalid decimals: {decimals}")
-        return float(raw_amount) / (10 ** decimals)
+        return float(float(raw_amount) / (10 ** decimals))
 
     def normalize_token_amount(self, raw_amount: int | float, decimals: int) -> float:
         """Normalize a raw token amount by its decimals (instance method).
@@ -398,7 +398,7 @@ class ProfitCalculator:
                 continue
 
             spec = spec_lookup.get(symbol.lower())
-            if not spec:
+            if spec is None:
                 continue
 
             # Normalize amount
@@ -458,7 +458,7 @@ class ProfitCalculator:
                 continue
 
             spec = spec_lookup.get(address)
-            if not spec:
+            if spec is None:
                 continue
 
             # Normalize and calculate USD value

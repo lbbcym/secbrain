@@ -58,13 +58,13 @@ class IdentityRegistry:
 
     def get(self, name: str | None = None) -> IdentitySession:
         """Get an identity by name.
-        
+
         Args:
             name: Identity name to retrieve. If None, returns the active identity.
-            
+
         Returns:
             The requested IdentitySession
-            
+
         Raises:
             KeyError: If the identity is not registered
             ValueError: If name is None and no active identity is set
@@ -81,13 +81,13 @@ class IdentityRegistry:
 
     def switch(self, name: str) -> IdentitySession:
         """Switch to a different identity.
-        
+
         Args:
             name: Name of the identity to switch to
-            
+
         Returns:
             The newly active IdentitySession
-            
+
         Raises:
             KeyError: If the identity is not registered
         """

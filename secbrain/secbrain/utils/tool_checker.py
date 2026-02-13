@@ -255,8 +255,8 @@ Verify installation:
                 all_tools.update(phase_tools["required"])
                 all_tools.update(phase_tools["recommended"])
 
-            missing_required = []
-            missing_recommended = []
+            missing_required: list[ToolStatus] = []
+            missing_recommended: list[ToolStatus] = []
             for tool in all_tools:
                 status = self.check_tool(tool)
                 if not status.available:
@@ -276,21 +276,21 @@ Verify installation:
         if missing_required:
             report_lines.append("WARNING: REQUIRED TOOLS MISSING:")
             report_lines.append("")
-            for tool in missing_required:
-                report_lines.append(f"  - {tool.name}")
-                if tool.install_guide:
-                    report_lines.append(f"{tool.install_guide}")
+            for missing_tool in missing_required:
+                report_lines.append(f"  - {missing_tool.name}")
+                if missing_tool.install_guide:
+                    report_lines.append(f"{missing_tool.install_guide}")
                 report_lines.append("")
 
         if missing_recommended:
             report_lines.append("INFO: RECOMMENDED TOOLS MISSING:")
             report_lines.append("")
-            for tool in missing_recommended:
-                report_lines.append(f"  - {tool.name}")
-                if tool.install_guide:
+            for missing_tool in missing_recommended:
+                report_lines.append(f"  - {missing_tool.name}")
+                if missing_tool.install_guide:
                     # Add indented install guide
                     indent = "    "
-                    for line in tool.install_guide.strip().split("\n"):
+                    for line in missing_tool.install_guide.strip().split("\n"):
                         report_lines.append(f"{indent}{line}")
                 report_lines.append("")
 

@@ -300,7 +300,7 @@ class BountyMetricsTracker:
 
     def get_learning_insights(self) -> dict[str, Any]:
         """Generate learning insights for improvement."""
-        insights = {
+        insights: dict[str, list[dict[str, Any]]] = {
             "high_value_patterns": [],
             "low_confidence_patterns": [],
             "recommended_focus_areas": [],

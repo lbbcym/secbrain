@@ -151,6 +151,7 @@ class ReconToolRunner:
 
         try:
             tool_path = self._find_tool(tool_name)
+            assert tool_path is not None  # guaranteed by _check_preconditions
             process = await asyncio.create_subprocess_exec(
                 tool_path,
                 *args,
@@ -314,7 +315,7 @@ class ReconToolRunner:
                 data = json.loads(result.output)
                 result.parsed_data = data.get("results", [])
             except json.JSONDecodeError:
-                pass
+                pass  # ffuf output may not always be valid JSON; keep raw output
 
         return result
 

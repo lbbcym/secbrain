@@ -19,7 +19,7 @@ class OOBProbe:
     url: str
     dns: str
     token: str
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 class OOBClient:
@@ -59,7 +59,8 @@ class OOBClient:
             resp = await self._client.post(url, json=payload)
             resp.raise_for_status()
             data = resp.json()
-            return data.get("interactions", [])
+            result: list[dict[str, Any]] = data.get("interactions", [])
+            return result
         except Exception:
             return []
 

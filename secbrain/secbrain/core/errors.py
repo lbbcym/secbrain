@@ -134,7 +134,7 @@ class NetworkError(SecBrainError):
     """Error in network operations."""
 
     def __init__(self, message: str, url: str | None = None, status_code: int | None = None):
-        details = {}
+        details: dict[str, Any] = {}
         if url:
             details["url"] = url
         if status_code:

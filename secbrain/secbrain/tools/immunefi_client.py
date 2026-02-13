@@ -494,7 +494,7 @@ class ImmunefiClient:
                         "blockchain": p.blockchain,
                     })
 
-        similar = sorted(similar, key=lambda x: x["max_bounty"], reverse=True)[:5]
+        similar = sorted(similar, key=lambda x: int(str(x["max_bounty"])), reverse=True)[:5]
 
         return {
             "program": {

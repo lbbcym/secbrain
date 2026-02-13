@@ -203,4 +203,4 @@ class ForgeOutputParser:
         elif isinstance(obj, list):
             for item in obj:
                 yield from ForgeOutputParser._iter_testcases(item)
-        return []
+        return

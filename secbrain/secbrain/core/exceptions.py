@@ -25,6 +25,7 @@ class CompilationError(SecBrainError):
         stderr: str = "",
     ) -> None:
         super().__init__(message)
+        self.message = message
         self.contract = contract
         self.stdout = stdout
         self.stderr = stderr
@@ -43,6 +44,7 @@ class RateLimitError(SecBrainError):
 
     def __init__(self, message: str, *, retry_after: float = 0.0) -> None:
         super().__init__(message)
+        self.message = message
         self.retry_after = retry_after
 
     def __repr__(self) -> str:
@@ -65,6 +67,7 @@ class InsufficientProfitError(SecBrainError):
         threshold: float = 0.0,
     ) -> None:
         super().__init__(message)
+        self.message = message
         self.actual_profit = actual_profit
         self.threshold = threshold
 

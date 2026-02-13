@@ -10,7 +10,7 @@ This module implements the circuit breaker pattern to prevent cascading failures
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any, TypeVar
@@ -48,17 +48,17 @@ class CircuitBreaker:
         self._state = CircuitState.CLOSED
         self._lock = asyncio.Lock()
 
-    async def call(self, func: Callable[..., T], *args: Any, **kwargs: Any) -> T:
+    async def call(self, func: Callable[..., Awaitable[T]], *args: Any, **kwargs: Any) -> T:
         """Execute function with circuit breaker protection.
-        
+
         Args:
             func: Async function to execute
             *args: Positional arguments for the function
             **kwargs: Keyword arguments for the function
-            
+
         Returns:
             Result from the function call
-            
+
         Raises:
             CircuitBreakerOpenError: If circuit is open and not ready to retry
             Exception: Any exception raised by the wrapped function
@@ -119,14 +119,14 @@ class CircuitBreaker:
 
 class CircuitBreakerOpenError(Exception):
     """Raised when circuit breaker is open.
-    
+
     This exception indicates that the circuit breaker has detected too many
     failures and is temporarily blocking requests to prevent cascading failures.
     """
-    
+
     def __init__(self, message: str, retry_after: float = 0.0):
         """Initialize the error.
-        
+
         Args:
             message: Error message
             retry_after: Seconds to wait before retrying

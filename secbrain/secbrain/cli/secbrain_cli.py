@@ -864,9 +864,8 @@ def research(
         workspace.mkdir(exist_ok=True)
 
         scope_config = ScopeConfig(
-            in_scope_domains=[],
-            in_scope_ips=[],
-            out_of_scope_domains=[],
+            domains=[],
+            ips=[],
         )
 
         program_config = ProgramConfig(
@@ -889,7 +888,7 @@ def research(
             research_client=None,  # Will use curated data
         )
 
-        results = {
+        results: dict[str, Any] = {
             "emerging_patterns": [],
             "protocol_findings": [],
             "novel_hypotheses": [],

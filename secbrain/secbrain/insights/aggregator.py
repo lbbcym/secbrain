@@ -57,7 +57,7 @@ class InsightsAggregator:
 
         Args:
             workspace_path: Path to the workspace directory
-            
+
         Raises:
             ValueError: If workspace path does not exist or is not a directory
         """

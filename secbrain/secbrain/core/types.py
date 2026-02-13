@@ -10,7 +10,7 @@ This module provides type-safe primitives using Python 3.11+ features:
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import (
     Any,
     Final,
@@ -25,7 +25,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import TypedDict
 
 
-class Phase(str, Enum):
+class Phase(StrEnum):
     """Workflow phases."""
 
     INIT = "init"
@@ -40,7 +40,7 @@ class Phase(str, Enum):
     META = "meta"
 
 
-class Severity(str, Enum):
+class Severity(StrEnum):
     """Vulnerability severity levels."""
 
     CRITICAL = "critical"
@@ -50,7 +50,7 @@ class Severity(str, Enum):
     INFO = "info"
 
 
-class FindingStatus(str, Enum):
+class FindingStatus(StrEnum):
     """Status of a finding."""
 
     POTENTIAL = "potential"

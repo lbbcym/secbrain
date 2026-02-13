@@ -14,7 +14,7 @@ from typing import Any
 @dataclass
 class ModelResponse:
     """Response from a model call.
-    
+
     Attributes:
         content: Generated text content
         model: Name of the model that generated the response
@@ -36,12 +36,12 @@ class ModelResponse:
     @property
     def success(self) -> bool:
         """Check if the response was successful.
-        
+
         Returns:
             True if content exists and finish_reason is not "error"
         """
         return bool(self.content) and self.finish_reason != "error"
-    
+
     def __post_init__(self) -> None:
         """Validate response data after initialization."""
         if self.prompt_tokens < 0:
@@ -54,18 +54,18 @@ class ModelResponse:
 
 class ModelClient(ABC):
     """Abstract base class for model clients.
-    
+
     Subclasses must implement generate() and generate_structured() methods
     to provide LLM functionality.
     """
 
     def __init__(self, model: str, **kwargs: Any):
         """Initialize the model client.
-        
+
         Args:
             model: Model identifier/name
             **kwargs: Additional configuration parameters
-            
+
         Raises:
             ValueError: If model is empty or invalid
         """

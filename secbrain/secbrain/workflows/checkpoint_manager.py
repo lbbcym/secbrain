@@ -56,15 +56,15 @@ class CheckpointManager:
 
     def __init__(self, workspace_path: Path):
         """Initialize checkpoint manager.
-        
+
         Args:
             workspace_path: Path to the workspace directory
-            
+
         Raises:
             ValueError: If workspace_path is not a valid Path
         """
         if not isinstance(workspace_path, Path):
-            raise ValueError(f"workspace_path must be a Path, got {type(workspace_path).__name__}")
+            raise TypeError(f"workspace_path must be a Path, got {type(workspace_path).__name__}")
         self.workspace_path = workspace_path
         self.checkpoint_dir = workspace_path / ".checkpoints"
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -85,10 +85,10 @@ class CheckpointManager:
             completed_phases: List of completed phases
             phase_data: Data from completed phases
             metadata: Optional additional metadata
-            
+
         Returns:
             Path to the saved checkpoint file
-            
+
         Raises:
             ValueError: If run_id is empty or phase data is invalid
         """

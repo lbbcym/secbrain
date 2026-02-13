@@ -135,6 +135,7 @@ class NucleiScanner:
 
         try:
             nuclei_path = self._find_nuclei()
+            assert nuclei_path is not None  # guaranteed by _check_preconditions
             process = await asyncio.create_subprocess_exec(
                 nuclei_path,
                 *args,
@@ -160,7 +161,7 @@ class NucleiScanner:
                         finding = json.loads(line)
                         findings.append(finding)
                     except json.JSONDecodeError:
-                        pass
+                        continue  # skip malformed JSON lines in nuclei output
 
             return ScanResult(
                 scanner="nuclei",
@@ -270,6 +271,7 @@ class SemgrepScanner:
 
         try:
             semgrep_path = self._find_semgrep()
+            assert semgrep_path is not None  # guaranteed by _check_preconditions
             process = await asyncio.create_subprocess_exec(
                 semgrep_path,
                 *args,
