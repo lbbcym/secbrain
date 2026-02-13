@@ -61,7 +61,7 @@ def test_nuclei_scanner_initialization():
     scanner = NucleiScanner(run_context)
 
     assert scanner.run_context == run_context
-    assert scanner.templates_path == "~/nuclei-templates"
+    assert scanner.templates_path == str(Path("~/nuclei-templates").expanduser())
 
 
 def test_nuclei_scanner_custom_templates_path():
@@ -70,7 +70,7 @@ def test_nuclei_scanner_custom_templates_path():
     custom_path = "/custom/templates"
     scanner = NucleiScanner(run_context, templates_path=custom_path)
 
-    assert scanner.templates_path == custom_path
+    assert scanner.templates_path == str(Path(custom_path).expanduser())
 
 
 

@@ -27,7 +27,7 @@ def test_token_spec_empty_symbol():
     """Test that empty symbol raises error."""
     with pytest.raises(ValueError, match="symbol cannot be empty"):
         TokenSpec("", "0x" + "a" * 40, 18, 1.0)
-    
+
     with pytest.raises(ValueError, match="symbol cannot be empty"):
         TokenSpec("   ", "0x" + "a" * 40, 18, 1.0)
 
@@ -36,7 +36,7 @@ def test_token_spec_empty_address():
     """Test that empty address raises error."""
     with pytest.raises(ValueError, match="address cannot be empty"):
         TokenSpec("TOKEN", "", 18, 1.0)
-    
+
     with pytest.raises(ValueError, match="address cannot be empty"):
         TokenSpec("TOKEN", "   ", 18, 1.0)
 
@@ -46,7 +46,7 @@ def test_token_spec_max_decimals():
     # At max should work
     spec = TokenSpec("TOKEN", "0xabc", MAX_TOKEN_DECIMALS, 1.0)
     assert spec.decimals == MAX_TOKEN_DECIMALS
-    
+
     # Over max should fail
     with pytest.raises(ValueError, match="Invalid decimals"):
         TokenSpec("TOKEN", "0xabc", MAX_TOKEN_DECIMALS + 1, 1.0)
@@ -172,7 +172,7 @@ def test_profit_calculator_unknown_token():
     """Test calculating profit with unknown token."""
     spec = TokenSpec("KNOWN", "0xabc", 18, 1.0)
     calc = ProfitCalculator([spec], eth_price_usd=3000.0)
-    
+
     result = calc.compute_usd({"UNKNOWN": 1_000_000_000_000_000_000})
     assert result.total_usd == 0.0
     assert "UNKNOWN" not in result.by_token
@@ -185,13 +185,13 @@ def test_profit_calculator_multiple_tokens():
         TokenSpec("WETH", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", 18, 3000.0),
     ]
     calc = ProfitCalculator(specs, eth_price_usd=3000.0)
-    
+
     # 1 USDC + 1 WETH
     result = calc.compute_usd({
         "USDC": 1_000_000,  # 1 USDC (6 decimals)
         "WETH": 1_000_000_000_000_000_000,  # 1 WETH (18 decimals)
     })
-    
+
     assert result.by_token["USDC"] == pytest.approx(1.0, abs=0.01)
     assert result.by_token["WETH"] == pytest.approx(3000.0, abs=0.01)
     assert result.total_usd == pytest.approx(3001.0, abs=0.01)

@@ -2,8 +2,6 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from secbrain.utils.tool_checker import ToolChecker, ToolStatus, check_tools_on_startup
 
 
@@ -96,7 +94,7 @@ class TestToolChecker:
             def which_side_effect(tool):
                 return "/usr/bin/forge" if tool == "forge" else None
             mock_which.side_effect = which_side_effect
-            
+
             status = checker.check_tool("foundry")
             assert status.name == "foundry"
             assert status.available is True
@@ -110,7 +108,7 @@ class TestToolChecker:
             status1 = checker.check_tool("python")
             # Second check should use cache
             status2 = checker.check_tool("python")
-            
+
             # which should only be called once
             assert mock_which.call_count == 1
             assert status1 is status2

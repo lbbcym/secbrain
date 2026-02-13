@@ -2,8 +2,6 @@
 
 from unittest.mock import AsyncMock, Mock, patch
 
-import pytest
-
 from secbrain.core.context import RunContext
 from secbrain.tools.oob_client import OOBClient, OOBProbe, create_oob_client
 

@@ -9,9 +9,7 @@ output is required.
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, Mock, patch
-
-import pytest
+from unittest.mock import AsyncMock, patch
 
 from secbrain.cli.approval_ui import interactive_approval_prompt
 from secbrain.core.approval import ApprovalRequest

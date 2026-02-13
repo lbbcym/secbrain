@@ -55,7 +55,7 @@ def test_approval_manager_deny_mode(tmp_path: Path) -> None:
 
 def test_approval_manager_unknown_mode(tmp_path: Path) -> None:
     """Test approval manager with unknown mode."""
-    with pytest.raises(ValueError, match="Invalid approval mode 'unknown_mode'. Must be 'auto', 'deny', or 'ask'"):
+    with pytest.raises(ValueError, match=r"Invalid approval mode 'unknown_mode'\. Must be 'auto', 'deny', or 'ask'"):
         ApprovalManager(
             mode="unknown_mode",
             audit_log_path=tmp_path / "audit.jsonl",
@@ -78,7 +78,7 @@ def test_approval_request_immutable() -> None:
         risk_level="low",
         timestamp=datetime.now(UTC),
     )
-    with pytest.raises(Exception):  # FrozenInstanceError
+    with pytest.raises(AttributeError):  # FrozenInstanceError
         req.request_id = "new"  # type: ignore
 
 
@@ -91,7 +91,7 @@ def test_approval_response_immutable() -> None:
         reason="reason",
         timestamp=datetime.now(UTC),
     )
-    with pytest.raises(Exception):  # FrozenInstanceError
+    with pytest.raises(AttributeError):  # FrozenInstanceError
         resp.approved = False  # type: ignore
 
 
