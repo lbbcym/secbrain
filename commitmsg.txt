@@ -1,0 +1,3 @@
+chore: ignore Windows nul device artifact in .gitignore
+
+Co-Authored-By: Claude <noreply@anthropic.com>
