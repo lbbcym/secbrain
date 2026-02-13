@@ -235,7 +235,7 @@ class HypothesisEnhancer:
                 # Return empty list if required keys are missing
                 return []
 
-        refinements = []
+        refinements: list[dict[str, Any]] = []
 
         # Group failures by type
         failure_types: dict[str, list[dict[str, Any]]] = {}

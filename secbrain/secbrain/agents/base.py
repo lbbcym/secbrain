@@ -134,7 +134,7 @@ class BaseAgent(ABC):
                 cache_key = hashlib.sha256(raw_key.encode("utf-8")).hexdigest()
                 cached = self.run_context.get_cached_llm(cache_key)
                 if cached is not None:
-                    return cached
+                    return str(cached)
         except Exception:
             cache_key = None
 
@@ -299,7 +299,7 @@ class BaseAgent(ABC):
         # Storage availability
         if self.storage:
             try:
-                await self.storage.ping()
+                await self.storage.initialize()
                 checks.append(("storage", BaseAgent.HealthStatus.HEALTHY, ""))
             except Exception as exc:  # pragma: no cover - external service
                 checks.append(("storage", BaseAgent.HealthStatus.UNHEALTHY, str(exc)))
