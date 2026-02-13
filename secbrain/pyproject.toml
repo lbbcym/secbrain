@@ -27,19 +27,13 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Security",
     "Topic :: Software Development :: Testing",
     "Typing :: Typed",
 ]
-
-[project.urls]
-Homepage = "https://github.com/blairmichaelg/secbrain"
-Repository = "https://github.com/blairmichaelg/secbrain"
-Issues = "https://github.com/blairmichaelg/secbrain/issues"
-Documentation = "https://github.com/blairmichaelg/secbrain#documentation"
-Changelog = "https://github.com/blairmichaelg/secbrain/blob/main/CHANGELOG.md"
-
 dependencies = [
     "typer>=0.9.0",
     "rich>=13.0.0",
@@ -55,6 +49,13 @@ dependencies = [
     "eth-hash[pycryptodome]>=0.7.0",
     "jsonschema>=4.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/blairmichaelg/secbrain"
+Repository = "https://github.com/blairmichaelg/secbrain"
+Issues = "https://github.com/blairmichaelg/secbrain/issues"
+Documentation = "https://github.com/blairmichaelg/secbrain#documentation"
+Changelog = "https://github.com/blairmichaelg/secbrain/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -110,17 +111,51 @@ select = [
     "TRY", # tryceratops
     "RUF", # ruff-specific rules
 ]
-# E501: Line too long (conflicts with formatter)
-# F821: Undefined name (temporary - requires code fixes)
-# F841: Unused variable (non-critical warnings)
-# S101: Use of assert (common in tests)
-# PLR0913: Too many arguments to function
-# TRY003: Avoid specifying long messages outside exception class
-ignore = ["E501", "F821", "F841", "S101", "PLR0913", "TRY003"]
+ignore = [
+    # --- Original suppressions ---
+    "E501",     # Line too long (conflicts with formatter)
+    "F821",     # Undefined name (temporary - requires code fixes)
+    "F841",     # Unused variable (non-critical warnings)
+    "S101",     # Use of assert (common in tests and validation code)
+    "PLR0913",  # Too many arguments to function (common in data-rich APIs)
+    "TRY003",   # Avoid specifying long messages outside exception class
+
+    # --- Complexity warnings on mature code (not actionable without refactoring) ---
+    "PLR0912",  # Too many branches
+    "PLR0915",  # Too many statements
+    "PLR0911",  # Too many return statements
+
+    # --- Style/pattern noise in this codebase ---
+    "TRY300",   # try-except in else clause (common in error-handling patterns)
+    "ERA001",   # Commented-out code (includes documentation examples in docstrings)
+    "PLC0415",  # Import not at top-level (conditional/lazy imports are intentional)
+    "ARG001",   # Unused function argument (callback signatures, interface conformance)
+    "ARG002",   # Unused method argument (base class/protocol method signatures)
+    "ARG003",   # Unused class method argument (interface conformance)
+    "PLR2004",  # Magic value comparison (ubiquitous in config, thresholds, protocol code)
+    "N802",     # Function name should be lowercase (external API names, test helpers)
+    "W291",     # Trailing whitespace (formatter responsibility)
+    "W293",     # Whitespace before punctuation (formatter responsibility)
+
+    # --- Security rule false positives in specific contexts ---
+    "S110",     # try-except-pass (used in error-tolerant parsing and fallback logic)
+    "S112",     # try-except-continue (used in best-effort iteration)
+    "S105",     # Possible hardcoded password (false positives on config field names)
+    "S603",     # subprocess call (core functionality for running security tools)
+    "S607",     # Starting a process with a partial executable path (tools in $PATH)
+    "S311",     # Standard pseudo-random (used for non-crypto jitter/backoff)
+    "PLW0603",  # Global statement (needed for signal handling kill-switch)
+    "TRY301",   # Abstract raise to inner function (test patterns)
+
+    # --- Migration/upgrade noise ---
+    "UP042",    # Replace TypeAlias with type keyword (requires Python 3.12+)
+    "PT011",    # pytest.raises too broad (match parameter not always needed)
+]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S", "ARG", "PLR2004"]
-"examples/**/*.py" = ["T20", "S"]
+"tests/**/*.py" = ["S", "ARG", "PLR2004", "PLC0415", "T20"]
+"examples/**/*.py" = ["T20", "S", "PLC0415"]
+"scripts/**/*.py" = ["T20", "S", "PLC0415"]
 "**/cli/**/*.py" = ["B008"]  # typer.Option in defaults is the correct pattern
 
 [tool.black]
