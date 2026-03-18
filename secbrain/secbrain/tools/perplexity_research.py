@@ -45,21 +45,15 @@ class PerplexityResearch:
     def __init__(
         self,
         api_key: str | None = None,
-        model: str = "sonar",  # Changed to sonar (faster, cheaper) from sonar-medium-online
+        search_url: str | None = None,
+        model: str = "sonar",  # Legacy model option; now using self-hosted searx-ng by default
         max_calls_per_run: int = 50,  # Increased from 20 for intensive research
     ):
-        self.api_key = api_key or os.environ.get("PERPLEXITY_API_KEY")
+        self.api_key = api_key or os.environ.get("PERPLEXITY_API_KEY", "")
+        self.search_url = search_url or os.environ.get("SEARXNG_URL", "http://192.168.1.28:8080")
 
-        # Validate API key is provided (will be None in dry-run mode)
-        if self.api_key is None:
-            warnings.warn(
-                "No API key provided for PerplexityResearch. "
-                "Set PERPLEXITY_API_KEY environment variable. "
-                "Research queries will return dry-run results unless API key is provided.",
-                stacklevel=2
-            )
-            # Use empty string for header compatibility
-            self.api_key = ""
+        if not self.search_url:
+            raise ValueError("search_url must be set for research operations")
 
         self.model = model
         self.max_calls_per_run = max_calls_per_run
@@ -75,12 +69,15 @@ class PerplexityResearch:
         self._default_ttl = timedelta(hours=24)
 
         # HTTP client with optimized connection pooling
+        headers = {
+            "Content-Type": "application/json",
+        }
+        if "perplexity.ai" in self.search_url and self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
         self.client = httpx.AsyncClient(
-            base_url="https://api.perplexity.ai",
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-            },
+            base_url=self.search_url,
+            headers=headers,
             timeout=60.0,
             limits=httpx.Limits(max_keepalive_connections=5, max_connections=10),
         )
@@ -178,8 +175,8 @@ class PerplexityResearch:
                 "limited": True,
             }
 
-        # Dry-run if explicitly requested or if no API key is available
-        if run_context.dry_run or not self.api_key:
+        # Dry-run if explicitly requested
+        if run_context.dry_run:
             result = {
                 "answer": f"[DRY-RUN] Would research: {question[:100]}...",
                 "sources": ["dry-run-source"],
@@ -195,35 +192,39 @@ class PerplexityResearch:
         # Enforce rate limiting
         await self._enforce_rate_limit()
 
-        # Make the API call
+        # Make the API call against self-hosted searx-ng
         try:
             self._call_count += 1
 
-            prompt = f"""Context: {context}
-
-Question: {question}
-
-Provide a focused, technical answer relevant to security research and bug bounty hunting.
-Include specific techniques, tools, CVE references, exploit dates, and profit amounts when applicable.
-Prioritize data from within the last 6 months (from {datetime.now(UTC).strftime('%B %Y')})."""
-
-            payload = {
-                "model": self.model,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are a security research assistant specializing in smart contract exploitation and bug bounty hunting. Provide accurate, actionable information with sources and specific data points.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
+            q = f"{question} {context}".strip()
+            params = {
+                "q": q,
+                "format": "json",
+                "p": "1",
+                "language": "en",
             }
 
-            response = await self.client.post("/chat/completions", json=payload)
+            response = await self.client.get("/search", params=params)
             response.raise_for_status()
             data = response.json()
 
-            answer = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-            sources = data.get("citations", [])
+            results = data.get("results", []) if isinstance(data, dict) else []
+            sources = [item.get("url") for item in results if item.get("url")]
+
+            if results:
+                snippets = []
+                for item in results[:3]:
+                    title = item.get("title", "").strip()
+                    snippet_text = item.get("content", "").strip()
+                    if title and snippet_text:
+                        snippets.append(f"{title}: {snippet_text}")
+                    elif title:
+                        snippets.append(title)
+                    elif snippet_text:
+                        snippets.append(snippet_text)
+                answer = "\n".join(snippets) if snippets else "No readable snippet available from searx-ng results."
+            else:
+                answer = f"No results from searx-ng for query: {q}"
 
             result = {
                 "answer": answer,
@@ -249,7 +250,26 @@ Prioritize data from within the last 6 months (from {datetime.now(UTC).strftime(
     # ============================================================
     # SPECIALIZED SECURITY RESEARCH METHODS
     # ============================================================
+    async def search_searx(
+        self,
+        query: str,
+        context: str,
+        run_context: RunContext,
+        ttl_hours: int = 24,
+    ) -> dict[str, Any]:
+        """Convenience wrapper to run a searx-ng query via ask_research.
 
+        query: primary search phrase
+        context: additional contextual keywords to blend into the search
+        run_context: runtime context for caching and dry-run flags
+        ttl_hours: TTL for caching the result
+        """
+        return await self.ask_research(
+            question=query,
+            context=context,
+            run_context=run_context,
+            ttl_hours=ttl_hours,
+        )
     async def research_severity_context(
         self,
         vuln_type: str,

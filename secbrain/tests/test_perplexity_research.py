@@ -69,16 +69,15 @@ class TestPerplexityResearchInit:
         client = PerplexityResearch()
         assert client.api_key == "env-key-xyz"
 
-    def test_init_with_no_api_key_warns(self, monkeypatch):
-        """Test that missing API key produces a warning."""
+    def test_init_with_no_api_key_sets_default_search_url(self, monkeypatch):
+        """Test that missing API key does not block searx-ng initialization."""
         monkeypatch.delenv("PERPLEXITY_API_KEY", raising=False)
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             client = PerplexityResearch(api_key=None)
-            assert len(w) == 1
-            assert "No API key provided" in str(w[0].message)
-            # api_key should be set to empty string for header compatibility
+            assert len(w) == 0
             assert client.api_key == ""
+            assert client.search_url == "http://192.168.1.28:8080"
 
     def test_init_custom_model_and_max_calls(self, api_key: str):
         """Test initialization with custom model and max call settings."""
@@ -285,13 +284,18 @@ class TestAskResearch:
 
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "choices": [{"message": {"content": "Reentrancy is a common vulnerability"}}],
-            "citations": ["https://source1.com", "https://source2.com"],
+            "results": [
+                {
+                    "title": "Reentrancy is a common vulnerability",
+                    "url": "https://source1.com",
+                    "content": "Reentrancy in a contract can allow repeated withdrawals.",
+                }
+            ]
         }
         mock_response.raise_for_status = MagicMock()
 
         client.client = AsyncMock()
-        client.client.post = AsyncMock(return_value=mock_response)
+        client.client.get = AsyncMock(return_value=mock_response)
 
         result = await client.ask_research(
             question="What is reentrancy?",
@@ -299,8 +303,8 @@ class TestAskResearch:
             run_context=mock_run_context,
         )
 
-        assert result["answer"] == "Reentrancy is a common vulnerability"
-        assert result["sources"] == ["https://source1.com", "https://source2.com"]
+        assert "Reentrancy is a common vulnerability" in result["answer"]
+        assert result["sources"] == ["https://source1.com"]
         assert result["cached"] is False
         assert client._call_count == 1
         mock_run_context.cache_research.assert_called_once()
@@ -312,7 +316,7 @@ class TestAskResearch:
 
         client = PerplexityResearch(api_key=api_key)
         client.client = AsyncMock()
-        client.client.post = AsyncMock(
+        client.client.get = AsyncMock(
             side_effect=httpx.HTTPError("Connection failed")
         )
 
@@ -335,13 +339,57 @@ class TestAskResearch:
             warnings.simplefilter("ignore")
             client = PerplexityResearch(api_key=None)
 
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "results": [
+                {
+                    "title": "API key not needed for searx-ng",
+                    "url": "https://source1.com",
+                    "content": "Self-hosted searx-ng returns results without an API key.",
+                }
+            ]
+        }
+        mock_response.raise_for_status = MagicMock()
+        client.client = AsyncMock()
+        client.client.get = AsyncMock(return_value=mock_response)
+
         result = await client.ask_research(
             question="Test question",
             context="Test context",
             run_context=mock_run_context,
         )
 
-        assert "[DRY-RUN]" in result["answer"]
+        assert "DRY-RUN" not in result["answer"]
+        assert "searx-ng" in result["answer"] or "No results" not in result["answer"]
+
+    async def test_search_searx_wrapper(self, mock_run_context, api_key):
+        """Test the new search_searx convenience helper."""
+        client = PerplexityResearch(api_key=api_key)
+
+        mock_response = MagicMock()
+        mock_response.json.return_value = {
+            "results": [
+                {
+                    "title": "CVE-2025-1234",
+                    "url": "https://source1.com",
+                    "content": "supply-chain attack pattern",
+                }
+            ]
+        }
+        mock_response.raise_for_status = MagicMock()
+        client.client = AsyncMock()
+        client.client.get = AsyncMock(return_value=mock_response)
+
+        mock_run_context.dry_run = False
+
+        result = await client.search_searx(
+            query="CVE-2025-1234 exploit details",
+            context="smart contract",
+            run_context=mock_run_context,
+        )
+
+        assert "CVE-2025-1234" in result["answer"]
+        assert result["sources"] == ["https://source1.com"]
 
 
 # ---------------------------------------------------------------------------

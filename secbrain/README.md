@@ -21,6 +21,42 @@ SecBrain is a CLI-first Python project that automates bug bounty workflows using
 - 📊 **Structured logging** in JSONL format
 - 📝 **Report generation** with CWE/CVE references
 
+## PerplexityResearch / searx-ng helper example
+
+Set searx-ng endpoint:
+
+```bash
+export SEARXNG_URL=http://192.168.1.28:8080
+```
+
+Example usage:
+
+```python
+import asyncio
+from secbrain.core.context import RunContext
+from secbrain.tools.perplexity_research import PerplexityResearch
+
+async def run_query():
+    ctx = RunContext(
+        workspace_path="/tmp/test",
+        scope_path="/tmp/test/scope.yaml",
+        program_path="/tmp/test/program.json",
+        dry_run=False,
+    )
+
+    client = PerplexityResearch(search_url="http://192.168.1.28:8080")
+    result = await client.search_searx(
+        query="popular DeFi exploits",
+        context="flash loan, reentrancy",
+        run_context=ctx,
+    )
+
+    print(result)
+    await client.close()
+
+asyncio.run(run_query())
+```
+
 ## Architecture
 
 ```
